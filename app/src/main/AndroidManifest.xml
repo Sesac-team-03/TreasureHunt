@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TreasureHunt"
         tools:targetApi="31">
+        <meta-data
+            android:name="com.naver.maps.map.CLIENT_ID"
+            android:value="ec9w14l190" />
         <activity
             android:name=".home.HomeActivity"
             android:exported="true">
