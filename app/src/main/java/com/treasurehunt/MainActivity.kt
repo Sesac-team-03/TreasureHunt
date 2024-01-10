@@ -1,4 +1,4 @@
-package com.example.treasurehunt
+package com.treasurehunt
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle

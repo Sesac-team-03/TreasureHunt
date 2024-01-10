@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.treasurehunt"
+    namespace = "com.treasurehunt"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.treasurehunt"
+        applicationId = "com.treasurehunt"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
