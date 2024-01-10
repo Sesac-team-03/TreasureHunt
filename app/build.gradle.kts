@@ -49,6 +49,9 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 fun getApiKey(propertyKey: String): String {
