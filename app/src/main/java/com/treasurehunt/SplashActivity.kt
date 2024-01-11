@@ -1,6 +1,8 @@
 package com.treasurehunt
 
+import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -20,6 +22,17 @@ class SplashActivity : AppCompatActivity() {
 
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // ConnectivityManager를 사용하여 네트워크 상태 확인
+        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkInfo = connectivityManager.activeNetworkInfo
+
+        if (networkInfo != null && networkInfo.isConnected) {
+            // 네트워크가 연결되어 있는 경우
+        } else {
+            // 네트워크가 연결되어 있지 않은 경우
+        }
+
 
         binding.animationView.setAnimation(R.raw.iv_treasure)
         binding.animationView.playAnimation()
