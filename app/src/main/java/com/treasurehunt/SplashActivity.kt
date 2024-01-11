@@ -21,7 +21,7 @@ class SplashActivity : AppCompatActivity() {
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.animationView.setAnimation(R.raw.treasure)
+        binding.animationView.setAnimation(R.raw.iv_treasure)
         binding.animationView.playAnimation()
 
 

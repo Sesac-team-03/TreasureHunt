@@ -11,7 +11,7 @@
         android:id="@+id/animationView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:lottie_rawRes="@raw/treasure"
+        app:lottie_rawRes="@raw/iv_treasure"
         app:lottie_autoPlay="true"
         app:lottie_loop="true" />
 
