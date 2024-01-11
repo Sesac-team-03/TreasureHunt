@@ -7,4 +7,5 @@
     <string name="record_tv_text">글</string>
     <string name="record_tv_photo">사진 (0/5)</string>
     <string name="record_btn_save">등록</string>
+    <string name="record_sb_max_count">사진은 5개까지 선택 가능합니다.</string>
 </resources>
