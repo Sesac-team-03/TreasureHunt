@@ -5,6 +5,7 @@ plugins {
 }
 
 android {
+
     namespace = "com.treasurehunt"
     compileSdk = 34
 
@@ -16,6 +17,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+    buildFeatures{
+        viewBinding = true
     }
 
     buildTypes {
@@ -48,4 +52,5 @@ dependencies {
 
     implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
     implementation("com.google.firebase:firebase-analytics")
+    implementation("com.navercorp.nid:oauth:5.9.0")
 }
