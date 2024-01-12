@@ -9,7 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -26,24 +26,20 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
-    private val locationSource: FusedLocationSource =
+    private val source: FusedLocationSource =
         FusedLocationSource(this, LOCATION_PERMISSION_REQUEST_CODE)
     private lateinit var map: NaverMap
     private val requestPermissionLauncher: ActivityResultLauncher<String> =
-        registerForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { isGranted: Boolean ->
+        registerForActivityResult(RequestPermission()) { isGranted ->
             if (isGranted) {
-                // Permission is granted. Continue the action or workflow in your
-                // app.
+                // Permission is granted. Continue the action or workflow in your app
+                map.locationTrackingMode = LocationTrackingMode.Follow
                 Log.d("test$", "isGranted")
             } else {
+                map.locationTrackingMode = LocationTrackingMode.None
                 Log.d("test$", "isNotGranted")
                 // Explain to the user that the feature is unavailable because the
-                // feature requires a permission that the user has denied. At the
-                // same time, respect the user's decision. Don't link to system
-                // settings in an effort to convince the user to change their
-                // decision.
+                // feature requires a permission that the user has denied.
             }
         }
 
@@ -66,14 +62,14 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         super.onDestroyView()
     }
 
-    fun loadMap() {
+    private fun loadMap() {
         val mapFragment = childFragmentManager.findFragmentById(R.id.fcv_map) as MapFragment
         mapFragment.getMapAsync(this)
     }
 
-    override fun onMapReady(map: NaverMap) {
-        this.map = map.apply {
-            locationSource = this@HomeFragment.locationSource
+    override fun onMapReady(naverMap: NaverMap) {
+        map = naverMap.apply {
+            locationSource = source
             uiSettings.isLocationButtonEnabled = true
         }
 
@@ -84,7 +80,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
             ) == PackageManager.PERMISSION_GRANTED -> {
                 Log.d("test$", "granted")
                 map.locationTrackingMode = LocationTrackingMode.Follow
-
             }
 
             ActivityCompat.shouldShowRequestPermissionRationale(
@@ -114,7 +109,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     private fun setLocationOverlay() {
         val locationOverlay = map.locationOverlay
         locationOverlay.isVisible = true
-        locationOverlay.icon = OverlayImage.fromResource(R.drawable.ic_launcher_foreground) // 사용자의 프로필 이미지를 파라미터로 전달
+        locationOverlay.icon =
+            OverlayImage.fromResource(R.drawable.ic_launcher_foreground) // 사용자의 프로필 이미지를 파라미터로 전달
         locationOverlay.anchor = PointF(0.5f, 1f)
     }
 
