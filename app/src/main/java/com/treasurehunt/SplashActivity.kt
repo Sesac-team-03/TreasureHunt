@@ -23,7 +23,7 @@ class SplashActivity : AppCompatActivity() {
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // ConnectivityManager를 사용하여 네트워크 상태 확인
+
         val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val networkInfo = connectivityManager.activeNetworkInfo
 
@@ -34,7 +34,7 @@ class SplashActivity : AppCompatActivity() {
         }
 
 
-        binding.animationView.setAnimation(R.raw.iv_treasure)
+        binding.animationView.setAnimation(R.raw.iv_second_treasure)
         binding.animationView.playAnimation()
 
 
