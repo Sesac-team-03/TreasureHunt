@@ -75,6 +75,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintStart_toEndOf="@+id/ib_select_photo"
             app:layout_constraintTop_toTopOf="@+id/ib_select_photo"
