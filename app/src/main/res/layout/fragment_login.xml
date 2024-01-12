@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/iv_treasure_logo"
+        android:layout_width="110dp"
+        android:layout_height="100dp"
+        android:layout_marginBottom="24dp"
+        android:src="@drawable/treasure_logo"
+        app:layout_constraintBottom_toTopOf="@+id/tv_treasure_hunt"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_treasure_hunt"
+        style="@style/Font.LogIn.TreasureHunt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="107dp"
+        android:shadowColor="#1A000000"
+        android:shadowDy="10.0"
+        android:shadowRadius="1.0"
+        android:text="@string/login_treasure_hunt"
+        app:layout_constraintBottom_toTopOf="@+id/btn_naver_login"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_naver_login"
+        style="@style/Font.LogIn.Naver"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginBottom="4dp"
+        android:gravity="center|center_horizontal"
+        android:paddingVertical="13dp"
+        android:text="@string/login_naver"
+        app:icon="@drawable/naver"
+        app:iconGravity=""
+        app:layout_constraintBottom_toTopOf="@id/btn_non_members_login"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_non_members_login"
+        style="@style/Font.LogIn.NonMembers"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginBottom="20dp"
+        android:paddingVertical="13dp"
+        android:text="@string/login_non_member"
+        app:icon="@drawable/naver"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
