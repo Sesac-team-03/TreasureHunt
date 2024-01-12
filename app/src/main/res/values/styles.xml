@@ -46,6 +46,9 @@
     <style name="RecordText">
         <item name="android:background">@drawable/button_record</item>
         <item name="android:gravity">top|start</item>
+        <item name="android:fontFamily">@font/pretendard</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">14sp</item>
     </style>
 
     <style name="RecordSave">
