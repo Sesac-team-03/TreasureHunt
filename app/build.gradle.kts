@@ -1,3 +1,5 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -17,9 +19,18 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "NAVER_LOGIN_CLIENT_ID", getApiKey("NAVER_LOGIN_CLIENT_ID"))
+        buildConfigField(
+            "String",
+            "NAVER_LOGIN_CLIENT_SECRET",
+            getApiKey("NAVER_LOGIN_CLIENT_SECRET")
+        )
+        buildConfigField("String", "APP_NAME", getApiKey("APP_NAME"))
+
     }
-    buildFeatures{
+    buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 
     buildTypes {
@@ -38,6 +49,10 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+}
+
+fun getApiKey(propertyKey: String): String {
+    return gradleLocalProperties(rootDir).getProperty(propertyKey)
 }
 
 dependencies {
