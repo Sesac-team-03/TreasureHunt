@@ -1,27 +1,28 @@
 package com.treasurehunt
 
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.treasurehunt.databinding.ItemRecordBinding
 
-class RecordAdapter : ListAdapter<Uri, RecordAdapter.ViewHolder>(diffUtil) {
+class RecordAdapter(private val clickListener: ImageClickListener) :
+    ListAdapter<ImageModel, RecordAdapter.ViewHolder>(diffUtil) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder.from(parent)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(getItem(position), clickListener)
     }
 
     class ViewHolder(private val binding: ItemRecordBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(imageUri: Uri) {
-            Glide.with(itemView).load(imageUri).into(binding.sivImage)
+        fun bind(imageModel: ImageModel, clickListener: ImageClickListener) {
+            binding.imageModel = imageModel
+            binding.clickListener = clickListener
+            binding.executePendingBindings()
         }
 
         companion object {
@@ -38,12 +39,12 @@ class RecordAdapter : ListAdapter<Uri, RecordAdapter.ViewHolder>(diffUtil) {
     }
 
     companion object {
-        private val diffUtil = object : DiffUtil.ItemCallback<Uri>() {
-            override fun areItemsTheSame(oldItem: Uri, newItem: Uri): Boolean {
-                return oldItem.hashCode() == newItem.hashCode()
+        private val diffUtil = object : DiffUtil.ItemCallback<ImageModel>() {
+            override fun areItemsTheSame(oldItem: ImageModel, newItem: ImageModel): Boolean {
+                return oldItem.url == newItem.url
             }
 
-            override fun areContentsTheSame(oldItem: Uri, newItem: Uri): Boolean {
+            override fun areContentsTheSame(oldItem: ImageModel, newItem: ImageModel): Boolean {
                 return oldItem == newItem
             }
 
