@@ -7,9 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
+import androidx.fragment.app.viewModels
 import com.navercorp.nid.NaverIdLoginSDK
 import com.navercorp.nid.oauth.NidOAuthBehavior
 import com.navercorp.nid.oauth.OAuthLoginCallback
@@ -24,7 +22,7 @@ class LogInFragment : Fragment() {
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var auth: FirebaseAuth
+    private val viewModel: LoginViewModel by viewModels { LoginViewModel.Factory }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +32,6 @@ class LogInFragment : Fragment() {
             NAVER_LOGIN_CLIENT_SECRET,
             APP_NAME
         )
-        auth = Firebase.auth
     }
 
     override fun onCreateView(
@@ -56,10 +53,7 @@ class LogInFragment : Fragment() {
         binding.btnNaverLogin.setOnClickListener {
             NaverIdLoginSDK.behavior = NidOAuthBehavior.NAVERAPP
             NaverIdLoginSDK.authenticate(requireContext(), object : OAuthLoginCallback {
-                override fun onSuccess() {
-
-                }
-
+                override fun onSuccess() {}
                 override fun onFailure(httpStatus: Int, message: String) {
                     val errorCode = NaverIdLoginSDK.getLastErrorCode().code
                     val errorDescription = NaverIdLoginSDK.getLastErrorDescription()
@@ -80,23 +74,25 @@ class LogInFragment : Fragment() {
 
     private fun nonMemberLogin() {
         binding.btnNonMembersLogin.setOnClickListener {
-            auth.signInAnonymously()
-                .addOnCompleteListener(Activity()) { task ->
-                    if (task.isSuccessful) {
-                        Toast.makeText(
-                            requireContext(),
-                            "Authentication Success.",
-                            Toast.LENGTH_SHORT,
-                        ).show()
-                    } else {
-                        // If sign in fails, display a message to the user.
-                        Toast.makeText(
-                            requireContext(),
-                            "Authentication failed.",
-                            Toast.LENGTH_SHORT,
-                        ).show()
+            viewModel.auth.observe(viewLifecycleOwner) {
+                it.signInAnonymously()
+                    .addOnCompleteListener(Activity()) { task ->
+                        if (task.isSuccessful) {
+                            Toast.makeText(
+                                requireContext(),
+                                "Authentication Success.",
+                                Toast.LENGTH_SHORT,
+                            ).show()
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Toast.makeText(
+                                requireContext(),
+                                "Authentication failed.",
+                                Toast.LENGTH_SHORT,
+                            ).show()
+                        }
                     }
-                }
+            }
         }
     }
 }
