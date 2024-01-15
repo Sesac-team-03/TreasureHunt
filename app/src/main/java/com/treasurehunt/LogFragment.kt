@@ -13,11 +13,7 @@ class LogFragment : Fragment() {
     private var _binding: FragmentLogBinding? = null
     private val binding get() = _binding!!
     private val viewModel: LogViewModel by viewModels()
-    private val recordAdapter = LogAdapter(object : ImageClickListener {
-        override fun onClick(imageModel: ImageModel) {
-            viewModel.removeImage(imageModel)
-        }
-    })
+    private val recordAdapter = LogAdapter { imageModel -> viewModel.removeImage(imageModel) }
     private val imageLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.data?.clipData != null) {
