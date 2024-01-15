@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="HomeBottomNavigationView">
+        <item name="itemActiveIndicatorStyle">@android:color/transparent</item>
+        <item name="itemIconTint">@color/home_bnv_home</item>
+        <item name="itemTextColor">@color/home_bnv_home</item>
+    </style>
+</resources>
