@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">TreasureHunt</string>
+
+    <!-- 홈 액티비티 -->
+    <string name="bnv_menu_home">홈</string>
+    <string name="bnv_menu_my">MY</string>
+
+    <!-- 홈 지도 화면 -->
+    <string name="home_map">지도</string>
+    <string name="home_feed">피드</string>
 </resources>
