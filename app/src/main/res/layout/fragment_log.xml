@@ -104,7 +104,7 @@
 
             <EditText
                 android:id="@+id/et_text"
-                style="@style/LogText"
+                style="@style/Font.LogText"
                 android:layout_width="0dp"
                 android:layout_height="130dp"
                 android:layout_marginHorizontal="16dp"
@@ -118,7 +118,7 @@
 
             <Button
                 android:id="@+id/btn_save"
-                style="@style/LogSave"
+                style="@style/Font.LogSave"
                 android:layout_width="0dp"
                 android:layout_height="52dp"
                 android:layout_marginHorizontal="16dp"
