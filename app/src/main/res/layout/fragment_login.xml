@@ -41,13 +41,13 @@
         android:text="@string/login_naver"
         app:icon="@drawable/naver"
         app:iconGravity=""
-        app:layout_constraintBottom_toTopOf="@id/btn_non_members_login"
+        app:layout_constraintBottom_toTopOf="@id/btn_guest_login"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_non_members_login"
-        style="@style/Font.LogIn.NonMembers"
+        android:id="@+id/btn_guest_login"
+        style="@style/Font.LogIn.Guest"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"

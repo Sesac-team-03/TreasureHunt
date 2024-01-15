@@ -7,7 +7,7 @@
     tools:context=".HomeActivity">
 
   <androidx.fragment.app.FragmentContainerView
-      android:id="@+id/fv_home"
+      android:id="@+id/fcv_home"
       android:name="com.treasurehunt.LogInFragment"
       android:layout_width="0dp"
       android:layout_height="0dp"

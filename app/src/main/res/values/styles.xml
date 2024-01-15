@@ -17,7 +17,7 @@
         <item name="backgroundTint">@color/green</item>
     </style>
 
-    <style name="Font.LogIn.NonMembers">
+    <style name="Font.LogIn.Guest">
         <item name="backgroundTint">@android:color/transparent</item>
         <item name="iconSize">24dp</item>
         <item name="iconTint">@android:color/transparent</item>

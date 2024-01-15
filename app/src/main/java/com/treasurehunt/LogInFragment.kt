@@ -38,18 +38,18 @@ class LogInFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentLoginBinding.inflate(layoutInflater)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        naverLogin()
-        nonMemberLogin()
+        setNaverLogin()
+        guestLogin()
     }
 
-    private fun naverLogin() {
+    private fun setNaverLogin() {
         binding.btnNaverLogin.setOnClickListener {
             NaverIdLoginSDK.behavior = NidOAuthBehavior.NAVERAPP
             NaverIdLoginSDK.authenticate(requireContext(), object : OAuthLoginCallback {
@@ -72,8 +72,8 @@ class LogInFragment : Fragment() {
         }
     }
 
-    private fun nonMemberLogin() {
-        binding.btnNonMembersLogin.setOnClickListener {
+    private fun guestLogin() {
+        binding.btnGuestLogin.setOnClickListener {
             viewModel.auth.observe(viewLifecycleOwner) {
                 it.signInAnonymously()
                     .addOnCompleteListener(Activity()) { task ->
