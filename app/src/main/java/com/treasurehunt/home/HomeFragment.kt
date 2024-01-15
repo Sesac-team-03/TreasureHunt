@@ -26,9 +26,9 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
+    private lateinit var map: NaverMap
     private val source: FusedLocationSource =
         FusedLocationSource(this, LOCATION_PERMISSION_REQUEST_CODE)
-    private lateinit var map: NaverMap
     private val requestPermissionLauncher: ActivityResultLauncher<String> =
         registerForActivityResult(RequestPermission()) { isGranted ->
             if (isGranted) {
@@ -44,8 +44,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
@@ -53,6 +52,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.btnMap.isSelected = true
 
         loadMap()
     }
