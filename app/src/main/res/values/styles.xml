@@ -30,4 +30,34 @@
 
     </style>
 
+    <!--기록 저장 화면 -->
+    <style name="LogTitle">
+        <item name="android:fontFamily">@font/pretendard_semibold</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">@dimen/large</item>
+    </style>
+
+    <style name="LogPhoto">
+        <item name="android:fontFamily">@font/pretendard_semibold</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">@dimen/middle</item>
+    </style>
+
+    <style name="Font.LogText">
+        <item name="android:background">@drawable/button_record</item>
+        <item name="android:gravity">top|start</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="Font.LogSave">
+        <item name="android:backgroundTint">@drawable/selector_button_record_background</item>
+        <item name="android:textColor">@drawable/selector_button_record_text_color</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/middle</item>
+    </style>
+
+    <style name="LogImage">
+        <item name="cornerSize">12dp</item>
+    </style>
 </resources>

@@ -4,6 +4,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
+    kotlin("kapt")
 }
 
 android {
@@ -49,6 +50,10 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+    buildFeatures {
+        viewBinding = true
+        dataBinding = true
+    }
 }
 
 fun getApiKey(propertyKey: String): String {
@@ -69,6 +74,7 @@ dependencies {
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.navercorp.nid:oauth:5.9.0")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
-
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
+    implementation("androidx.fragment:fragment-ktx:1.6.2")
+    implementation("com.github.bumptech.glide:glide:4.16.0")
 }
