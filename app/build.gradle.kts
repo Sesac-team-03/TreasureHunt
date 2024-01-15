@@ -72,6 +72,6 @@ dependencies {
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.navercorp.nid:oauth:5.9.0")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
-
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
+    implementation("androidx.fragment:fragment-ktx:1.6.2")
 }
