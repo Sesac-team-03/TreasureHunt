@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="com.treasurehunt.RecordViewModel" />
+            type="com.treasurehunt.LogViewModel" />
     </data>
 
     <androidx.core.widget.NestedScrollView
@@ -27,18 +27,18 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="40dp"
                 android:background="@android:color/transparent"
-                android:contentDescription="@string/record_ib_cancel"
+                android:contentDescription="@string/log_ib_cancel"
                 android:src="@drawable/icon_cancel"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/tv_title"
-                style="@style/RecordTitle"
+                style="@style/LogTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="40dp"
-                android:text="@string/record_tv_title"
+                android:text="@string/log_tv_title"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -58,12 +58,12 @@
 
             <TextView
                 android:id="@+id/tv_photo"
-                style="@style/RecordPhoto"
+                style="@style/LogPhoto"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
-                android:text="@string/record_tv_photo"
+                android:text="@string/log_tv_photo"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/mcv_map" />
 
@@ -89,22 +89,22 @@
                 app:layout_constraintStart_toEndOf="@+id/ib_select_photo"
                 app:layout_constraintTop_toTopOf="@+id/ib_select_photo"
                 app:submitList="@{viewModel.images}"
-                tools:listitem="@layout/item_record" />
+                tools:listitem="@layout/item_log" />
 
             <TextView
                 android:id="@+id/tv_text"
-                style="@style/RecordPhoto"
+                style="@style/LogPhoto"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
-                android:text="@string/record_tv_text"
+                android:text="@string/log_tv_text"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/ib_select_photo" />
 
             <EditText
                 android:id="@+id/et_text"
-                style="@style/RecordText"
+                style="@style/LogText"
                 android:layout_width="0dp"
                 android:layout_height="130dp"
                 android:layout_marginHorizontal="16dp"
@@ -118,12 +118,12 @@
 
             <Button
                 android:id="@+id/btn_save"
-                style="@style/RecordSave"
+                style="@style/LogSave"
                 android:layout_width="0dp"
                 android:layout_height="52dp"
                 android:layout_marginHorizontal="16dp"
                 android:enabled="false"
-                android:text="@string/record_btn_save"
+                android:text="@string/log_btn_save"
                 app:cornerRadius="12dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

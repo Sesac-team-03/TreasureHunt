@@ -7,13 +7,13 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.treasurehunt.databinding.FragmentRecordBinding
+import com.treasurehunt.databinding.FragmentLogBinding
 
-class RecordFragment : Fragment() {
-    private var _binding: FragmentRecordBinding? = null
+class LogFragment : Fragment() {
+    private var _binding: FragmentLogBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: RecordViewModel by viewModels()
-    private val recordAdapter = RecordAdapter(object : ImageClickListener {
+    private val viewModel: LogViewModel by viewModels()
+    private val recordAdapter = LogAdapter(object : ImageClickListener {
         override fun onClick(imageModel: ImageModel) {
             viewModel.removeImage(imageModel)
         }
@@ -39,7 +39,7 @@ class RecordFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentRecordBinding.inflate(inflater, container, false)
+        _binding = FragmentLogBinding.inflate(inflater, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
         return binding.root
