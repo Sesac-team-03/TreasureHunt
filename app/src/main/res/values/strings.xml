@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">TreasureHunt</string>
+    <string name="login_naver">네이버로 계속하기</string>
+    <string name="login_non_member">비회원으로 로그인</string>
+    <string name="login_treasure_hunt">보물찾기</string>
+
 </resources>
