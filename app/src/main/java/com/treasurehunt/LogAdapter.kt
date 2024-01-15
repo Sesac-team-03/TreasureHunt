@@ -5,10 +5,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.treasurehunt.databinding.ItemRecordBinding
+import com.treasurehunt.databinding.ItemLogBinding
 
-class RecordAdapter(private val clickListener: ImageClickListener) :
-    ListAdapter<ImageModel, RecordAdapter.ViewHolder>(diffUtil) {
+class LogAdapter(private val clickListener: ImageClickListener) :
+    ListAdapter<ImageModel, LogAdapter.ViewHolder>(diffUtil) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder.from(parent)
     }
@@ -17,7 +17,7 @@ class RecordAdapter(private val clickListener: ImageClickListener) :
         holder.bind(getItem(position), clickListener)
     }
 
-    class ViewHolder(private val binding: ItemRecordBinding) :
+    class ViewHolder(private val binding: ItemLogBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(imageModel: ImageModel, clickListener: ImageClickListener) {
             binding.imageModel = imageModel
@@ -28,7 +28,7 @@ class RecordAdapter(private val clickListener: ImageClickListener) :
         companion object {
             fun from(parent: ViewGroup): ViewHolder {
                 return ViewHolder(
-                    ItemRecordBinding.inflate(
+                    ItemLogBinding.inflate(
                         LayoutInflater.from(parent.context),
                         parent,
                         false

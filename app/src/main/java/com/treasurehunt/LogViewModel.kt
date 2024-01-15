@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class RecordViewModel : ViewModel() {
+class LogViewModel : ViewModel() {
     private val _images: MutableStateFlow<List<ImageModel>> = MutableStateFlow(emptyList())
     val images = _images.asStateFlow()
     private val _isImageMax = MutableStateFlow(false)
