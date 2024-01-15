@@ -6,8 +6,8 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 
-@BindingAdapter("submitList")
-fun bindSubmitList(view: RecyclerView, itemList: List<Any>?) {
+@BindingAdapter("dataset")
+fun bindDataset(view: RecyclerView, itemList: List<Any>?) {
     view.adapter?.let {
         (view.adapter as ListAdapter<Any, *>).submitList(itemList)
     }
