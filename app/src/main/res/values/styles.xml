@@ -34,13 +34,13 @@
     <style name="RecordTitle">
         <item name="android:fontFamily">@font/pretendard_semibold</item>
         <item name="android:textColor">@color/black</item>
-        <item name="android:textSize">@dimen/xLarge</item>
+        <item name="android:textSize">@dimen/large</item>
     </style>
 
     <style name="RecordPhoto">
         <item name="android:fontFamily">@font/pretendard_semibold</item>
         <item name="android:textColor">@color/black</item>
-        <item name="android:textSize">@dimen/large</item>
+        <item name="android:textSize">@dimen/middle</item>
     </style>
 
     <style name="RecordText">
@@ -54,5 +54,9 @@
         <item name="android:textColor">@drawable/selector_button_record_text_color</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">@dimen/middle</item>
+    </style>
+
+    <style name="RecordImage">
+        <item name="cornerSize">12dp</item>
     </style>
 </resources>
