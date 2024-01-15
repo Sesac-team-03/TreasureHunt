@@ -1,5 +1,5 @@
 package com.treasurehunt
 
-interface ImageClickListener {
+fun interface ImageClickListener {
     fun onClick(imageModel: ImageModel)
 }
