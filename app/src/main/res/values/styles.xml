@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <style name="Font">
+        <item name="fontFamily">@font/pretendard</item>
+    </style>
+
     <!-- LogFragment -->
     <style name="LogTitle">
         <item name="android:fontFamily">@font/pretendard_semibold</item>
@@ -14,16 +18,14 @@
         <item name="android:textSize">@dimen/middle</item>
     </style>
 
-    <style name="LogText">
+    <style name="Font.LogText">
         <item name="android:background">@drawable/button_record</item>
         <item name="android:gravity">top|start</item>
-        <item name="android:fontFamily">@font/pretendard</item>
         <item name="android:textColor">@color/black</item>
         <item name="android:textSize">14sp</item>
     </style>
 
-    <style name="LogSave">
-        <item name="fontFamily">@font/pretendard</item>
+    <style name="Font.LogSave">
         <item name="android:backgroundTint">@drawable/selector_button_record_background</item>
         <item name="android:textColor">@drawable/selector_button_record_text_color</item>
         <item name="android:textStyle">bold</item>
