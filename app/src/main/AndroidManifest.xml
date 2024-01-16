@@ -14,12 +14,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TreasureHunt"
         tools:targetApi="31">
-        <!--        <service-->
-        <!--            android:name="com.treasurehunt.LocationService"-->
-        <!--            android:foregroundServiceType="location" />-->
+
         <meta-data
             android:name="com.naver.maps.map.CLIENT_ID"
             android:value="ec9w14l190" />
+
         <activity
             android:name=".home.HomeActivity"
             android:configChanges="orientation|screenSize"

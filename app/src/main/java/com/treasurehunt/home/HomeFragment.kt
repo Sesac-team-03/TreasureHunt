@@ -4,13 +4,10 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.PointF
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.naver.maps.map.LocationTrackingMode
@@ -29,18 +26,9 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     private lateinit var map: NaverMap
     private val source: FusedLocationSource =
         FusedLocationSource(this, LOCATION_PERMISSION_REQUEST_CODE)
-    private val requestPermissionLauncher: ActivityResultLauncher<String> =
+    private val requestPermissionLauncher =
         registerForActivityResult(RequestPermission()) { isGranted ->
-            if (isGranted) {
-                // Permission is granted. Continue the action or workflow in your app
-                map.locationTrackingMode = LocationTrackingMode.Follow
-                Log.d("test$", "isGranted")
-            } else {
-                map.locationTrackingMode = LocationTrackingMode.None
-                Log.d("test$", "isNotGranted")
-                // Explain to the user that the feature is unavailable because the
-                // feature requires a permission that the user has denied.
-            }
+            setLocationTrackingMode(isGranted)
         }
 
     override fun onCreateView(
@@ -53,14 +41,27 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.btnMap.isSelected = true
+        initSegmentedButton()
 
         loadMap()
     }
 
     override fun onDestroyView() {
-        _binding = null
         super.onDestroyView()
+        _binding = null
+    }
+
+    private fun setLocationTrackingMode(isGranted: Boolean) {
+        map.locationTrackingMode =
+            if (isGranted) {
+                LocationTrackingMode.Follow
+            } else {
+                LocationTrackingMode.None
+            }
+    }
+
+    private fun initSegmentedButton() {
+        binding.btnMap.isSelected = true
     }
 
     private fun loadMap() {
@@ -69,57 +70,42 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     }
 
     override fun onMapReady(naverMap: NaverMap) {
+        initMap(naverMap)
+
+        handleLocationAccessPermission()
+
+        setLocationOverlay()
+    }
+
+    private fun initMap(naverMap: NaverMap) {
         map = naverMap.apply {
             locationSource = source
             uiSettings.isLocationButtonEnabled = true
         }
+    }
 
-        when {
+    private fun handleLocationAccessPermission() {
+        when (PackageManager.PERMISSION_GRANTED) {
             ContextCompat.checkSelfPermission(
                 requireContext(),
                 Manifest.permission.ACCESS_COARSE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED -> {
-                Log.d("test$", "granted")
-                map.locationTrackingMode = LocationTrackingMode.Follow
-            }
-
-            ActivityCompat.shouldShowRequestPermissionRationale(
-                requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION
             ) -> {
-                Log.d("test$", "request dialog needed")
-                // In an educational UI, explain to the user why your app requires this
-                // permission for a specific feature to behave as expected, and what
-                // features are disabled if it's declined. In this UI, include a
-                // "cancel" or "no thanks" button that lets the user continue
-                // using your app without granting the permission.
+                setLocationTrackingMode(true)
             }
 
             else -> {
-                // You can directly ask for the permission.
-                // The registered ActivityResultCallback gets the result of this request.
                 requestPermissionLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
-                Log.d("test$", "launched")
             }
         }
-
-        setLocationOverlay()
-
-        setSymbolClickEvent()
     }
 
     private fun setLocationOverlay() {
         val locationOverlay = map.locationOverlay
         locationOverlay.isVisible = true
+        // TODO: 사용자의 프로필 이미지를 파라미터로 전달
         locationOverlay.icon =
-            OverlayImage.fromResource(R.drawable.ic_launcher_foreground) // 사용자의 프로필 이미지를 파라미터로 전달
+            OverlayImage.fromResource(R.drawable.ic_launcher_foreground)
         locationOverlay.anchor = PointF(0.5f, 1f)
-    }
-
-    private fun setSymbolClickEvent() {
-        map.setOnSymbolClickListener { symbol ->
-            Log.d("test$", "${symbol.position} // ${symbol.caption}}")
-            true
-        }
     }
 
     companion object {
