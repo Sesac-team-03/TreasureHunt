@@ -1,4 +1,4 @@
-package com.treasurehunt.home
+package com.treasurehunt.ui.home
 
 import android.Manifest
 import android.content.pm.PackageManager

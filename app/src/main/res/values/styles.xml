@@ -1,9 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- 홈 액티비티 -->
     <style name="HomeBottomNavigationView">
         <item name="itemActiveIndicatorStyle">@android:color/transparent</item>
         <item name="itemIconTint">@color/home_bnv_home</item>
         <item name="itemTextColor">@color/home_bnv_home</item>
+    </style>
+
+    <!--로그인 화면-->
+    <style name="Font">
+        <item name="fontFamily">@font/pretendard</item>
+    </style>
+
+    <style name="Font.LogIn">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">16dp</item>
+        <item name="cornerRadius">100dp</item>
+    </style>
+
+    <style name="Font.LogIn.Naver">
+        <item name="iconSize">24sp</item>
+        <item name="backgroundTint">@color/green</item>
+    </style>
+
+    <style name="Font.LogIn.Guest">
+        <item name="backgroundTint">@android:color/transparent</item>
+        <item name="iconSize">24dp</item>
+        <item name="iconTint">@android:color/transparent</item>
+    </style>
+
+    <style name="Font.LogIn.TreasureHunt">
+        <item name="android:textSize">40dp</item>
+        <item name="android:elevation">20dp</item>
+        <item name="android:textColor">@color/white</item>
+
+    </style>
+
+    <!--기록 저장 화면 -->
+    <style name="LogTitle">
+        <item name="android:fontFamily">@font/pretendard_semibold</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">@dimen/large</item>
+    </style>
+
+    <style name="LogPhoto">
+        <item name="android:fontFamily">@font/pretendard_semibold</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">@dimen/middle</item>
+    </style>
+
+    <style name="Font.LogText">
+        <item name="android:background">@drawable/button_record</item>
+        <item name="android:gravity">top|start</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="Font.LogSave">
+        <item name="android:backgroundTint">@drawable/selector_button_record_background</item>
+        <item name="android:textColor">@drawable/selector_button_record_text_color</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/middle</item>
+    </style>
+
+    <style name="LogImage">
+        <item name="cornerSize">12dp</item>
     </style>
 </resources>

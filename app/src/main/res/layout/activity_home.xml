@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".home.HomeActivity">
+    android:background="@drawable/background"
+    tools:context=".ui.home.HomeActivity">
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fcv_home"
@@ -23,11 +24,10 @@
         style="@style/HomeBottomNavigationView"
         android:layout_width="0dp"
         android:layout_height="52dp"
-        app:itemPaddingTop="6dp"
         app:itemPaddingBottom="8dp"
+        app:itemPaddingTop="6dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:menu="@menu/bnv_menu" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

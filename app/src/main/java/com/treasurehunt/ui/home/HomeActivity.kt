@@ -1,4 +1,4 @@
-package com.treasurehunt.home
+package com.treasurehunt.ui.home
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
