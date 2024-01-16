@@ -5,8 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/background"
-    tools:context=".SplashFragment">
-
+    tools:context=".ui.login.SplashFragment">
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/animationView"
@@ -19,5 +18,4 @@
         app:lottie_autoPlay="true"
         app:lottie_loop="true"
         app:lottie_rawRes="@raw/iv_treasure" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

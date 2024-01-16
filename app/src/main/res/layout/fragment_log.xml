@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="com.treasurehunt.LogViewModel" />
+            type="com.treasurehunt.ui.login.LogViewModel" />
     </data>
 
     <androidx.core.widget.NestedScrollView

@@ -6,11 +6,11 @@
 
         <variable
             name="clickListener"
-            type="com.treasurehunt.ImageClickListener" />
+            type="com.treasurehunt.ui.savelog.ImageClickListener" />
 
         <variable
             name="imageModel"
-            type="com.treasurehunt.ImageModel" />
+            type="com.treasurehunt.ui.savelog.ImageModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
