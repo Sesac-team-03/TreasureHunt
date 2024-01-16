@@ -7,23 +7,15 @@
 
     <fragment
         android:id="@+id/splashFragment"
-        android:name="com.treasurehunt.ui.login.SplashFragment"
+        android:name="com.treasurehunt.SplashFragment"
         android:label="fragment_splash"
         tools:layout="@layout/fragment_splash" >
         <action
             android:id="@+id/action_splashFragment_to_logInFragment"
             app:destination="@id/logInFragment" />
     </fragment>
-
     <fragment
         android:id="@+id/logInFragment"
-        android:name="com.treasurehunt.ui.login.LogInFragment"
-        android:label="fragment_login"
-        tools:layout="@layout/fragment_login" />
-
-    <fragment
-        android:id="@+id/homeFragment"
-        android:name="com.treasurehunt.ui.home.HomeFragment"
-        android:label="fragment_home"
-        tools:layout="@layout/fragment_home" />
+        android:name="com.treasurehunt.LogInFragment"
+        android:label="LogInFragment" />
 </navigation>

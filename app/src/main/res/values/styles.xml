@@ -1,13 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- 홈 액티비티 -->
-    <style name="HomeBottomNavigationView">
-        <item name="itemActiveIndicatorStyle">@android:color/transparent</item>
-        <item name="itemIconTint">@color/home_bnv_home</item>
-        <item name="itemTextColor">@color/home_bnv_home</item>
-    </style>
-
     <!--로그인 화면-->
     <style name="Font">
         <item name="fontFamily">@font/pretendard</item>

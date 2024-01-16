@@ -5,7 +5,6 @@
     <color name="green">#6DE888</color>
     <color name="pink">#FEC4C4</color>
     <color name="gray_100">#9E9E9E</color>
-    <color name="gray_200">#BDBDBD</color>
-    <color name="gray_300">#E0E0E0</color>
+    <color name="gray_200">#E0E0E0</color>
     <color name="blue">#005AFF</color>
 </resources>
