@@ -1,7 +1,5 @@
 package com.treasurehunt
 
-import android.content.Context
-import android.net.ConnectivityManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -27,16 +25,10 @@ class SplashFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val connectivityManager =
-            context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val networkInfo = connectivityManager.activeNetworkInfo
+        initSplashScreen()
+    }
 
-        if (networkInfo != null && networkInfo.isConnected) {
-
-        } else {
-
-        }
-
+    private fun initSplashScreen() {
         binding.animationView.setAnimation(R.raw.iv_treasure)
         binding.animationView.playAnimation()
 
@@ -45,7 +37,7 @@ class SplashFragment : Fragment() {
         }, 4000)
     }
 
-        override fun onDestroyView() {
+    override fun onDestroyView() {
             super.onDestroyView()
             _binding = null
         }
