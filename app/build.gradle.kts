@@ -29,13 +29,6 @@ android {
         buildConfigField("String", "APP_NAME", getApiKey("APP_NAME"))
 
     }
-    buildFeatures {
-        viewBinding = true
-        buildConfig = true
-    }
-    buildFeatures {
-        viewBinding = true
-    }
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -55,6 +48,7 @@ android {
     buildFeatures {
         viewBinding = true
         dataBinding = true
+        buildConfig = true
     }
 }
 
@@ -71,8 +65,8 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-
     implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
+
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-analytics")
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.6")
