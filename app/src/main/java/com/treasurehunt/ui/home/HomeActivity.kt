@@ -23,7 +23,10 @@ class HomeActivity : AppCompatActivity() {
         navController.addOnDestinationChangedListener { _, destination, _ ->
 
             when (destination.id) {
-                R.id.splashFragment, R.id.logInFragment -> {
+                R.id.splashFragment -> {
+                    binding.bnvHome.visibility = View.GONE
+                }
+                R.id.logInFragment -> {
                     binding.bnvHome.visibility = View.GONE
                 }
                 else -> {
