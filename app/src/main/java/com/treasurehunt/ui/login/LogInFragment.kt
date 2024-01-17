@@ -112,6 +112,7 @@ class LogInFragment : Fragment() {
                 it.signInAnonymously()
                     .addOnCompleteListener(Activity()) { task ->
                         if (task.isSuccessful) {
+                            findNavController().navigate(R.id.action_logInFragment_to_homeFragment)
                         } else {
                             // If sign in fails, display a message to the user.
                             Toast.makeText(

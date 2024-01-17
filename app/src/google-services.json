@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "144271841948",
+    "project_id": "treasurehunt-32565",
+    "storage_bucket": "treasurehunt-32565.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:144271841948:android:ed653ddf94b305a0e66b59",
+        "android_client_info": {
+          "package_name": "com.treasurehunt"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBnbGuu39ZRq5-Oe3dKlibWPnTwPvwfAgw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

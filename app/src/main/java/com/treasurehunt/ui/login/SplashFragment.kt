@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.treasurehunt.R
@@ -16,6 +17,8 @@ class SplashFragment : Fragment() {
 
     private var _binding: FragmentSplashBinding? = null
     private val binding get() = _binding!!
+
+    private val viewModel: LoginViewModel by viewModels { LoginViewModel.Factory }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,11 +37,16 @@ class SplashFragment : Fragment() {
     private fun initSplashScreen() {
         binding.animationView.setAnimation(R.raw.iv_treasure)
         binding.animationView.playAnimation()
-
         lifecycleScope.launch {
             delay(2000)
             findNavController().navigate(R.id.action_splashFragment_to_logInFragment)
         }
+        Handler(Looper.getMainLooper()).postDelayed({
+            viewModel.auth.observe(viewLifecycleOwner) {
+                if (it.currentUser == null) findNavController().navigate(R.id.action_splashFragment_to_logInFragment)
+                else findNavController().navigate(R.id.action_splashFragment_to_homeFragment)
+            }
+        }, 4000)
     }
 
     override fun onDestroyView() {
