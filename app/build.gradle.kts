@@ -4,6 +4,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
+    id("kotlinx-serialization")
     kotlin("kapt")
 }
 
@@ -80,4 +81,8 @@ dependencies {
     implementation("com.google.android.gms:play-services-location:21.0.1")
 
     implementation("com.github.bumptech.glide:glide:4.16.0")
+
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
+    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
 }
