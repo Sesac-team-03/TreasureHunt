@@ -9,7 +9,7 @@
         android:id="@+id/splashFragment"
         android:name="com.treasurehunt.ui.login.SplashFragment"
         android:label="fragment_splash"
-        tools:layout="@layout/fragment_splash" >
+        tools:layout="@layout/fragment_splash">
         <action
             android:id="@+id/action_splashFragment_to_logInFragment"
             app:destination="@id/logInFragment" />
@@ -19,11 +19,21 @@
         android:id="@+id/logInFragment"
         android:name="com.treasurehunt.ui.login.LogInFragment"
         android:label="fragment_login"
-        tools:layout="@layout/fragment_login" />
+        tools:layout="@layout/fragment_login">
+        <action
+            android:id="@+id/action_logInFragment_to_saveLogFragment"
+            app:destination="@id/saveLogFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.treasurehunt.ui.home.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" />
+
+    <fragment
+        android:id="@+id/saveLogFragment"
+        android:name="com.treasurehunt.ui.savelog.SaveLogFragment"
+        android:label="SaveLogFragment"
+        tools:layout="@layout/fragment_savelog" />
 </navigation>
