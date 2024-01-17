@@ -29,6 +29,9 @@ class HomeActivity : AppCompatActivity() {
                 R.id.logInFragment -> {
                     binding.bnvHome.visibility = View.GONE
                 }
+                R.id.saveLogFragment -> {
+                    binding.bnvHome.visibility = View.GONE
+                }
                 else -> {
                     binding.bnvHome.visibility = View.VISIBLE
                 }
