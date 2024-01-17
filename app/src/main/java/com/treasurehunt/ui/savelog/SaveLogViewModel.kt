@@ -1,13 +1,12 @@
-package com.treasurehunt.ui.login
+package com.treasurehunt.ui.savelog
 
 import android.content.Intent
 import android.provider.MediaStore
 import androidx.lifecycle.ViewModel
-import com.treasurehunt.ui.savelog.ImageModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class LogViewModel : ViewModel() {
+class SaveLogViewModel : ViewModel() {
 
     private val _images: MutableStateFlow<List<ImageModel>> = MutableStateFlow(emptyList())
     val images = _images.asStateFlow()

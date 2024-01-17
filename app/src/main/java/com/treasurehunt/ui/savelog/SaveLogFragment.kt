@@ -7,16 +7,15 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.treasurehunt.databinding.FragmentLogBinding
-import com.treasurehunt.ui.login.LogViewModel
-import com.treasurehunt.ui.savelog.adapter.LogAdapter
+import com.treasurehunt.databinding.FragmentSavelogBinding
+import com.treasurehunt.ui.savelog.adapter.SaveLogAdapter
 
-class LogFragment : Fragment() {
+class SaveLogFragment : Fragment() {
 
-    private var _binding: FragmentLogBinding? = null
+    private var _binding: FragmentSavelogBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: LogViewModel by viewModels()
-    private val recordAdapter = LogAdapter { imageModel -> viewModel.removeImage(imageModel) }
+    private val viewModel: SaveLogViewModel by viewModels()
+    private val recordAdapter = SaveLogAdapter { imageModel -> viewModel.removeImage(imageModel) }
     private val imageLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.data?.clipData != null) {
@@ -34,7 +33,7 @@ class LogFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentLogBinding.inflate(inflater, container, false)
+        _binding = FragmentSavelogBinding.inflate(inflater, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
         return binding.root
