@@ -13,24 +13,24 @@
         <item name="fontFamily">@font/pretendard</item>
     </style>
 
-    <style name="Font.LogIn">
+    <style name="Font.Login">
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">16dp</item>
         <item name="cornerRadius">100dp</item>
     </style>
 
-    <style name="Font.LogIn.Naver">
+    <style name="Font.Login.Naver">
         <item name="iconSize">24sp</item>
         <item name="backgroundTint">@color/green</item>
     </style>
 
-    <style name="Font.LogIn.Guest">
+    <style name="Font.Login.Guest">
         <item name="backgroundTint">@android:color/transparent</item>
         <item name="iconSize">24dp</item>
         <item name="iconTint">@android:color/transparent</item>
     </style>
 
-    <style name="Font.LogIn.TreasureHunt">
+    <style name="Font.Login.TreasureHunt">
         <item name="android:textSize">40dp</item>
         <item name="android:elevation">20dp</item>
         <item name="android:textColor">@color/white</item>

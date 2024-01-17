@@ -17,7 +17,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tv_treasure_hunt"
-        style="@style/Font.LogIn.TreasureHunt"
+        style="@style/Font.Login.TreasureHunt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="107dp"
@@ -31,7 +31,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_naver_login"
-        style="@style/Font.LogIn.Naver"
+        style="@style/Font.Login.Naver"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"
@@ -40,14 +40,13 @@
         android:paddingVertical="13dp"
         android:text="@string/login_naver"
         app:icon="@drawable/naver"
-        app:iconGravity=""
         app:layout_constraintBottom_toTopOf="@id/btn_guest_login"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_guest_login"
-        style="@style/Font.LogIn.Guest"
+        style="@style/Font.Login.Guest"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"
