@@ -5,10 +5,10 @@ import androidx.room.PrimaryKey
 
 @Entity("places")
 data class PlaceEntity(
-    val log: String,
     val lat: Double,
     val lng: Double,
     val plan: Boolean,
+    val log: String? = null,
     @PrimaryKey(autoGenerate = true)
     val uid: Long = 0
 )
