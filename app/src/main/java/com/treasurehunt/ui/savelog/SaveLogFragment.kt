@@ -2,7 +2,6 @@ package com.treasurehunt.ui.savelog
 
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,7 +9,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.google.android.material.snackbar.Snackbar
 import com.naver.maps.map.LocationTrackingMode
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
@@ -32,7 +30,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
             if (result.data?.clipData != null) {
                 val count = result.data?.clipData!!.itemCount
                 if (viewModel.images.value.size + count > 5) {
-                    binding.root.showSnackbar(R.string.log_sb_warning_count)
+                    binding.root.showSnackbar(R.string.savelog_sb_warning_count)
                     return@registerForActivityResult
                 }
                 for (i in 0 until count) {
@@ -40,7 +38,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
                 }
             } else if (result.data?.data != null) {
                 if (viewModel.images.value.size + 1 > 5) {
-                    binding.root.showSnackbar(R.string.log_sb_warning_count)
+                    binding.root.showSnackbar(R.string.savelog_sb_warning_count)
                     return@registerForActivityResult
                 }
                 viewModel.addImage(ImageModel(result.data?.data.toString()))
