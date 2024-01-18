@@ -1,18 +1,18 @@
 package com.treasurehunt.ui.savelog
 
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.firebase.Firebase
-import com.google.firebase.storage.ktx.storage
 import com.google.firebase.storage.storage
 import com.naver.maps.map.LocationTrackingMode
 import com.naver.maps.map.MapFragment
@@ -23,7 +23,6 @@ import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentSavelogBinding
 import com.treasurehunt.ui.savelog.adapter.SaveLogAdapter
 import com.treasurehunt.util.showSnackbar
-import kotlinx.coroutines.flow.first
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -33,7 +32,6 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
     private val binding get() = _binding!!
     private val viewModel: SaveLogViewModel by viewModels()
     private val recordAdapter = SaveLogAdapter { imageModel -> viewModel.removeImage(imageModel) }
-    private val uriList: MutableList<Uri> = arrayListOf()
     private val imageLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.data?.clipData != null) {
@@ -44,7 +42,6 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
                 }
                 for (i in 0 until count) {
                     viewModel.addImage(ImageModel(result.data?.clipData!!.getItemAt(i).uri.toString()))
-                    uriList.add(result.data?.clipData!!.getItemAt(i).uri)
                 }
             } else if (result.data?.data != null) {
                 if (viewModel.images.value.size + 1 > 5) {
@@ -52,20 +49,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
                     return@registerForActivityResult
                 }
                 val uri = result?.data?.data
-                if (uri != null) {
-                    uriList.add(uri)
-                }
                 viewModel.addImage(ImageModel(uri.toString()))
-            }
-            binding.btnSave.setOnClickListener {
-                for (i in 0 until uriList.size) {
-                    uploadImage(uriList[i], i)
-                    try {
-                        Thread.sleep(500)
-                    } catch (e: InterruptedException) {
-                        e.printStackTrace()
-                    }
-                }
             }
         }
 
@@ -93,6 +77,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         initAdapter()
         setAddImage()
         loadMap()
+        saveLog()
     }
 
     override fun onDestroyView() {
@@ -110,6 +95,15 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    private fun saveLog() {
+        binding.btnSave.setOnClickListener {
+            for (i in 0 until viewModel.images.value.size) {
+                uploadImage(viewModel.images.value[0].url.toUri(), i)
+            }
+        }
+    }
+
+    @SuppressLint("SimpleDateFormat")
     private fun uploadImage(uri: Uri, count: Int) {
         val storage = Firebase.storage
         val storageRef = storage.getReference("uid/image")
