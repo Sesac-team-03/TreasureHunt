@@ -61,7 +61,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
-                android:text="@string/log_tv_photo"
+                android:text="@{@string/log_tv_photo_count(viewModel.images.size())}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/fcv_map" />
 
