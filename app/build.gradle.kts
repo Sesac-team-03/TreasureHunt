@@ -80,11 +80,7 @@ dependencies {
     implementation("androidx.room:room-runtime:2.6.1")
     ksp("androidx.room:room-compiler:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
-<<<<<<< HEAD
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
-=======
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
->>>>>>> 6898ea2 (build: Room DB 및 코틀린 직렬화 의존성 추가)
 
     implementation("com.navercorp.nid:oauth:5.9.0")
 
