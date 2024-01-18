@@ -3,6 +3,7 @@ package com.treasurehunt.ui.savelog
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.google.firebase.Firebase
 import com.google.firebase.storage.storage
 import com.naver.maps.map.LocationTrackingMode
@@ -20,10 +22,15 @@ import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.util.FusedLocationSource
 import com.treasurehunt.R
+import com.treasurehunt.data.network.LogClient
+import com.treasurehunt.data.network.LogModel
 import com.treasurehunt.databinding.FragmentSavelogBinding
 import com.treasurehunt.ui.savelog.adapter.SaveLogAdapter
 import com.treasurehunt.util.showSnackbar
-import java.text.SimpleDateFormat
+import kotlinx.coroutines.launch
+import java.sql.Timestamp
+import java.time.LocalDateTime
+import java.time.ZoneId
 import java.util.Date
 
 class SaveLogFragment : Fragment(), OnMapReadyCallback {
@@ -97,17 +104,31 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
 
     private fun saveLog() {
         binding.btnSave.setOnClickListener {
+            val createdDate = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+            } else {
+                Date().time
+            }
+            val place = 1
+            val text = binding.etText.text.toString()
+            val user = 1
+            val theme = 1
+            val images: MutableList<String> = arrayListOf()
             for (i in 0 until viewModel.images.value.size) {
-                uploadImage(viewModel.images.value[0].url.toUri(), i)
+                uploadImage(viewModel.images.value[i].url.toUri())
+                images.add("${viewModel.images.value[i].url.replace("[^0-9]".toRegex(), "")}.png")
+            }
+            lifecycleScope.launch {
+                LogClient.create().addLogs(LogModel(createdDate, images, place, text, theme, user))
             }
         }
     }
 
     @SuppressLint("SimpleDateFormat")
-    private fun uploadImage(uri: Uri, count: Int) {
+    private fun uploadImage(uri: Uri) {
         val storage = Firebase.storage
         val storageRef = storage.getReference("uid/image")
-        val fileName = SimpleDateFormat("yyyyMMddHHmmss_${count}").format(Date())
+        val fileName = uri.toString().replace("[^0-9]".toRegex(), "")
         val mountainsRef = storageRef.child("${fileName}.png")
         val uploadTask = mountainsRef.putFile(uri)
         uploadTask.addOnSuccessListener { taskSnapshot ->
