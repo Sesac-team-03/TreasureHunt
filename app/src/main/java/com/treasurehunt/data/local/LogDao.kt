@@ -1,6 +1,7 @@
 package com.treasurehunt.data.local
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -18,6 +19,6 @@ interface LogDao {
     @Query("SELECT * from logs ORDER BY created_date DESC")
     fun getAllLogs(): Flow<List<LogEntity>>
 
-    @Query("DELETE FROM logs WHERE uid = :id")
-    suspend fun delete(id: String)
+    @Delete
+    suspend fun delete(log: LogEntity)
 }
