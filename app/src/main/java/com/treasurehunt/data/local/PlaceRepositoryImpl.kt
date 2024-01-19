@@ -14,7 +14,7 @@ class PlaceRepositoryImpl(private val placeDao: PlaceDao) : PlaceRepository {
 
     override fun getAllPlans(): Flow<List<PlaceEntity>> = placeDao.getAllPlans()
 
-    override suspend fun delete(id: String) {
-        placeDao.delete(id)
+    override suspend fun delete(place: PlaceEntity) {
+        placeDao.delete(place)
     }
 }

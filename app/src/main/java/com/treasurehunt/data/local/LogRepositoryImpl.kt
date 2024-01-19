@@ -12,7 +12,7 @@ class LogRepositoryImpl(private val logDao: LogDao) : LogRepository {
 
     override fun getAllLogs(): Flow<List<LogEntity>> = logDao.getAllLogs()
 
-    override suspend fun delete(id: String) {
-        logDao.delete(id)
+    override suspend fun delete(log: LogEntity) {
+        logDao.delete(log)
     }
 }
