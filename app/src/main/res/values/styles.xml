@@ -67,4 +67,10 @@
     <style name="SaveLogImage">
         <item name="cornerSize">12dp</item>
     </style>
+
+    <!-- 지도 전체 화면 -->
+    <style name="Font.SaveLogMapTitle">
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">@dimen/xLarge</item>
+    </style>
 </resources>
