@@ -14,6 +14,7 @@ import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.google.firebase.Firebase
 import com.google.firebase.storage.storage
 import com.naver.maps.map.LocationTrackingMode
@@ -28,7 +29,6 @@ import com.treasurehunt.databinding.FragmentSavelogBinding
 import com.treasurehunt.ui.savelog.adapter.SaveLogAdapter
 import com.treasurehunt.util.showSnackbar
 import kotlinx.coroutines.launch
-import java.sql.Timestamp
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.Date
@@ -81,6 +81,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        moveMap()
         initAdapter()
         setAddImage()
         loadMap()
@@ -94,6 +95,12 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
 
     private fun initAdapter() {
         binding.rvPhoto.adapter = recordAdapter
+    }
+
+    private fun moveMap() {
+        binding.ibFullScreen.setOnClickListener {
+            findNavController().navigate(R.id.action_saveLogFragment_to_saveLogMapFragment)
+        }
     }
 
     private fun setAddImage() {

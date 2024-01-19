@@ -35,5 +35,15 @@
         android:id="@+id/saveLogFragment"
         android:name="com.treasurehunt.ui.savelog.SaveLogFragment"
         android:label="SaveLogFragment"
-        tools:layout="@layout/fragment_savelog" />
+        tools:layout="@layout/fragment_savelog">
+        <action
+            android:id="@+id/action_saveLogFragment_to_saveLogMapFragment"
+            app:destination="@id/saveLogMapFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/saveLogMapFragment"
+        android:name="com.treasurehunt.ui.savelog.SaveLogMapFragment"
+        android:label="SaveLogMapFragment"
+        tools:layout="@layout/fragment_savelog_map" />
 </navigation>
