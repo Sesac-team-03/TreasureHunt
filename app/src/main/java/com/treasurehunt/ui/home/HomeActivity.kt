@@ -17,24 +17,18 @@ class HomeActivity : AppCompatActivity() {
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fcv_home) as NavHostFragment
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.fcv_home) as NavHostFragment
         val navController = navHostFragment.navController
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
 
-            when (destination.id) {
-                R.id.splashFragment -> {
-                    binding.bnvHome.visibility = View.GONE
-                }
-                R.id.logInFragment -> {
-                    binding.bnvHome.visibility = View.GONE
-                }
-                R.id.saveLogFragment -> {
-                    binding.bnvHome.visibility = View.GONE
-                }
-                else -> {
-                    binding.bnvHome.visibility = View.VISIBLE
-                }
+            binding.bnvHome.visibility = when (destination.id) {
+                R.id.splashFragment -> View.GONE
+                R.id.logInFragment -> View.GONE
+                R.id.saveLogFragment -> View.GONE
+                R.id.saveLogMapFragment -> View.GONE
+                else -> View.VISIBLE
             }
         }
     }
