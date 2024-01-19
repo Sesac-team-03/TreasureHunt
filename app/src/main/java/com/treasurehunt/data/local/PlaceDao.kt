@@ -1,6 +1,7 @@
 package com.treasurehunt.data.local
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -21,6 +22,6 @@ interface PlaceDao {
     @Query("SELECT * from places WHERE `plan` = 1")
     fun getAllPlans(): Flow<List<PlaceEntity>>
 
-    @Query("DELETE FROM places WHERE uid = :id")
-    suspend fun delete(id: String)
+    @Delete
+    suspend fun delete(place: PlaceEntity)
 }
