@@ -13,6 +13,6 @@ interface PlaceRepository {
 
     fun getAllPlans(): Flow<List<PlaceEntity>>
 
-    suspend fun delete(id: String)
+    suspend fun delete(place: PlaceEntity)
 }
 

@@ -11,5 +11,5 @@ interface LogRepository {
 
     fun getAllLogs(): Flow<List<LogEntity>>
 
-    suspend fun delete(id: String)
+    suspend fun delete(log: LogEntity)
 }
