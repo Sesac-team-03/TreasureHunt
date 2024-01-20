@@ -4,9 +4,8 @@ import com.treasurehunt.data.model.PlaceEntity
 import kotlinx.coroutines.flow.Flow
 
 class PlaceRepositoryImpl(private val placeDao: PlaceDao) : PlaceRepository {
-    override suspend fun insert(place: PlaceEntity) {
-        placeDao.insert(place)
-    }
+
+    override suspend fun insert(place: PlaceEntity) = placeDao.insert(place)
 
     override fun getPlaceById(id: String): Flow<PlaceEntity> = placeDao.getPlaceById(id)
 
@@ -14,7 +13,7 @@ class PlaceRepositoryImpl(private val placeDao: PlaceDao) : PlaceRepository {
 
     override fun getAllPlans(): Flow<List<PlaceEntity>> = placeDao.getAllPlans()
 
-    override suspend fun delete(place: PlaceEntity) {
-        placeDao.delete(place)
-    }
+    override fun update(place: PlaceEntity) = placeDao.update(place)
+
+    override suspend fun delete(vararg places: PlaceEntity) = placeDao.delete(*places)
 }
