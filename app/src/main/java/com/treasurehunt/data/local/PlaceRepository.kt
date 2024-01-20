@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface PlaceRepository {
 
-    suspend fun insert(place: PlaceEntity)
+    suspend fun insert(place: PlaceEntity): Long
 
     fun getPlaceById(id: String): Flow<PlaceEntity>
 
@@ -13,6 +13,8 @@ interface PlaceRepository {
 
     fun getAllPlans(): Flow<List<PlaceEntity>>
 
-    suspend fun delete(place: PlaceEntity)
+    fun update(place: PlaceEntity): Int
+
+    suspend fun delete(vararg places: PlaceEntity): Int
 }
 
