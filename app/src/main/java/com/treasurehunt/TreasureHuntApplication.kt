@@ -1,6 +1,7 @@
 package com.treasurehunt
 
 import android.app.Application
+import android.util.Log
 import com.treasurehunt.data.local.LogRepository
 import com.treasurehunt.data.local.LogRepositoryImpl
 import com.treasurehunt.data.local.PlaceRepository

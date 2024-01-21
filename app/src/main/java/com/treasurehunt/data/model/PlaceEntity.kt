@@ -8,6 +8,7 @@ data class PlaceEntity(
     val lat: Double,
     val lng: Double,
     val plan: Boolean,
+    val caption: String,
     val log: String? = null,
     @PrimaryKey(autoGenerate = true)
     val uid: Long = 0
