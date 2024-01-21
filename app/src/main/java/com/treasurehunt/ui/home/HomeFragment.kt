@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.PointF
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -83,7 +82,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
         setLocationOverlay()
 
-        test()
+        showMarkers()
     }
 
     private fun initMap(naverMap: NaverMap) {
@@ -117,21 +116,16 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         locationOverlay.anchor = PointF(0.5f, 1f)
     }
 
-    fun test() {
+    private fun showMarkers() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { uiState ->
-                    uiState.markers.forEach {
-                        it.map = map
+                    uiState.markers.forEach { marker ->
+                        marker.map = map
                     }
                 }
             }
         }
-
-//        map.setOnSymbolClickListener { symbol ->
-//            Log.d("test$", symbol.position.toString())
-//            true
-//        }
     }
 
     companion object {

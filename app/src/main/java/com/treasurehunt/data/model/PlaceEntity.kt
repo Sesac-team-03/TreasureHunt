@@ -11,6 +11,7 @@ data class PlaceEntity(
     val plan: Boolean,
     @ColumnInfo("remote_id")
     val remoteId: String? = null,
+    val caption: String,
     val log: String? = null,
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0

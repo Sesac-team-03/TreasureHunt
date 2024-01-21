@@ -9,88 +9,89 @@ import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
 import com.treasurehunt.R
+import com.treasurehunt.TreasureHuntApplication.Companion.logRepo
+import com.treasurehunt.TreasureHuntApplication.Companion.placeRepo
+import com.treasurehunt.data.local.LogRepository
+import com.treasurehunt.data.local.PlaceRepository
+import com.treasurehunt.data.model.MapUiState
 import com.treasurehunt.data.model.PlaceEntity
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.IOException
 
-data class MapUiState(
-    val isSignedIn: Boolean = false,
-    val places: List<PlaceEntity> = listOf(),
-    val plans: List<PlaceEntity> = listOf(),
-    val markers: List<Marker> = listOf()
-)
-
-class HomeViewModel : ViewModel() {
+class HomeViewModel(private val logRepo: LogRepository, private val placeRepo: PlaceRepository) :
+    ViewModel() {
 
     private val _uiState = MutableStateFlow(MapUiState())
-    val uiState: StateFlow<MapUiState> = _uiState.asStateFlow()
+    val uiState: StateFlow<MapUiState> = _uiState
     private var fetchJob: Job? = null
 
     init {
-        fetchMarkers()
+        storeSampleData()
+        getAllMarkers()
     }
 
-    private fun fetchMarkers() {
+    private fun getAllMarkers() {
         fetchJob?.cancel()
+
         fetchJob = viewModelScope.launch {
             try {
-                val places = getPlaces()
-                val plans = getPlans()
-                val placeMarkers = places.map {
-                    Marker().apply {
-                        position = LatLng(it.lat, it.lng)
-                        icon = OverlayImage.fromResource(R.drawable.ic_chest_open)
-                        // captionText = "톰톰"
-                        width = 116
-                        height = 80
+                merge(placeRepo.getAllPlaces(), placeRepo.getAllPlans()).collect { placesAndPlans ->
+                    _uiState.update {
+                        it.copy(markers = placesAndPlans.mapToMarkers())
                     }
                 }
-                val planMarkers = plans.map {
-                    Marker().apply {
-                        position = LatLng(it.lat, it.lng)
-                        icon = OverlayImage.fromResource(R.drawable.ic_chest_closed)
-                        // captionText = "스벅"
-                        width = 96
-                        height = 80
-                    }
-                }
-                val markers = placeMarkers + planMarkers
-
-                _uiState.update {
-                    it.copy(
-                        places = getPlaces(),
-                        plans = getPlans(),
-                        markers = markers
-
-                    )
-                }
-            } catch (ioe: IOException) {
-                // Handle the error and notify the UI when appropriate.
+            } catch (e: IOException) {
             }
         }
     }
 
-    private fun getPlaces() = listOf(
-        PlaceEntity(
-            37.495401046241, 127.03978300094604, false, "memory"
-        )
-    )
+    private fun List<PlaceEntity>.mapToMarkers() = map {
+        Marker(LatLng(it.lat, it.lng)).from(it)
+    }
 
-    private fun getPlans() = listOf(
-        PlaceEntity(
-            37.49220887221752, 127.0393967628479, true
-        )
-    )
+    private fun Marker.from(place: PlaceEntity): Marker {
+        return if (!place.plan) {
+            apply {
+                captionText = place.caption
+                icon = OverlayImage.fromResource(R.drawable.ic_chest_open)
+                width = 116
+                height = 80
+            }
+        } else {
+            apply {
+                captionText = place.caption
+                icon = OverlayImage.fromResource(R.drawable.ic_chest_closed)
+                width = 96
+                height = 80
+            }
+        }
+    }
+
+    // TEST
+    private fun storeSampleData() {
+        viewModelScope.launch {
+            placeRepo.insert(
+                PlaceEntity(
+                    37.495401046241, 127.03978300094604, false, "탐앤탐스", "memory"
+                )
+            )
+            placeRepo.insert(
+                PlaceEntity(
+                    37.49220887221752, 127.0393967628479, true, "스타벅스"
+                )
+            )
+        }
+    }
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                HomeViewModel()
+                HomeViewModel(logRepo, placeRepo)
             }
         }
     }
