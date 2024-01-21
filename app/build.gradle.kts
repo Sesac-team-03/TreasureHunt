@@ -4,7 +4,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
-    id("kotlinx-serialization")
+    id("org.jetbrains.kotlin.plugin.serialization")
     kotlin("kapt")
 }
 
@@ -28,7 +28,7 @@ android {
             getApiKey("NAVER_LOGIN_CLIENT_SECRET")
         )
         buildConfigField("String", "APP_NAME", getApiKey("APP_NAME"))
-
+        buildConfigField("String", "BASE_URL", getApiKey("BASE_URL"))
     }
     buildTypes {
         release {
