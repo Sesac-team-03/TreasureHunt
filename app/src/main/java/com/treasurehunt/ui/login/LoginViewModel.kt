@@ -1,21 +1,49 @@
 package com.treasurehunt.ui.login
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
-import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.auth.userProfileChangeRequest
 import com.google.firebase.ktx.Firebase
+import com.navercorp.nid.profile.data.NidProfile
+import com.treasurehunt.TreasureHuntApplication
+import com.treasurehunt.data.model.UserDTO
+import com.treasurehunt.data.remote.FirebaseRepository
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
-class LoginViewModel : ViewModel() {
+const val USER_UPDATE_DELAY = 1000L
 
-    private var _auth: MutableLiveData<FirebaseAuth?> = MutableLiveData(null)
-    val auth: LiveData<FirebaseAuth> get() = _auth as LiveData<FirebaseAuth>
+class LoginViewModel(
+    private val firebaseRepository: FirebaseRepository
+) : ViewModel() {
 
-    init {
-        _auth.value = Firebase.auth
+    fun resisterUser(naverProfile: NidProfile) {
+        updateProfile(naverProfile)
+        viewModelScope.launch {
+            updateProfile(naverProfile)
+            delay(USER_UPDATE_DELAY)
+            val user = Firebase.auth.currentUser!!
+            val userDTO = UserDTO(
+                email = user.email!!,
+                nickname = user.displayName,
+                profileImage = user.photoUrl.toString()
+            )
+            firebaseRepository.resisterUser(user.uid, userDTO)
+        }
+    }
+
+    private fun updateProfile(naverProfile: NidProfile) {
+        val profileUpdate = userProfileChangeRequest {
+            displayName = naverProfile.nickname
+            photoUri = Uri.parse(naverProfile.profileImage)
+        }
+        Firebase.auth.currentUser!!.updateProfile(profileUpdate)
     }
 
     companion object {
@@ -24,7 +52,9 @@ class LoginViewModel : ViewModel() {
                 modelClass: Class<T>,
                 extras: CreationExtras
             ): T {
-                return LoginViewModel() as T
+                return LoginViewModel(
+                    TreasureHuntApplication.firebaseRepository
+                ) as T
             }
         }
     }
