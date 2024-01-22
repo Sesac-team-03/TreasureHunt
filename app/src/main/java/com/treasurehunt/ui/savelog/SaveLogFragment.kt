@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
@@ -41,23 +42,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
     private val saveLogAdapter = SaveLogAdapter { imageModel -> viewModel.removeImage(imageModel) }
     private val imageLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.data?.clipData != null) {
-                val count = result.data?.clipData!!.itemCount
-                if (viewModel.images.value.size + count > 5) {
-                    binding.root.showSnackbar(R.string.savelog_sb_warning_count)
-                    return@registerForActivityResult
-                }
-                for (i in 0 until count) {
-                    viewModel.addImage(ImageModel(result.data?.clipData!!.getItemAt(i).uri.toString()))
-                }
-            } else if (result.data?.data != null) {
-                if (viewModel.images.value.size + 1 > 5) {
-                    binding.root.showSnackbar(R.string.savelog_sb_warning_count)
-                    return@registerForActivityResult
-                }
-                val uri = result?.data?.data
-                viewModel.addImage(ImageModel(uri.toString()))
-            }
+            setImageLauncher(result)
         }
 
     private lateinit var map: NaverMap
@@ -91,6 +76,26 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun setImageLauncher(result: ActivityResult) {
+        if (result.data?.clipData != null) {
+            val count = result.data?.clipData!!.itemCount
+            if (viewModel.images.value.size + count > 5) {
+                binding.root.showSnackbar(R.string.savelog_sb_warning_count)
+                return
+            }
+            for (i in 0 until count) {
+                viewModel.addImage(ImageModel(result.data?.clipData!!.getItemAt(i).uri.toString()))
+            }
+        } else if (result.data?.data != null) {
+            if (viewModel.images.value.size + 1 > 5) {
+                binding.root.showSnackbar(R.string.savelog_sb_warning_count)
+                return
+            }
+            val uri = result.data?.data
+            viewModel.addImage(ImageModel(uri.toString()))
+        }
     }
 
     private fun initAdapter() {
