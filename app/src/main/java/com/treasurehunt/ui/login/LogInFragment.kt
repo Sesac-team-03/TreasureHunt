@@ -55,7 +55,10 @@ class LogInFragment : Fragment() {
         binding.btnNaverLogin.setOnClickListener {
             NaverIdLoginSDK.behavior = NidOAuthBehavior.NAVERAPP
             NaverIdLoginSDK.authenticate(requireContext(), object : OAuthLoginCallback {
-                override fun onSuccess() {}
+                override fun onSuccess() {
+                    findNavController().navigate(R.id.action_logInFragment_to_homeFragment)
+                }
+
                 override fun onFailure(httpStatus: Int, message: String) {
                     val errorCode = NaverIdLoginSDK.getLastErrorCode().code
                     val errorDescription = NaverIdLoginSDK.getLastErrorDescription()
