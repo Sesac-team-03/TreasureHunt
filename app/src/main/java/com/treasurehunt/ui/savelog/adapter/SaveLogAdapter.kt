@@ -5,12 +5,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.treasurehunt.databinding.ItemLogBinding
+import com.treasurehunt.databinding.ItemSavelogBinding
 import com.treasurehunt.ui.savelog.ImageClickListener
 import com.treasurehunt.ui.savelog.ImageModel
 
-class LogAdapter(private val clickListener: ImageClickListener) :
-    ListAdapter<ImageModel, LogAdapter.ViewHolder>(diffUtil) {
+class SaveLogAdapter(private val clickListener: ImageClickListener) :
+    ListAdapter<ImageModel, SaveLogAdapter.ViewHolder>(diffUtil) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder.from(parent)
     }
@@ -19,7 +19,7 @@ class LogAdapter(private val clickListener: ImageClickListener) :
         holder.bind(getItem(position), clickListener)
     }
 
-    class ViewHolder(private val binding: ItemLogBinding) :
+    class ViewHolder(private val binding: ItemSavelogBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(imageModel: ImageModel, clickListener: ImageClickListener) {
             binding.imageModel = imageModel
@@ -30,7 +30,7 @@ class LogAdapter(private val clickListener: ImageClickListener) :
         companion object {
             fun from(parent: ViewGroup): ViewHolder {
                 return ViewHolder(
-                    ItemLogBinding.inflate(
+                    ItemSavelogBinding.inflate(
                         LayoutInflater.from(parent.context),
                         parent,
                         false

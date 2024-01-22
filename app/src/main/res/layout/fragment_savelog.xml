@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="com.treasurehunt.ui.login.LogViewModel" />
+            type="com.treasurehunt.ui.savelog.SaveLogViewModel" />
     </data>
 
     <androidx.core.widget.NestedScrollView
@@ -27,45 +27,54 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="40dp"
                 android:background="@android:color/transparent"
-                android:contentDescription="@string/log_ib_cancel"
+                android:contentDescription="@string/savelog_ib_cancel"
                 android:src="@drawable/icon_cancel"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/tv_title"
-                style="@style/LogTitle"
+                style="@style/SaveLogTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="40dp"
-                android:text="@string/log_tv_title"
+                android:text="@string/savelog_tv_title"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <!-- map 표시될 view -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/mcv_map"
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/fcv_map"
+                android:name="com.naver.maps.map.MapFragment"
                 android:layout_width="0dp"
                 android:layout_height="130dp"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="16dp"
-                android:background="@drawable/button_record"
-                app:cardCornerRadius="20dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_title" />
 
+            <ImageButton
+                android:id="@+id/ib_full_screen"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="4dp"
+                android:backgroundTint="@android:color/transparent"
+                android:src="@drawable/ic_full_screen"
+                app:layout_constraintBottom_toBottomOf="@+id/fcv_map"
+                app:layout_constraintEnd_toEndOf="@+id/fcv_map" />
+
             <TextView
                 android:id="@+id/tv_photo"
-                style="@style/LogPhoto"
+                style="@style/SaveLogPhoto"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
-                android:text="@string/log_tv_photo"
+                android:text="@{@string/savelog_tv_photo_count(viewModel.images.size())}"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/mcv_map" />
+                app:layout_constraintTop_toBottomOf="@id/fcv_map" />
 
             <ImageButton
                 android:id="@+id/ib_select_photo"
@@ -84,33 +93,35 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
                 android:orientation="horizontal"
+                app:dataset="@{viewModel.images}"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/ib_select_photo"
                 app:layout_constraintTop_toTopOf="@+id/ib_select_photo"
-                app:dataset="@{viewModel.images}"
-                tools:listitem="@layout/item_log" />
+                tools:listitem="@layout/item_savelog" />
 
             <TextView
                 android:id="@+id/tv_text"
-                style="@style/LogPhoto"
+                style="@style/SaveLogPhoto"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
-                android:text="@string/log_tv_text"
+                android:text="@string/savelog_tv_text"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/ib_select_photo" />
 
             <EditText
                 android:id="@+id/et_text"
-                style="@style/Font.LogText"
+                style="@style/Font.SaveLogText"
                 android:layout_width="0dp"
                 android:layout_height="130dp"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="16dp"
+                android:onTextChanged="@{ (s, start, before, count) -> viewModel.setTextInput(s) }"
                 android:paddingStart="16dp"
                 android:paddingTop="16dp"
+                android:text="@{viewModel.text}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_text"
@@ -118,12 +129,12 @@
 
             <Button
                 android:id="@+id/btn_save"
-                style="@style/Font.LogSave"
+                style="@style/Font.SaveLogSave"
                 android:layout_width="0dp"
                 android:layout_height="52dp"
                 android:layout_marginHorizontal="16dp"
-                android:enabled="false"
-                android:text="@string/log_btn_save"
+                android:enabled="@{viewModel.isEnabled}"
+                android:text="@string/savelog_btn_save"
                 app:cornerRadius="12dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
