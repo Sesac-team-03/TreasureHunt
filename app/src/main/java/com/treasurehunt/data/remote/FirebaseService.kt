@@ -2,12 +2,15 @@ package com.treasurehunt.data.remote
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.treasurehunt.BuildConfig
-import com.treasurehunt.data.model.UserDTO
+import com.treasurehunt.data.remote.model.LogDTO
+import com.treasurehunt.data.remote.model.PlaceDTO
+import com.treasurehunt.data.remote.model.UserDTO
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.PUT
 import retrofit2.http.Path
 
@@ -27,6 +30,22 @@ interface FirebaseService {
         @Path("uid") uid: String,
         @Body data: UserDTO
     )
+
+    @GET("/users/{uid}.json")
+    suspend fun getUser(
+        @Path("uid") uid: String
+    ): UserDTO
+
+    @GET("/logs/{key}.json")
+    suspend fun getLog(
+        @Path("key") key: String
+    ): LogDTO
+
+    @GET("/places/{key}.json")
+    suspend fun getPlace(
+        @Path("key") key: String
+    ): PlaceDTO
+
 
     companion object {
 
