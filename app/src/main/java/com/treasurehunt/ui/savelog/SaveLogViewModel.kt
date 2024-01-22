@@ -14,8 +14,8 @@ class SaveLogViewModel : ViewModel() {
     val images = _images.asStateFlow()
     private val _isImageMax = MutableStateFlow(false)
     val isImageMax = _isImageMax.asStateFlow()
-    private val _text: MutableLiveData<String> = MutableLiveData()
-    val text: LiveData<String> = _text
+    private val _text: MutableStateFlow<String> = MutableStateFlow("")
+    val text = _text.asStateFlow()
     private val _isEnabled: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isEnabled = _isEnabled.asStateFlow()
 
