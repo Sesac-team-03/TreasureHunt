@@ -20,9 +20,6 @@
         android:name="com.treasurehunt.ui.login.LogInFragment"
         android:label="fragment_login"
         tools:layout="@layout/fragment_login">
-        <action
-            android:id="@+id/action_logInFragment_to_saveLogFragment"
-            app:destination="@id/saveLogFragment" />
     </fragment>
 
     <fragment
