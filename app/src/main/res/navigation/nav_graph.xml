@@ -20,6 +20,12 @@
         android:name="com.treasurehunt.ui.login.LogInFragment"
         android:label="fragment_login"
         tools:layout="@layout/fragment_login">
+        <action
+            android:id="@+id/action_logInFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+        <action
+            android:id="@+id/action_logInFragment_to_bottomSheetFragment"
+            app:destination="@id/bottomSheetFragment" />
     </fragment>
 
     <fragment
@@ -43,4 +49,9 @@
         android:name="com.treasurehunt.ui.savelog.SaveLogMapFragment"
         android:label="SaveLogMapFragment"
         tools:layout="@layout/fragment_savelog_map" />
+
+    <dialog
+        android:id="@+id/bottomSheetFragment"
+        android:name="com.treasurehunt.ui.detail.BottomSheetFragment"
+        android:label="BottomSheetFragment" />
 </navigation>
