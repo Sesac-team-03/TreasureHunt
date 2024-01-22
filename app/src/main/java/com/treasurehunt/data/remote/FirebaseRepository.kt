@@ -1,5 +1,6 @@
 package com.treasurehunt.data.remote
 
+import android.util.Log
 import com.treasurehunt.data.remote.model.UserDTO
 
 class FirebaseRepository(private val firebaseService: FirebaseService) {

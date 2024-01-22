@@ -21,6 +21,7 @@ import com.navercorp.nid.profile.data.NidProfileResponse
 import com.treasurehunt.BuildConfig
 import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentLoginBinding
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 private const val NAVER_LOGIN_CLIENT_ID = BuildConfig.NAVER_LOGIN_CLIENT_ID
@@ -105,7 +106,11 @@ class LogInFragment : Fragment() {
         auth.signInWithEmailAndPassword(naverProfile.email!!, naverProfile.id!!)
             .addOnCompleteListener(requireActivity()) { task ->
                 if (task.isSuccessful) {
-                    findNavController().navigate(R.id.action_logInFragment_to_homeFragment)
+                    viewModel.castingRemoteData()
+                    lifecycleScope.launch {
+                        delay(5000)
+                        findNavController().navigate(R.id.action_logInFragment_to_homeFragment)
+                    }
                 } else {
                     createAccount(naverProfile)
                 }
@@ -118,10 +123,12 @@ class LogInFragment : Fragment() {
             .addOnCompleteListener(requireActivity()) { task ->
                 if (task.isSuccessful) {
                     viewModel.resisterUser(naverProfile)
-                    findNavController().navigate(R.id.action_logInFragment_to_homeFragment)
+                    lifecycleScope.launch {
+                        delay(4000)
+                        findNavController().navigate(R.id.action_logInFragment_to_homeFragment)
+                    }
                 }
             }
-
     }
 
     private fun guestLogin() {
