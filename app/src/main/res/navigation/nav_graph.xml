@@ -53,5 +53,9 @@
     <dialog
         android:id="@+id/bottomSheetFragment"
         android:name="com.treasurehunt.ui.detail.BottomSheetFragment"
-        android:label="BottomSheetFragment" />
+        android:label="BottomSheetFragment" >
+        <action
+            android:id="@+id/action_bottomSheetFragment_to_saveLogFragment"
+            app:destination="@id/saveLogFragment" />
+    </dialog>
 </navigation>

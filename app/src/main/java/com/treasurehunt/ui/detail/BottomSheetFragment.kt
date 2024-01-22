@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.treasurehunt.R
@@ -31,6 +32,7 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupBottomSheet()
+        setEditButton()
     }
 
     private fun setupBottomSheet() {
@@ -88,6 +90,12 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
         val btnClose = binding.btnClose
         btnClose.setOnClickListener {
             dismiss()
+        }
+    }
+
+    private fun setEditButton() {
+        binding.btnEdit.setOnClickListener {
+            findNavController().navigate(R.id.action_bottomSheetFragment_to_saveLogFragment)
         }
     }
 
