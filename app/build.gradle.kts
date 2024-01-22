@@ -1,5 +1,9 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 
+kapt {
+    correctErrorTypes = true
+}
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
