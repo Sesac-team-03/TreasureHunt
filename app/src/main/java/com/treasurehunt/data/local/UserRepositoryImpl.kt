@@ -1,6 +1,6 @@
 package com.treasurehunt.data.local
 
-import com.treasurehunt.data.model.UserEntity
+import com.treasurehunt.data.remote.model.UserEntity
 import kotlinx.coroutines.flow.Flow
 
 class UserRepositoryImpl(private val userDao: UserDao) {

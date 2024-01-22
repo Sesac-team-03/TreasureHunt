@@ -13,8 +13,8 @@ import com.treasurehunt.TreasureHuntApplication.Companion.logRepo
 import com.treasurehunt.TreasureHuntApplication.Companion.placeRepo
 import com.treasurehunt.data.local.LogRepository
 import com.treasurehunt.data.local.PlaceRepository
-import com.treasurehunt.data.model.MapUiState
-import com.treasurehunt.data.model.PlaceEntity
+import com.treasurehunt.data.remote.model.MapUiState
+import com.treasurehunt.data.remote.model.PlaceEntity
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

@@ -1,6 +1,7 @@
-package com.treasurehunt.data.model
+package com.treasurehunt.data.remote.model
 
 import com.naver.maps.map.overlay.Marker
+import com.treasurehunt.data.remote.model.PlaceEntity
 
 data class MapUiState(
     val isSignedInAsMember: Boolean = false,

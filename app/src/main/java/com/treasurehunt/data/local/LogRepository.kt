@@ -1,7 +1,6 @@
 package com.treasurehunt.data.local
 
-import androidx.room.Update
-import com.treasurehunt.data.model.LogEntity
+import com.treasurehunt.data.remote.model.LogEntity
 import kotlinx.coroutines.flow.Flow
 
 interface LogRepository {

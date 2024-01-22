@@ -1,4 +1,4 @@
-package com.treasurehunt.data.model
+package com.treasurehunt.data.remote.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

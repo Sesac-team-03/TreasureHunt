@@ -1,6 +1,6 @@
 package com.treasurehunt.data.local
 
-import com.treasurehunt.data.model.PlaceEntity
+import com.treasurehunt.data.remote.model.PlaceEntity
 import kotlinx.coroutines.flow.Flow
 
 interface PlaceRepository {

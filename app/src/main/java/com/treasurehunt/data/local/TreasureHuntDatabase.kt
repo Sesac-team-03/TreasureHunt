@@ -6,8 +6,8 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.treasurehunt.data.Converters
-import com.treasurehunt.data.model.LogEntity
-import com.treasurehunt.data.model.PlaceEntity
+import com.treasurehunt.data.remote.model.LogEntity
+import com.treasurehunt.data.remote.model.PlaceEntity
 
 @Database(entities = [LogEntity::class, PlaceEntity::class], version = 1, exportSchema = false)
 @TypeConverters(Converters::class)
