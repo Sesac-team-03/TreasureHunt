@@ -10,7 +10,7 @@ interface LogService {
     suspend fun getLogs(): List<LogModel>
 
     @POST("logs.json")
-    suspend fun addLogs(@Body logModel: LogModel)
+    suspend fun addLog(@Body logModel: LogModel)
 }
 
 @Serializable

@@ -29,21 +29,21 @@ class SaveLogViewModel : ViewModel() {
     fun addImage(image: ImageModel) {
         _images.value = images.value + image
         _isImageMax.value = images.value.size >= 5
-        validateButtonState()
+        setButtonState()
     }
 
     fun removeImage(image: ImageModel) {
         _images.value = images.value - image
         _isImageMax.value = images.value.size >= 5
-        validateButtonState()
+        setButtonState()
     }
 
     fun setTextInput(input: CharSequence) {
         _text.value = input.toString()
-        validateButtonState()
+        setButtonState()
     }
 
-    private fun validateButtonState(): Boolean {
+    private fun setButtonState(): Boolean {
         _isEnabled.value = _images.value.isNotEmpty() && _text.value?.isNotEmpty() == true
         return _isEnabled.value
     }

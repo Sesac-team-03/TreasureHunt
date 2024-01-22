@@ -38,7 +38,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
     private var _binding: FragmentSavelogBinding? = null
     private val binding get() = _binding!!
     private val viewModel: SaveLogViewModel by viewModels()
-    private val recordAdapter = SaveLogAdapter { imageModel -> viewModel.removeImage(imageModel) }
+    private val saveLogAdapter = SaveLogAdapter { imageModel -> viewModel.removeImage(imageModel) }
     private val imageLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.data?.clipData != null) {
@@ -81,7 +81,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        moveMap()
+        showMapFullScreen()
         initAdapter()
         setAddImage()
         loadMap()
@@ -94,10 +94,10 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun initAdapter() {
-        binding.rvPhoto.adapter = recordAdapter
+        binding.rvPhoto.adapter = saveLogAdapter
     }
 
-    private fun moveMap() {
+    private fun showMapFullScreen() {
         binding.ibFullScreen.setOnClickListener {
             findNavController().navigate(R.id.action_saveLogFragment_to_saveLogMapFragment)
         }
@@ -126,7 +126,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
                 images.add("${viewModel.images.value[i].url.replace("[^0-9]".toRegex(), "")}.png")
             }
             lifecycleScope.launch {
-                LogClient.create().addLogs(LogModel(createdDate, images, place, text, theme, user))
+                LogClient.create().addLog(LogModel(createdDate, images, place, text, theme, user))
             }
         }
     }
