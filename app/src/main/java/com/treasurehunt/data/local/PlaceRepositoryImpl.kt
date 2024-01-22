@@ -16,4 +16,8 @@ class PlaceRepositoryImpl(private val placeDao: PlaceDao) : PlaceRepository {
     override fun update(place: PlaceEntity) = placeDao.update(place)
 
     override suspend fun delete(vararg places: PlaceEntity) = placeDao.delete(*places)
+
+    override suspend fun deleteAll() {
+        placeDao.deleteAllPlaces()
+    }
 }

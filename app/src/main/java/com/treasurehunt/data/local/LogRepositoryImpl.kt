@@ -14,4 +14,9 @@ class LogRepositoryImpl(private val logDao: LogDao) : LogRepository {
     override fun update(log: LogEntity) = logDao.update(log)
 
     override suspend fun delete(vararg logs: LogEntity) = logDao.delete(*logs)
+    override suspend fun deleteAll() {
+        logDao.deleteAllLogs()
+    }
+
+
 }

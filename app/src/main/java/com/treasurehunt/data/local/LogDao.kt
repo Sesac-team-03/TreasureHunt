@@ -26,4 +26,7 @@ interface LogDao {
 
     @Delete
     suspend fun delete(vararg logs: LogEntity): Int
+
+    @Query("DELETE FROM logs")
+    suspend fun deleteAllLogs()
 }
