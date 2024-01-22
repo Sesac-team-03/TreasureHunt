@@ -44,7 +44,7 @@ class SaveLogViewModel : ViewModel() {
     }
 
     private fun setButtonState(): Boolean {
-        _isEnabled.value = _images.value.isNotEmpty() && _text.value?.isNotEmpty() == true
+        _isEnabled.value = _images.value.isNotEmpty() && _text.value.isNotEmpty()
         return _isEnabled.value
     }
 }
