@@ -9,6 +9,8 @@ data class UserEntity(
     val nickname: String,
     @ColumnInfo("profile_image")
     val profileImage: String? = null,
+    @ColumnInfo("remote_id")
+    val remoteId: String? = null,
     @PrimaryKey(autoGenerate = true)
-    val uid: Long = 0,
+    val id: Long = 0,
 )
