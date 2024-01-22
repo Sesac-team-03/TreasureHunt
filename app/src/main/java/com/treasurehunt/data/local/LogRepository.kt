@@ -14,4 +14,6 @@ interface LogRepository {
     fun update(log: LogEntity): Int
 
     suspend fun delete(vararg logs: LogEntity): Int
+
+    suspend fun deleteAll()
 }

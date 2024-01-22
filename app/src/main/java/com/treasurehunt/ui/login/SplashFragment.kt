@@ -20,6 +20,9 @@ class SplashFragment : Fragment() {
     private var _binding: FragmentSplashBinding? = null
     private val binding get() = _binding!!
 
+    private val viewModel: LoginViewModel by viewModels { LoginViewModel.Factory }
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -42,8 +45,14 @@ class SplashFragment : Fragment() {
             findNavController().navigate(R.id.action_splashFragment_to_logInFragment)
         }
         Handler(Looper.getMainLooper()).postDelayed({
-            if (Firebase.auth == null) findNavController().navigate(R.id.action_splashFragment_to_logInFragment)
-            else findNavController().navigate(R.id.action_splashFragment_to_logInFragment)
+            if (Firebase.auth.currentUser == null) findNavController().navigate(R.id.action_splashFragment_to_logInFragment)
+            else {
+                viewModel.castingRemoteData()
+                lifecycleScope.launch {
+                    delay(3000)
+                    findNavController().navigate(R.id.action_splashFragment_to_homeFragment)
+                }
+            }
         }, 4000)
     }
 
