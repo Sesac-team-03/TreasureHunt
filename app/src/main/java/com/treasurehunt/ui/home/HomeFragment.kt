@@ -18,6 +18,7 @@ import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.util.FusedLocationSource
 import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentHomeBinding
+import com.treasurehunt.ui.detail.BottomSheetFragment
 
 class HomeFragment : Fragment(), OnMapReadyCallback {
 
@@ -75,6 +76,11 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         handleLocationAccessPermission()
 
         setLocationOverlay()
+
+        naverMap.setOnMapClickListener { coord, point ->
+            val bottomSheetFragment = BottomSheetFragment()
+            bottomSheetFragment.show(childFragmentManager, bottomSheetFragment.tag)
+        }
     }
 
     private fun initMap(naverMap: NaverMap) {
@@ -106,6 +112,12 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         locationOverlay.icon =
             OverlayImage.fromResource(R.drawable.ic_launcher_foreground)
         locationOverlay.anchor = PointF(0.5f, 1f)
+    }
+
+    //데이터베이스에 저장된 각각의 마커와 연동시 사용
+    fun showMarkerBottomSheet(contentId: String) {
+        val bottomSheetFragment = BottomSheetFragment.newInstance(contentId)
+        bottomSheetFragment.show(childFragmentManager, bottomSheetFragment.tag)
     }
 
     companion object {
