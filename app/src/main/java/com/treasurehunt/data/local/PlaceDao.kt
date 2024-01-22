@@ -15,7 +15,7 @@ interface PlaceDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(place: PlaceEntity): Long
 
-    @Query("SELECT * from places WHERE uid = :id")
+    @Query("SELECT * from places WHERE id = :id")
     fun getPlaceById(id: String): Flow<PlaceEntity>
 
     @Query("SELECT * from places WHERE `plan` = 0")

@@ -9,9 +9,9 @@ data class PlaceEntity(
     val lat: Double,
     val lng: Double,
     val plan: Boolean,
+    val caption: String,
     @ColumnInfo("remote_id")
     val remoteId: String? = null,
-    val caption: String,
     val log: String? = null,
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0

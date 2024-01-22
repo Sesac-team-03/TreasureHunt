@@ -15,7 +15,7 @@ interface UserDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(user: UserEntity): Long
 
-    @Query("SELECT * from places WHERE uid = :id")
+    @Query("SELECT * from places WHERE id = :id")
     fun getUserById(id: String): Flow<UserEntity>
 
     @Query("SELECT * from places WHERE `plan` = 0")

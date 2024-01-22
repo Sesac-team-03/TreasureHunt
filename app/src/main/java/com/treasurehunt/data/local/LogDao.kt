@@ -15,7 +15,7 @@ interface LogDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(log: LogEntity): Long
 
-    @Query("SELECT * from logs WHERE uid = :id")
+    @Query("SELECT * from logs WHERE id = :id")
     fun getLogById(id: String): Flow<LogEntity>
 
     @Query("SELECT * from logs ORDER BY created_date DESC")
