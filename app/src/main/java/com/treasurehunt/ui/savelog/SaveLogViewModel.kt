@@ -27,13 +27,13 @@ class SaveLogViewModel : ViewModel() {
     }
 
     fun addImage(image: ImageModel) {
-        _images.value = images.value + image
+        _images.value += image
         _isImageMax.value = images.value.size >= 5
         setButtonState()
     }
 
     fun removeImage(image: ImageModel) {
-        _images.value = images.value - image
+        _images.value -= image
         _isImageMax.value = images.value.size >= 5
         setButtonState()
     }
