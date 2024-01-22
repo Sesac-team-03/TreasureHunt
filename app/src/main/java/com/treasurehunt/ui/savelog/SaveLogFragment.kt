@@ -81,7 +81,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
     private fun setImageLauncher(result: ActivityResult) {
         if (result.data?.clipData != null) {
             val count = result.data?.clipData!!.itemCount
-            if (viewModel.images.value.size + count > 5) {
+            if (viewModel.images.value.size + count > MAX_COUNT) {
                 binding.root.showSnackbar(R.string.savelog_sb_warning_count)
                 return
             }
@@ -89,7 +89,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
                 viewModel.addImage(ImageModel(result.data?.clipData!!.getItemAt(i).uri.toString()))
             }
         } else if (result.data?.data != null) {
-            if (viewModel.images.value.size + 1 > 5) {
+            if (viewModel.images.value.size + 1 > MAX_COUNT) {
                 binding.root.showSnackbar(R.string.savelog_sb_warning_count)
                 return
             }
@@ -193,5 +193,6 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
 
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1001
+        private const val MAX_COUNT = 5
     }
 }

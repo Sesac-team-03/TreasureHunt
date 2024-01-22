@@ -14,7 +14,7 @@ interface LogService {
 }
 
 @Serializable
-data class LogModel (
+data class LogModel(
     val createdDate: Long,
     val images: List<String>,
     val place: Int,
