@@ -106,9 +106,8 @@ class LogInFragment : Fragment() {
         auth.signInWithEmailAndPassword(naverProfile.email!!, naverProfile.id!!)
             .addOnCompleteListener(requireActivity()) { task ->
                 if (task.isSuccessful) {
-                    viewModel.castingRemoteData()
                     lifecycleScope.launch {
-                        delay(5000)
+                        viewModel.castingRemoteData()
                         findNavController().navigate(R.id.action_logInFragment_to_homeFragment)
                     }
                 } else {
@@ -122,9 +121,8 @@ class LogInFragment : Fragment() {
         auth.createUserWithEmailAndPassword(naverProfile.email!!, naverProfile.id!!)
             .addOnCompleteListener(requireActivity()) { task ->
                 if (task.isSuccessful) {
-                    viewModel.resisterUser(naverProfile)
                     lifecycleScope.launch {
-                        delay(4000)
+                        viewModel.resisterUser(naverProfile)
                         findNavController().navigate(R.id.action_logInFragment_to_homeFragment)
                     }
                 }

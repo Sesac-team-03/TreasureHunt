@@ -12,7 +12,6 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentSplashBinding
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class SplashFragment : Fragment() {
@@ -47,9 +46,8 @@ class SplashFragment : Fragment() {
         Handler(Looper.getMainLooper()).postDelayed({
             if (Firebase.auth.currentUser == null) findNavController().navigate(R.id.action_splashFragment_to_logInFragment)
             else {
-                viewModel.castingRemoteData()
                 lifecycleScope.launch {
-                    delay(3000)
+                    viewModel.castingRemoteData()
                     findNavController().navigate(R.id.action_splashFragment_to_homeFragment)
                 }
             }
