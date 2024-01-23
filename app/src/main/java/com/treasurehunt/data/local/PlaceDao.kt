@@ -6,7 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.treasurehunt.data.model.PlaceEntity
+import com.treasurehunt.data.local.model.PlaceEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -29,4 +29,7 @@ interface PlaceDao {
 
     @Delete
     suspend fun delete(vararg places: PlaceEntity): Int
+
+    @Query("DELETE FROM places")
+    suspend fun deleteAllPlaces()
 }

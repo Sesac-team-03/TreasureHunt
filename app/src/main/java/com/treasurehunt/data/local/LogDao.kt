@@ -6,7 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.treasurehunt.data.model.LogEntity
+import com.treasurehunt.data.local.model.LogEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -26,4 +26,7 @@ interface LogDao {
 
     @Delete
     suspend fun delete(vararg logs: LogEntity): Int
+
+    @Query("DELETE FROM logs")
+    suspend fun deleteAllLogs()
 }

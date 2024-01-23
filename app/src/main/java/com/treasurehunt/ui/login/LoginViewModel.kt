@@ -1,21 +1,74 @@
 package com.treasurehunt.ui.login
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.auth.userProfileChangeRequest
 import com.google.firebase.ktx.Firebase
+import com.treasurehunt.TreasureHuntApplication
+import com.treasurehunt.data.LogRepository
+import com.treasurehunt.data.PlaceRepository
+import com.treasurehunt.data.User
+import com.treasurehunt.data.UserRepository
+import com.treasurehunt.data.remote.model.UserDTO
+import com.treasurehunt.data.remote.model.toLogEntity
+import com.treasurehunt.data.remote.model.toPlaceEntity
+import kotlinx.coroutines.delay
 
-class LoginViewModel : ViewModel() {
+const val USER_UPDATE_DELAY = 1000L
 
-    private var _auth: MutableLiveData<FirebaseAuth?> = MutableLiveData(null)
-    val auth: LiveData<FirebaseAuth> get() = _auth as LiveData<FirebaseAuth>
+class LoginViewModel(
+    private val userRepository: UserRepository,
+    private val logRepository: LogRepository,
+    private val placeRepository: PlaceRepository
+) : ViewModel() {
 
-    init {
-        _auth.value = Firebase.auth
+    suspend fun resisterUser(user: User) {
+        updateProfile(user)
+        delay(USER_UPDATE_DELAY)
+        val currentUser = Firebase.auth.currentUser!!
+        // 테스트 샘플
+        val userDTO = UserDTO(
+            email = currentUser.email!!,
+            nickname = currentUser.displayName,
+            profileImage = currentUser.photoUrl.toString(),
+            logs = listOf("-NoV18iQHObalOr66Yh4", "0"),
+            places = listOf("0")
+        )
+        userRepository.insertRemoteUser(currentUser.uid, userDTO)
+    }
+
+    private fun updateProfile(user: User) {
+        val profileUpdate = userProfileChangeRequest {
+            displayName = user.nickname
+            photoUri = Uri.parse(user.profileImage)
+        }
+        Firebase.auth.currentUser!!.updateProfile(profileUpdate)
+    }
+
+    suspend fun initLocalData() {
+        val curUserUid = Firebase.auth.currentUser!!.uid
+        val userDTO = userRepository.getRemoteUser(curUserUid)
+        initLocalLogs(userDTO)
+//            castingRemotePlaces(userDTO)
+    }
+
+    private suspend fun initLocalLogs(userDTO: UserDTO) {
+        logRepository.deleteAll()
+        userDTO.logs.map {
+            val log = logRepository.getRemoteLog(it)
+            logRepository.insert(log.toLogEntity(it))
+        }
+    }
+
+    private suspend fun initLocalPlaces(userDTO: UserDTO) {
+        placeRepository.deleteAll()
+        userDTO.places.map {
+            val place = placeRepository.getRemotePlace(it)
+            placeRepository.insert(place.toPlaceEntity())
+        }
     }
 
     companion object {
@@ -24,7 +77,11 @@ class LoginViewModel : ViewModel() {
                 modelClass: Class<T>,
                 extras: CreationExtras
             ): T {
-                return LoginViewModel() as T
+                return LoginViewModel(
+                    TreasureHuntApplication.userRepo,
+                    TreasureHuntApplication.logRepo,
+                    TreasureHuntApplication.placeRepo
+                ) as T
             }
         }
     }

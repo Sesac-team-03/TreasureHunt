@@ -1,4 +1,4 @@
-package com.treasurehunt.data.model
+package com.treasurehunt.data.local.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -15,5 +15,6 @@ data class LogEntity(
     @ColumnInfo("remote_id")
     val remoteId: String? = null,
     @PrimaryKey(autoGenerate = true)
-    val id: Long = 0
+    val id:
+    Long = 0
 )

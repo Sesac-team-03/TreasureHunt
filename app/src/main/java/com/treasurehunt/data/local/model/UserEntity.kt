@@ -1,4 +1,4 @@
-package com.treasurehunt.data.model
+package com.treasurehunt.data.local.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

@@ -11,10 +11,10 @@ import com.naver.maps.map.overlay.OverlayImage
 import com.treasurehunt.R
 import com.treasurehunt.TreasureHuntApplication.Companion.logRepo
 import com.treasurehunt.TreasureHuntApplication.Companion.placeRepo
-import com.treasurehunt.data.local.LogRepository
-import com.treasurehunt.data.local.PlaceRepository
-import com.treasurehunt.data.model.MapUiState
-import com.treasurehunt.data.model.PlaceEntity
+import com.treasurehunt.data.LogRepository
+import com.treasurehunt.data.PlaceRepository
+import com.treasurehunt.data.remote.model.MapUiState
+import com.treasurehunt.data.local.model.PlaceEntity
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
