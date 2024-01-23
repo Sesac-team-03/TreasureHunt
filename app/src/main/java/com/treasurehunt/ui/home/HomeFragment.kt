@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.PointF
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,6 +20,7 @@ import com.naver.maps.map.LocationTrackingMode
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
+import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.util.FusedLocationSource
 import com.treasurehunt.R
@@ -86,9 +88,13 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
         showMarkers()
 
-        naverMap.setOnMapClickListener { coord, point ->
-            findNavController().navigate(R.id.action_homeFragment_to_detailFragment)
-        }
+        setPlaceClick()
+
+        //TODO
+//        naverMap.setOnMapClickListener { coord, point ->
+//            val bottomSheetFragment = BottomSheetFragment()
+//            bottomSheetFragment.show(childFragmentManager, bottomSheetFragment.tag)
+//        }
     }
 
     private fun initMap(naverMap: NaverMap) {
@@ -122,15 +128,44 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         locationOverlay.anchor = PointF(0.5f, 1f)
     }
 
+    private fun setPlaceClick() {
+        map.setOnSymbolClickListener { symbol ->
+            val mapSymbol = MapSymbol(
+                symbol.position.latitude,
+                symbol.position.longitude,
+                symbol.caption
+            )
+            val action = HomeFragmentDirections.actionHomeFragmentToMapDialogFragment(mapSymbol)
+            findNavController().navigate(action)
+            true
+        }
+    }
+
     private fun showMarkers() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { uiState ->
                     uiState.markers.forEach { marker ->
                         marker.map = map
+                        marker.setClick()
                     }
                 }
             }
+        }
+    }
+
+    private fun Marker.setClick() {
+        setOnClickListener {
+            if (tag == "place") {
+                Log.d("test$", captionText)
+                // open specific detail
+                val bottomSheetFragment = BottomSheetFragment()
+                bottomSheetFragment.show(childFragmentManager, bottomSheetFragment.tag)
+            } else {
+                Log.d("test$", captionText)
+                // navigate to save log
+            }
+            true
         }
     }
 

@@ -33,8 +33,8 @@ class SplashFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        initSplashScreen()
+        findNavController().navigate(R.id.action_splashFragment_to_homeFragment)
+//        initSplashScreen()
     }
 
     override fun onDestroyView() {
@@ -56,5 +56,4 @@ class SplashFragment : Fragment() {
             }
         }
     }
-
 }

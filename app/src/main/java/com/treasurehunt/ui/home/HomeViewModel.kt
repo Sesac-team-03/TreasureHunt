@@ -31,8 +31,13 @@ class HomeViewModel(private val logRepo: LogRepository, private val placeRepo: P
     private var fetchJob: Job? = null
 
     init {
-        storeSampleData()
         getAllMarkers()
+    }
+
+    fun addPlan(plan: PlaceEntity) {
+        viewModelScope.launch {
+            placeRepo.insert(plan)
+        }
     }
 
     private fun getAllMarkers() {
@@ -57,6 +62,7 @@ class HomeViewModel(private val logRepo: LogRepository, private val placeRepo: P
     private fun Marker.from(place: PlaceEntity): Marker {
         return if (!place.plan) {
             apply {
+                tag = "place"
                 captionText = place.caption
                 icon = OverlayImage.fromResource(R.drawable.ic_chest_open)
                 width = 116
@@ -64,6 +70,7 @@ class HomeViewModel(private val logRepo: LogRepository, private val placeRepo: P
             }
         } else {
             apply {
+                tag = "plan"
                 captionText = place.caption
                 icon = OverlayImage.fromResource(R.drawable.ic_chest_closed)
                 width = 96
