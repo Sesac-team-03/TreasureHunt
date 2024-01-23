@@ -1,25 +1,22 @@
 package com.treasurehunt.data.remote.model
 
-import com.treasurehunt.data.local.model.LogEntity
+import androidx.room.ColumnInfo
+import androidx.room.PrimaryKey
 import com.treasurehunt.data.local.model.PlaceEntity
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class PlaceDTO(
-    val log: String,
     val lat: Double,
     val lng: Double,
     val plan: Boolean,
-    val uid: Long = 0
+    val caption: String,
+    val remoteId: String? = null,
+    val log: String? = null,
+    val id: Long = 0
 )
 
 fun PlaceDTO.toPlaceEntity(): PlaceEntity {
-    val (log, lat, lng, plan, uid) = this
-    return PlaceEntity(
-        log,
-        lat,
-        lng,
-        plan,
-        uid
-    )
+    val (lat, lng, plan, caption, remoteId, log, id) = this
+    return PlaceEntity(lat, lng, plan, caption, remoteId, log, id)
 }

@@ -6,14 +6,21 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.treasurehunt.data.Converters
-import com.treasurehunt.data.remote.model.LogEntity
-import com.treasurehunt.data.remote.model.PlaceEntity
+import com.treasurehunt.data.local.model.LogEntity
+import com.treasurehunt.data.local.model.PlaceEntity
+import com.treasurehunt.data.local.model.UserEntity
 
-@Database(entities = [LogEntity::class, PlaceEntity::class], version = 1, exportSchema = false)
+@Database(
+    entities = [LogEntity::class, PlaceEntity::class, UserEntity::class],
+    version = 1,
+    exportSchema = false
+)
 @TypeConverters(Converters::class)
 abstract class TreasureHuntDatabase : RoomDatabase() {
     abstract fun logDao(): LogDao
     abstract fun placeDao(): PlaceDao
+
+    abstract fun userDao(): UserDao
 
     companion object {
         @Volatile

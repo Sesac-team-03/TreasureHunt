@@ -3,10 +3,17 @@ package com.treasurehunt.ui.savelog
 import android.content.Intent
 import android.provider.MediaStore
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.CreationExtras
+import com.treasurehunt.TreasureHuntApplication
+import com.treasurehunt.data.LogRepository
+import com.treasurehunt.data.remote.model.LogDTO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class SaveLogViewModel : ViewModel() {
+class SaveLogViewModel(
+    private val logRepo: LogRepository,
+) : ViewModel() {
 
     private val _images: MutableStateFlow<List<ImageModel>> = MutableStateFlow(emptyList())
     val images = _images.asStateFlow()
@@ -30,6 +37,10 @@ class SaveLogViewModel : ViewModel() {
         setButtonState()
     }
 
+    suspend fun addLog(logDTO: LogDTO) {
+        logRepo.addRemoteLog(logDTO)
+    }
+
     fun removeImage(image: ImageModel) {
         _images.value -= image
         _isImageMax.value = images.value.size >= 5
@@ -44,5 +55,18 @@ class SaveLogViewModel : ViewModel() {
     private fun setButtonState(): Boolean {
         _isEnabled.value = _images.value.isNotEmpty() && _text.value.isNotEmpty()
         return _isEnabled.value
+    }
+
+    companion object {
+        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(
+                modelClass: Class<T>,
+                extras: CreationExtras
+            ): T {
+                return SaveLogViewModel(
+                    TreasureHuntApplication.logRepo
+                ) as T
+            }
+        }
     }
 }

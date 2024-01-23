@@ -7,11 +7,11 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.auth.userProfileChangeRequest
 import com.google.firebase.ktx.Firebase
-import com.navercorp.nid.profile.data.NidProfile
 import com.treasurehunt.TreasureHuntApplication
-import com.treasurehunt.data.local.LogRepository
-import com.treasurehunt.data.local.PlaceRepository
-import com.treasurehunt.data.remote.FirebaseRepository
+import com.treasurehunt.data.LogRepository
+import com.treasurehunt.data.PlaceRepository
+import com.treasurehunt.data.User
+import com.treasurehunt.data.UserRepository
 import com.treasurehunt.data.remote.model.UserDTO
 import com.treasurehunt.data.remote.model.toLogEntity
 import com.treasurehunt.data.remote.model.toPlaceEntity
@@ -20,54 +20,55 @@ import kotlinx.coroutines.delay
 const val USER_UPDATE_DELAY = 1000L
 
 class LoginViewModel(
-    private val firebaseRepository: FirebaseRepository,
+    private val userRepository: UserRepository,
     private val logRepository: LogRepository,
     private val placeRepository: PlaceRepository
 ) : ViewModel() {
 
-    suspend fun resisterUser(naverProfile: NidProfile) {
-        updateProfile(naverProfile)
+    suspend fun resisterUser(user: User) {
+        updateProfile(user)
         delay(USER_UPDATE_DELAY)
-        val user = Firebase.auth.currentUser!!
+        val currentUser = Firebase.auth.currentUser!!
+        // 테스트 샘플
         val userDTO = UserDTO(
-            email = user.email!!,
-            nickname = user.displayName,
-            profileImage = user.photoUrl.toString(),
+            email = currentUser.email!!,
+            nickname = currentUser.displayName,
+            profileImage = currentUser.photoUrl.toString(),
             logs = listOf("-NoV18iQHObalOr66Yh4", "0"),
             places = listOf("0")
         )
-        firebaseRepository.resisterUser(user.uid, userDTO)
+        userRepository.insertRemoteUser(currentUser.uid, userDTO)
     }
 
-    suspend fun castingRemoteData() {
+    private fun updateProfile(user: User) {
+        val profileUpdate = userProfileChangeRequest {
+            displayName = user.nickname
+            photoUri = Uri.parse(user.profileImage)
+        }
+        Firebase.auth.currentUser!!.updateProfile(profileUpdate)
+    }
+
+    suspend fun initLocalData() {
         val curUserUid = Firebase.auth.currentUser!!.uid
-        val userDTO = firebaseRepository.getUserData(curUserUid)
-        castingRemoteLogs(userDTO)
+        val userDTO = userRepository.getRemoteUser(curUserUid)
+        initLocalLogs(userDTO)
 //            castingRemotePlaces(userDTO)
     }
 
-    private suspend fun castingRemoteLogs(userDTO: UserDTO) {
+    private suspend fun initLocalLogs(userDTO: UserDTO) {
         logRepository.deleteAll()
         userDTO.logs.map {
-            val log = firebaseRepository.getLog(it)
-            logRepository.insert(log.toLogEntity())
+            val log = logRepository.getRemoteLog(it)
+            logRepository.insert(log.toLogEntity(it))
         }
     }
 
-    private suspend fun castingRemotePlaces(userDTO: UserDTO) {
+    private suspend fun initLocalPlaces(userDTO: UserDTO) {
         placeRepository.deleteAll()
         userDTO.places.map {
-            val place = firebaseRepository.getPlace(it)
+            val place = placeRepository.getRemotePlace(it)
             placeRepository.insert(place.toPlaceEntity())
         }
-    }
-
-    private fun updateProfile(naverProfile: NidProfile) {
-        val profileUpdate = userProfileChangeRequest {
-            displayName = naverProfile.nickname
-            photoUri = Uri.parse(naverProfile.profileImage)
-        }
-        Firebase.auth.currentUser!!.updateProfile(profileUpdate)
     }
 
     companion object {
@@ -77,7 +78,7 @@ class LoginViewModel(
                 extras: CreationExtras
             ): T {
                 return LoginViewModel(
-                    TreasureHuntApplication.firebaseRepository,
+                    TreasureHuntApplication.userRepo,
                     TreasureHuntApplication.logRepo,
                     TreasureHuntApplication.placeRepo
                 ) as T

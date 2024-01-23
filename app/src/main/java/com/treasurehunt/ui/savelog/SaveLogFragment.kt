@@ -24,8 +24,7 @@ import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.util.FusedLocationSource
 import com.treasurehunt.R
-import com.treasurehunt.data.network.LogClient
-import com.treasurehunt.data.network.LogModel
+import com.treasurehunt.data.remote.model.LogDTO
 import com.treasurehunt.databinding.FragmentSavelogBinding
 import com.treasurehunt.ui.savelog.adapter.SaveLogAdapter
 import com.treasurehunt.util.showSnackbar
@@ -38,7 +37,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
 
     private var _binding: FragmentSavelogBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: SaveLogViewModel by viewModels()
+    private val viewModel: SaveLogViewModel by viewModels { SaveLogViewModel.Factory }
     private val saveLogAdapter = SaveLogAdapter { imageModel -> viewModel.removeImage(imageModel) }
     private val imageLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -121,17 +120,17 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
             } else {
                 Date().time
             }
-            val place = 1
+            val place = "123"
             val text = binding.etText.text.toString()
             val user = 1
-            val theme = 1
+            val theme = "123"
             val images: MutableList<String> = arrayListOf()
             for (i in 0 until viewModel.images.value.size) {
                 uploadImage(viewModel.images.value[i].url.toUri())
                 images.add("${viewModel.images.value[i].url.replace("[^0-9]".toRegex(), "")}.png")
             }
             lifecycleScope.launch {
-                LogClient.create().addLog(LogModel(createdDate, images, place, text, theme, user))
+                viewModel.addLog(LogDTO(place, images, text, theme, createdDate))
             }
         }
     }

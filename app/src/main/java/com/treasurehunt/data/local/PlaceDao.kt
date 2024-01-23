@@ -6,7 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.treasurehunt.data.remote.model.PlaceEntity
+import com.treasurehunt.data.local.model.PlaceEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

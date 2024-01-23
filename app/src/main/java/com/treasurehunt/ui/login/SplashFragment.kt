@@ -12,6 +12,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentSplashBinding
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class SplashFragment : Fragment() {
@@ -36,26 +37,24 @@ class SplashFragment : Fragment() {
         initSplashScreen()
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
     private fun initSplashScreen() {
         binding.animationView.setAnimation(R.raw.iv_treasure)
         binding.animationView.playAnimation()
         lifecycleScope.launch {
             delay(2000)
-            findNavController().navigate(R.id.action_splashFragment_to_logInFragment)
-        }
-        Handler(Looper.getMainLooper()).postDelayed({
             if (Firebase.auth.currentUser == null) findNavController().navigate(R.id.action_splashFragment_to_logInFragment)
             else {
                 lifecycleScope.launch {
-                    viewModel.castingRemoteData()
+                    viewModel.initLocalData()
                     findNavController().navigate(R.id.action_splashFragment_to_homeFragment)
                 }
             }
-        }, 4000)
+        }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
 }

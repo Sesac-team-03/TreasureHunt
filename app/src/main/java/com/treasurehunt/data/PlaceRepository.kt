@@ -1,11 +1,15 @@
-package com.treasurehunt.data.local
+package com.treasurehunt.data
 
-import com.treasurehunt.data.remote.model.PlaceEntity
+import com.treasurehunt.data.local.model.PlaceEntity
+import com.treasurehunt.data.remote.model.PlaceDTO
+import com.treasurehunt.data.remote.model.UserDTO
 import kotlinx.coroutines.flow.Flow
 
 interface PlaceRepository {
 
     suspend fun insert(place: PlaceEntity): Long
+
+    suspend fun getRemotePlace(id: String): PlaceDTO
 
     fun getPlaceById(id: String): Flow<PlaceEntity>
 

@@ -1,11 +1,18 @@
-package com.treasurehunt.data.local
+package com.treasurehunt.data
 
-import com.treasurehunt.data.remote.model.LogEntity
+import com.treasurehunt.data.local.model.LogEntity
+import com.treasurehunt.data.remote.model.LogDTO
 import kotlinx.coroutines.flow.Flow
 
 interface LogRepository {
 
     suspend fun insert(log: LogEntity): Long
+
+    suspend fun getRemoteLog(id: String): LogDTO
+
+    suspend fun getRemoteLogs(): List<LogDTO>
+
+    suspend fun addRemoteLog(logModel: LogDTO)
 
     fun getLogById(id: String): Flow<LogEntity>
 

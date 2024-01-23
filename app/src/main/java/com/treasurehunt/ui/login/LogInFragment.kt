@@ -16,12 +16,11 @@ import com.navercorp.nid.oauth.NidOAuthBehavior
 import com.navercorp.nid.oauth.NidOAuthLogin
 import com.navercorp.nid.oauth.OAuthLoginCallback
 import com.navercorp.nid.profile.NidProfileCallback
-import com.navercorp.nid.profile.data.NidProfile
 import com.navercorp.nid.profile.data.NidProfileResponse
 import com.treasurehunt.BuildConfig
 import com.treasurehunt.R
+import com.treasurehunt.data.User
 import com.treasurehunt.databinding.FragmentLoginBinding
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 private const val NAVER_LOGIN_CLIENT_ID = BuildConfig.NAVER_LOGIN_CLIENT_ID
@@ -88,7 +87,14 @@ class LogInFragment : Fragment() {
         NidOAuthLogin().callProfileApi(object : NidProfileCallback<NidProfileResponse> {
             override fun onSuccess(response: NidProfileResponse) {
                 val naverProfile = response.profile!!
-                loginAccount(naverProfile)
+                val user =
+                    User(
+                        naverProfile.id!!,
+                        naverProfile.email!!,
+                        naverProfile.nickname,
+                        naverProfile.profileImage
+                    )
+                loginAccount(user)
             }
 
             override fun onFailure(httpStatus: Int, message: String) {
@@ -101,28 +107,28 @@ class LogInFragment : Fragment() {
         })
     }
 
-    private fun loginAccount(naverProfile: NidProfile) {
+    private fun loginAccount(user: User) {
         val auth = Firebase.auth
-        auth.signInWithEmailAndPassword(naverProfile.email!!, naverProfile.id!!)
+        auth.signInWithEmailAndPassword(user.email, user.id)
             .addOnCompleteListener(requireActivity()) { task ->
                 if (task.isSuccessful) {
                     lifecycleScope.launch {
-                        viewModel.castingRemoteData()
+                        viewModel.initLocalData()
                         findNavController().navigate(R.id.action_logInFragment_to_homeFragment)
                     }
                 } else {
-                    createAccount(naverProfile)
+                    createAccount(user)
                 }
             }
     }
 
-    private fun createAccount(naverProfile: NidProfile) {
+    private fun createAccount(user: User) {
         val auth = Firebase.auth
-        auth.createUserWithEmailAndPassword(naverProfile.email!!, naverProfile.id!!)
+        auth.createUserWithEmailAndPassword(user.email, user.id)
             .addOnCompleteListener(requireActivity()) { task ->
                 if (task.isSuccessful) {
                     lifecycleScope.launch {
-                        viewModel.resisterUser(naverProfile)
+                        viewModel.resisterUser(user)
                         findNavController().navigate(R.id.action_logInFragment_to_homeFragment)
                     }
                 }

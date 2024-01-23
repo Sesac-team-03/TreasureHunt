@@ -12,6 +12,9 @@ data class LogEntity(
     val theme: String,
     @ColumnInfo("created_date")
     val createdDate: Long,
+    @ColumnInfo("remote_id")
+    val remoteId: String? = null,
     @PrimaryKey(autoGenerate = true)
-    val uid: Long = 0
+    val id:
+    Long = 0
 )

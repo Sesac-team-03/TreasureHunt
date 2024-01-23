@@ -6,7 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.treasurehunt.data.remote.model.UserEntity
+import com.treasurehunt.data.local.model.UserEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -15,10 +15,10 @@ interface UserDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(user: UserEntity): Long
 
-    @Query("SELECT * from places WHERE id = :id")
+    @Query("SELECT * from users WHERE id = :id")
     fun getUserById(id: String): Flow<UserEntity>
 
-    @Query("SELECT * from places WHERE `plan` = 0")
+    @Query("SELECT * from users")
     fun getAllUsers(): Flow<List<UserEntity>>
 
     @Update

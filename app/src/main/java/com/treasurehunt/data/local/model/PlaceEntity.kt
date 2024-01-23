@@ -1,14 +1,18 @@
 package com.treasurehunt.data.local.model
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity("places")
 data class PlaceEntity(
-    val log: String,
     val lat: Double,
     val lng: Double,
     val plan: Boolean,
+    val caption: String,
+    @ColumnInfo("remote_id")
+    val remoteId: String? = null,
+    val log: String? = null,
     @PrimaryKey(autoGenerate = true)
-    val uid: Long = 0
+    val id: Long = 0
 )
