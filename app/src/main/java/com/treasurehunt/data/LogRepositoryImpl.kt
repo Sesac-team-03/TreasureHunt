@@ -3,20 +3,20 @@ package com.treasurehunt.data
 import com.treasurehunt.data.local.model.LogEntity
 import com.treasurehunt.data.local.LogDao
 import com.treasurehunt.data.remote.model.LogDTO
-import com.treasurehunt.data.remote.model.LogDTODataSource
+import com.treasurehunt.data.remote.model.LogRemoteDataSource
 import kotlinx.coroutines.flow.Flow
 
 class LogRepositoryImpl(
     private val logDao: LogDao,
-    private val logDTODataSource: LogDTODataSource
+    private val logRemoteDataSource: LogRemoteDataSource
 ) : LogRepository {
 
     override suspend fun insert(log: LogEntity) = logDao.insert(log)
-    override suspend fun getRemoteLog(id: String): LogDTO = logDTODataSource.getLog(id)
-    override suspend fun getRemoteLogs(): List<LogDTO> = logDTODataSource.getLogs()
+    override suspend fun getRemoteLog(id: String): LogDTO = logRemoteDataSource.getLog(id)
+    override suspend fun getRemoteAllLogs(): List<LogDTO> = logRemoteDataSource.getAllLogs()
 
-    override suspend fun addRemoteLog(logModel: LogDTO) {
-        logDTODataSource.addLog(logModel)
+    override suspend fun insert(logDTD: LogDTO) {
+        logRemoteDataSource.insert(logDTD)
     }
 
     override fun getLogById(id: String): Flow<LogEntity> = logDao.getLogById(id)

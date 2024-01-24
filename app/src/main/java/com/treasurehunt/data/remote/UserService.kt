@@ -21,7 +21,7 @@ private val jsonRule = Json {
 interface UserService {
 
     @PUT("/users/{id}.json")
-    suspend fun resisterUser(
+    suspend fun insert(
         @Path("id") id: String,
         @Body data: UserDTO
     )

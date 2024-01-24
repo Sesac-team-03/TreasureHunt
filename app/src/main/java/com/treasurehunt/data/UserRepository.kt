@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 interface UserRepository {
 
     suspend fun insert(user: UserEntity): Long
-    suspend fun insertRemoteUser(id: String, data: UserDTO)
+    suspend fun insert(id: String, data: UserDTO)
     suspend fun getRemoteUser(id: String): UserDTO
 
     fun getUserById(id: String): Flow<UserEntity>

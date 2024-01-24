@@ -37,8 +37,8 @@ class SaveLogViewModel(
         setButtonState()
     }
 
-    suspend fun addLog(logDTO: LogDTO) {
-        logRepo.addRemoteLog(logDTO)
+    suspend fun insertLog(logDTO: LogDTO) {
+        logRepo.insert(logDTO)
     }
 
     fun removeImage(image: ImageModel) {
