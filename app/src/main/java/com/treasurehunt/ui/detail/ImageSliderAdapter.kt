@@ -10,10 +10,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.treasurehunt.R
 
-class ImageSliderAdapter :
-    ListAdapter<Any, ImageSliderAdapter.ImageViewHolder>(ImageDiffCallback()) {
+class ImageSliderAdapter(
+    private val imageUrls: List<Any>
+) : ListAdapter<Any, ImageSliderAdapter.ImageViewHolder>(ImageDiffCallback()) {
 
     internal var currentPage: Int = 0
+
+    init {
+        submitList(imageUrls)
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_image, parent, false)
         return ImageViewHolder(view)
