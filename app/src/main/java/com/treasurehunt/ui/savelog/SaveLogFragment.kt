@@ -71,6 +71,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         setAlbumPermission()
         loadMap()
         saveLog()
+        backScreen()
     }
 
     override fun onDestroyView() {
@@ -193,6 +194,12 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
             else -> {
                 requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_COARSE_LOCATION)
             }
+        }
+    }
+
+    private fun backScreen() {
+        binding.ibCancel.setOnClickListener {
+            findNavController().navigateUp()
         }
     }
 
