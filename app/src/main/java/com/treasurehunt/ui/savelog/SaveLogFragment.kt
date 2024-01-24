@@ -17,6 +17,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import com.google.firebase.storage.storage
 import com.naver.maps.map.LocationTrackingMode
 import com.naver.maps.map.MapFragment
@@ -29,6 +30,7 @@ import com.treasurehunt.databinding.FragmentSavelogBinding
 import com.treasurehunt.ui.savelog.adapter.SaveLogAdapter
 import com.treasurehunt.util.showSnackbar
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.Date
@@ -134,29 +136,31 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
             }
             val place = "123"
             val text = binding.etText.text.toString()
-            val user = 1
             val theme = "123"
             val images: MutableList<String> = arrayListOf()
-            for (i in 0 until viewModel.images.value.size) {
-                uploadImage(viewModel.images.value[i].url.toUri())
-                images.add("${viewModel.images.value[i].url.replace("[^0-9]".toRegex(), "")}.png")
-            }
+            val uid = Firebase.auth.currentUser!!.uid
             lifecycleScope.launch {
+                for (i in 0 until viewModel.images.value.size) {
+                    uploadImage(uid, viewModel.images.value[i].url.toUri())
+                    images.add("${viewModel.images.value[i].url.replace("[^0-9]".toRegex(), "")}.png")
+                }
                 viewModel.insertLog(LogDTO(place, images, text, theme, createdDate))
+                findNavController().navigateUp()
             }
         }
     }
 
     @SuppressLint("SimpleDateFormat")
-    private fun uploadImage(uri: Uri) {
+    private suspend fun uploadImage(uid: String, uri: Uri) {
         val storage = Firebase.storage
-        val storageRef = storage.getReference("uid/image")
+        val storageRef = storage.getReference("${uid}/log_images")
         val fileName = uri.toString().replace("[^0-9]".toRegex(), "")
         val mountainsRef = storageRef.child("${fileName}.png")
         val uploadTask = mountainsRef.putFile(uri)
-        uploadTask.addOnSuccessListener { taskSnapshot ->
+        try {
+            uploadTask.await()
             binding.root.showSnackbar(R.string.savelog_sb_upload_success)
-        }.addOnFailureListener {
+        } catch (e: Exception) {
             binding.root.showSnackbar(R.string.savelog_sb_upload_failure)
         }
     }
