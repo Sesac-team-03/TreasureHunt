@@ -44,7 +44,7 @@ class LoginViewModel(
         val currentUser = Firebase.auth.currentUser!!
         // 테스트 샘플
         val userDTO = UserDTO(
-            email = currentUser.email!!,
+            email = currentUser.email ?: "",
             logs = listOf("-NoV18iQHObalOr66Yh4", "0"),
             places = listOf("0")
         )
