@@ -89,8 +89,8 @@ class LogInFragment : Fragment() {
                 val naverProfile = response.profile!!
                 val user =
                     User(
-                        naverProfile.id!!,
                         naverProfile.email!!,
+                        naverProfile.id!!,
                         naverProfile.nickname,
                         naverProfile.profileImage
                     )
