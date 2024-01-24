@@ -50,6 +50,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             setLocationTrackingMode(isGranted)
+            handleAccessAlbum(isGranted)
         }
 
     override fun onCreateView(
@@ -67,7 +68,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         super.onViewCreated(view, savedInstanceState)
         showMapFullScreen()
         initAdapter()
-        setAddImage()
+        setAlbumPermission()
         loadMap()
         saveLog()
     }
@@ -107,9 +108,19 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun setAddImage() {
-        binding.ibSelectPhoto.setOnClickListener {
+    private fun handleAccessAlbum(isGranted: Boolean) {
+        if (isGranted) {
             imageLauncher.launch(viewModel.getImage())
+        }
+    }
+
+    private fun setAlbumPermission() {
+        binding.ibSelectPhoto.setOnClickListener {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                requestPermissionLauncher.launch(android.Manifest.permission.READ_MEDIA_IMAGES)
+            } else {
+                requestPermissionLauncher.launch(android.Manifest.permission.READ_EXTERNAL_STORAGE)
+            }
         }
     }
 
