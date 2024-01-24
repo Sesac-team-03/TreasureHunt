@@ -89,8 +89,8 @@ class LogInFragment : Fragment() {
                 val naverProfile = response.profile!!
                 val user =
                     User(
-                        naverProfile.id!!,
                         naverProfile.email!!,
+                        naverProfile.id!!,
                         naverProfile.nickname,
                         naverProfile.profileImage
                     )
@@ -128,7 +128,7 @@ class LogInFragment : Fragment() {
             .addOnCompleteListener(requireActivity()) { task ->
                 if (task.isSuccessful) {
                     lifecycleScope.launch {
-                        viewModel.resisterUser(user)
+                        viewModel.insertNaverUser(user)
                         findNavController().navigate(R.id.action_logInFragment_to_homeFragment)
                     }
                 }
@@ -140,7 +140,10 @@ class LogInFragment : Fragment() {
             Firebase.auth.signInAnonymously()
                 .addOnCompleteListener(Activity()) { task ->
                     if (task.isSuccessful) {
-                        findNavController().navigate(R.id.action_logInFragment_to_homeFragment)
+                        lifecycleScope.launch {
+                            viewModel.insertGuestUser()
+                            findNavController().navigate(R.id.action_logInFragment_to_homeFragment)
+                        }
                     }
                 }
         }

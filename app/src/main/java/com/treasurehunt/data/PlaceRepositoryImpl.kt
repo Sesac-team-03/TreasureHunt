@@ -1,18 +1,18 @@
 package com.treasurehunt.data
 
 import com.treasurehunt.data.local.PlaceDao
-import com.treasurehunt.data.remote.model.PlaceDTODataSource
+import com.treasurehunt.data.remote.model.PlaceRemoteDataSource
 import com.treasurehunt.data.local.model.PlaceEntity
 import com.treasurehunt.data.remote.model.PlaceDTO
 import kotlinx.coroutines.flow.Flow
 
 class PlaceRepositoryImpl(
     private val placeDao: PlaceDao,
-    private val placeDTODataSource: PlaceDTODataSource
+    private val placeRemoteDataSource: PlaceRemoteDataSource
 ) : PlaceRepository {
 
     override suspend fun insert(place: PlaceEntity) = placeDao.insert(place)
-    override suspend fun getRemotePlace(id: String): PlaceDTO = placeDTODataSource.getPlace(id)
+    override suspend fun getRemotePlace(id: String): PlaceDTO = placeRemoteDataSource.getPlace(id)
 
     override fun getPlaceById(id: String): Flow<PlaceEntity> = placeDao.getPlaceById(id)
 

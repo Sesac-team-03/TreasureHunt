@@ -8,11 +8,11 @@ interface LogRepository {
 
     suspend fun insert(log: LogEntity): Long
 
+    suspend fun insert(log: LogDTO)
+
     suspend fun getRemoteLog(id: String): LogDTO
 
-    suspend fun getRemoteLogs(): List<LogDTO>
-
-    suspend fun addRemoteLog(logModel: LogDTO)
+    suspend fun getRemoteAllLogs(): List<LogDTO>
 
     fun getLogById(id: String): Flow<LogEntity>
 

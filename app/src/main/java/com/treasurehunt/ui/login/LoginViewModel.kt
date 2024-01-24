@@ -25,7 +25,7 @@ class LoginViewModel(
     private val placeRepository: PlaceRepository
 ) : ViewModel() {
 
-    suspend fun resisterUser(user: User) {
+    suspend fun insertNaverUser(user: User) {
         updateProfile(user)
         delay(USER_UPDATE_DELAY)
         val currentUser = Firebase.auth.currentUser!!
@@ -37,7 +37,18 @@ class LoginViewModel(
             logs = listOf("-NoV18iQHObalOr66Yh4", "0"),
             places = listOf("0")
         )
-        userRepository.insertRemoteUser(currentUser.uid, userDTO)
+        userRepository.insert(currentUser.uid, userDTO)
+    }
+
+    suspend fun insertGuestUser() {
+        val currentUser = Firebase.auth.currentUser!!
+        // 테스트 샘플
+        val userDTO = UserDTO(
+            email = currentUser.email ?: "",
+            logs = listOf("-NoV18iQHObalOr66Yh4", "0"),
+            places = listOf("0")
+        )
+        userRepository.insert(currentUser.uid, userDTO)
     }
 
     private fun updateProfile(user: User) {

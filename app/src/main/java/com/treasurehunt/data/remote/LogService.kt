@@ -26,10 +26,10 @@ interface LogService {
     ): LogDTO
 
     @GET("logs.json")
-    suspend fun getLogs(): List<LogDTO>
+    suspend fun getAllLogs(): List<LogDTO>
 
     @POST("logs.json")
-    suspend fun addLog(@Body logModel: LogDTO)
+    suspend fun insert(@Body logDTO: LogDTO)
 
     companion object {
 

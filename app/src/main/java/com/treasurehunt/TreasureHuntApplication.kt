@@ -11,9 +11,9 @@ import com.treasurehunt.data.local.TreasureHuntDatabase
 import com.treasurehunt.data.remote.LogService
 import com.treasurehunt.data.remote.PlaceService
 import com.treasurehunt.data.remote.UserService
-import com.treasurehunt.data.remote.model.LogDTODataSource
-import com.treasurehunt.data.remote.model.PlaceDTODataSource
-import com.treasurehunt.data.remote.model.UserDTODataSource
+import com.treasurehunt.data.remote.model.LogRemoteDataSource
+import com.treasurehunt.data.remote.model.PlaceRemoteDataSource
+import com.treasurehunt.data.remote.model.UserRemoteDataSource
 
 class TreasureHuntApplication : Application() {
 
@@ -22,15 +22,15 @@ class TreasureHuntApplication : Application() {
         userRepo =
             UserRepositoryImpl(
                 TreasureHuntDatabase.from(this).userDao(),
-                UserDTODataSource(UserService.create())
+                UserRemoteDataSource(UserService.create())
             )
         logRepo = LogRepositoryImpl(
             TreasureHuntDatabase.from(this).logDao(),
-            LogDTODataSource(LogService.create())
+            LogRemoteDataSource(LogService.create())
         )
         placeRepo = PlaceRepositoryImpl(
             TreasureHuntDatabase.from(this).placeDao(),
-            PlaceDTODataSource(PlaceService.create())
+            PlaceRemoteDataSource(PlaceService.create())
         )
     }
 

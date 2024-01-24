@@ -130,7 +130,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
                 images.add("${viewModel.images.value[i].url.replace("[^0-9]".toRegex(), "")}.png")
             }
             lifecycleScope.launch {
-                viewModel.addLog(LogDTO(place, images, text, theme, createdDate))
+                viewModel.insertLog(LogDTO(place, images, text, theme, createdDate))
             }
         }
     }
