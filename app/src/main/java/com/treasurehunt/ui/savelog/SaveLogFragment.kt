@@ -28,6 +28,7 @@ import com.treasurehunt.R
 import com.treasurehunt.data.remote.model.LogDTO
 import com.treasurehunt.databinding.FragmentSavelogBinding
 import com.treasurehunt.ui.savelog.adapter.SaveLogAdapter
+import com.treasurehunt.util.showGetStringSnackbar
 import com.treasurehunt.util.showSnackbar
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -141,7 +142,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
             val uid = Firebase.auth.currentUser!!.uid
             lifecycleScope.launch {
                 for (i in 0 until viewModel.images.value.size) {
-                    uploadImage(uid, viewModel.images.value[i].url.toUri())
+                    uploadImage(i + 1 , viewModel.images.value.size, uid, viewModel.images.value[i].url.toUri())
                     images.add("${viewModel.images.value[i].url.replace("[^0-9]".toRegex(), "")}.png")
                 }
                 viewModel.insertLog(LogDTO(place, images, text, theme, createdDate))
@@ -151,16 +152,16 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
     }
 
     @SuppressLint("SimpleDateFormat")
-    private suspend fun uploadImage(uid: String, uri: Uri) {
+    private suspend fun uploadImage(currentCount: Int, maxCount: Int, uid: String, uri: Uri) {
         val storage = Firebase.storage
         val storageRef = storage.getReference("${uid}/log_images")
         val fileName = uri.toString().replace("[^0-9]".toRegex(), "")
         val mountainsRef = storageRef.child("${fileName}.png")
         val uploadTask = mountainsRef.putFile(uri)
-        try {
-            uploadTask.await()
-            binding.root.showSnackbar(R.string.savelog_sb_upload_success)
-        } catch (e: Exception) {
+        uploadTask.await()
+        uploadTask.addOnSuccessListener {
+            binding.root.showGetStringSnackbar(getString(R.string.savelog_sb_upload_success, currentCount, maxCount))
+        }.addOnFailureListener {
             binding.root.showSnackbar(R.string.savelog_sb_upload_failure)
         }
     }
