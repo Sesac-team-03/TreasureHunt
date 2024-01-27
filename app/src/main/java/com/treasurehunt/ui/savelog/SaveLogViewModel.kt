@@ -17,8 +17,8 @@ class SaveLogViewModel(
 
     private val _images: MutableStateFlow<List<ImageModel>> = MutableStateFlow(emptyList())
     val images = _images.asStateFlow()
-    private val _isImageMax = MutableStateFlow(false)
-    val isImageMax = _isImageMax.asStateFlow()
+    private val _imageUrl: MutableStateFlow<List<String>> = MutableStateFlow(emptyList())
+    val imageUrl = _imageUrl.asStateFlow()
     private val _text: MutableStateFlow<String> = MutableStateFlow("")
     val text = _text.asStateFlow()
     private val _isEnabled: MutableStateFlow<Boolean> = MutableStateFlow(false)
@@ -31,9 +31,12 @@ class SaveLogViewModel(
         }
     }
 
+    fun addImageUrl(url: String) {
+        _imageUrl.value += url
+    }
+
     fun addImage(image: ImageModel) {
         _images.value += image
-        _isImageMax.value = images.value.size >= 5
         setButtonState()
     }
 
@@ -43,7 +46,6 @@ class SaveLogViewModel(
 
     fun removeImage(image: ImageModel) {
         _images.value -= image
-        _isImageMax.value = images.value.size >= 5
         setButtonState()
     }
 

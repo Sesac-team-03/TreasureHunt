@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -138,14 +139,13 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
             val place = "123"
             val text = binding.etText.text.toString()
             val theme = "123"
-            val images: MutableList<String> = arrayListOf()
             val uid = Firebase.auth.currentUser!!.uid
             lifecycleScope.launch {
                 for (i in 0 until viewModel.images.value.size) {
                     uploadImage(i + 1 , viewModel.images.value.size, uid, viewModel.images.value[i].url.toUri())
-                    images.add("${viewModel.images.value[i].url.replace("[^0-9]".toRegex(), "")}.png")
                 }
-                viewModel.insertLog(LogDTO(place, images, text, theme, createdDate))
+                Log.d("SaveLogFragment", viewModel.imageUrl.value.toString())
+                viewModel.insertLog(LogDTO(place, viewModel.imageUrl.value, text, theme, createdDate))
                 findNavController().navigateUp()
             }
         }
@@ -158,12 +158,13 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         val fileName = uri.toString().replace("[^0-9]".toRegex(), "")
         val mountainsRef = storageRef.child("${fileName}.png")
         val uploadTask = mountainsRef.putFile(uri)
-        uploadTask.await()
-        uploadTask.addOnSuccessListener {
+        uploadTask.addOnSuccessListener { taskSnapshot ->
+            viewModel.addImageUrl(taskSnapshot.storage.toString())
             binding.root.showGetStringSnackbar(getString(R.string.savelog_sb_upload_success, currentCount, maxCount))
         }.addOnFailureListener {
             binding.root.showSnackbar(R.string.savelog_sb_upload_failure)
         }
+        uploadTask.await()
     }
 
     private fun setLocationTrackingMode(isGranted: Boolean) {
