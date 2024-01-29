@@ -2,9 +2,9 @@ package com.treasurehunt.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.lifecycle.viewmodel.CreationExtras
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
@@ -13,8 +13,9 @@ import com.treasurehunt.TreasureHuntApplication.Companion.logRepo
 import com.treasurehunt.TreasureHuntApplication.Companion.placeRepo
 import com.treasurehunt.data.LogRepository
 import com.treasurehunt.data.PlaceRepository
-import com.treasurehunt.data.remote.model.MapUiState
 import com.treasurehunt.data.local.model.PlaceEntity
+import com.treasurehunt.data.remote.model.MapUiState
+import com.treasurehunt.util.ConnectivityRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,7 +24,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.IOException
 
-class HomeViewModel(private val logRepo: LogRepository, private val placeRepo: PlaceRepository) :
+class HomeViewModel(
+    private val logRepo: LogRepository,
+    private val placeRepo: PlaceRepository,
+    private val connectivityRepo: ConnectivityRepository
+) :
     ViewModel() {
 
     private val _uiState = MutableStateFlow(MapUiState())
@@ -31,7 +36,23 @@ class HomeViewModel(private val logRepo: LogRepository, private val placeRepo: P
     private var fetchJob: Job? = null
 
     init {
+        updateNetworkConnectivity()
         getAllMarkers()
+    }
+
+    override fun onCleared() {
+        connectivityRepo.release()
+        super.onCleared()
+    }
+
+    private fun updateNetworkConnectivity() {
+        viewModelScope.launch {
+            connectivityRepo.isConnected.collect { value ->
+                _uiState.update {
+                    it.copy(isOnline = value)
+                }
+            }
+        }
     }
 
     fun addPlan(plan: PlaceEntity) {
@@ -96,9 +117,17 @@ class HomeViewModel(private val logRepo: LogRepository, private val placeRepo: P
     }
 
     companion object {
-        val Factory: ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                HomeViewModel(logRepo, placeRepo)
+        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(
+                modelClass: Class<T>,
+                extras: CreationExtras
+            ): T {
+                val application = checkNotNull(extras[APPLICATION_KEY])
+                return HomeViewModel(
+                    logRepo,
+                    placeRepo,
+                    ConnectivityRepository(application.applicationContext)
+                ) as T
             }
         }
     }

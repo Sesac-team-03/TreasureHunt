@@ -7,5 +7,6 @@ data class MapUiState(
     val isSignedInAsMember: Boolean = false,
     val places: List<PlaceEntity> = listOf(),
     val plans: List<PlaceEntity> = listOf(),
-    val markers: List<Marker> = listOf()
+    val markers: List<Marker> = listOf(),
+    val isOnline: Boolean = false
 )
