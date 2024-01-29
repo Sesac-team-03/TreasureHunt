@@ -149,20 +149,20 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                 viewModel.uiState.collect { uiState ->
                     uiState.markers.forEach { marker ->
                         marker.map = map
-                        marker.setClick()
+                        val placeId = ""
+                        marker.setClick(placeId)
                     }
                 }
             }
         }
     }
 
-    private fun Marker.setClick() {
+    private fun Marker.setClick(contentId: String) {
         setOnClickListener {
             if (tag == "place") {
                 Log.d("test$", captionText)
                 // open specific detail
-                val bottomSheetFragment = BottomSheetFragment()
-                bottomSheetFragment.show(childFragmentManager, bottomSheetFragment.tag)
+                showMarkerBottomSheet(contentId)
             } else {
                 Log.d("test$", captionText)
                 // navigate to save log
