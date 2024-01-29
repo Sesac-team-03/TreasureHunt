@@ -171,7 +171,7 @@ class ProfileFragment : Fragment() {
                 UserDTO(
                     email = binding.tvAccount.text.toString(),
                     nickname = binding.etNickname.text.toString(),
-                    profileImage = viewModel.profileUri.value
+                    profileImage = viewModel.userData.value!!.profileImage.toString()
                 )
             )
         }
