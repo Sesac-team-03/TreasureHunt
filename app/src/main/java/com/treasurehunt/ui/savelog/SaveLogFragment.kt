@@ -5,7 +5,6 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -54,7 +53,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             setLocationTrackingMode(isGranted)
-            handleAccessAlbum(isGranted)
+            setAddImage(isGranted)
         }
 
     override fun onCreateView(
@@ -144,7 +143,6 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
                 for (i in 0 until viewModel.images.value.size) {
                     uploadImage(i + 1 , viewModel.images.value.size, uid, viewModel.images.value[i].url.toUri())
                 }
-                Log.d("SaveLogFragment", viewModel.imageUrl.value.toString())
                 viewModel.insertLog(LogDTO(place, viewModel.imageUrl.value, text, theme, createdDate))
                 findNavController().navigateUp()
             }
