@@ -12,6 +12,9 @@ class PlaceRepositoryImpl(
 ) : PlaceRepository {
 
     override suspend fun insert(place: PlaceEntity) = placeDao.insert(place)
+
+    override suspend fun insert(place: PlaceDTO): String = placeRemoteDataSource.insert(place)
+
     override suspend fun getRemotePlace(id: String): PlaceDTO = placeRemoteDataSource.getPlace(id)
 
     override fun getPlaceById(id: String): Flow<PlaceEntity> = placeDao.getPlaceById(id)

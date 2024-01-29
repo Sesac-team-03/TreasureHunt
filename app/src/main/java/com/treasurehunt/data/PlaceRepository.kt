@@ -8,6 +8,8 @@ interface PlaceRepository {
 
     suspend fun insert(place: PlaceEntity): Long
 
+    suspend fun insert(place: PlaceDTO): String
+
     suspend fun getRemotePlace(id: String): PlaceDTO
 
     fun getPlaceById(id: String): Flow<PlaceEntity>
