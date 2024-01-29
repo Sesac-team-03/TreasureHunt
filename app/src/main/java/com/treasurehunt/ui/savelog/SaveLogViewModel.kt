@@ -16,6 +16,7 @@ import com.treasurehunt.data.remote.model.PlaceDTO
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 class SaveLogViewModel(
     private val logRepo: LogRepository,
@@ -80,6 +81,10 @@ class SaveLogViewModel(
         return viewModelScope.async {
             placeRepo.insert(placeDTO)
         }.await()
+    }
+
+    suspend fun updatePlace(place: PlaceEntity) {
+        placeRepo.update(place)
     }
 
     companion object {

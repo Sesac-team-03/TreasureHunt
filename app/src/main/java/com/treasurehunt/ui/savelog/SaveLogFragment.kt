@@ -33,7 +33,6 @@ import com.treasurehunt.data.remote.model.PlaceDTO
 import com.treasurehunt.databinding.FragmentSavelogBinding
 import com.treasurehunt.ui.savelog.adapter.SaveLogAdapter
 import com.treasurehunt.util.showSnackbar
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.time.LocalDateTime
@@ -156,6 +155,9 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
             viewLifecycleOwner.lifecycleScope.launch {
                 val localPlaceId = viewModel.insertPlace(placeEntity)
                 val remotePlaceId = viewModel.insertPlace(placeDTO)
+
+                viewModel.updatePlace(placeEntity.copy(id = localPlaceId, remoteId = remotePlaceId))
+
                 val createdDate = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
                 } else {

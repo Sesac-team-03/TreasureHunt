@@ -32,7 +32,6 @@
             app:destination="@id/homeFragment"
             app:popUpTo="@id/logInFragment"
             app:popUpToInclusive="true" />
-
     </fragment>
 
     <fragment
