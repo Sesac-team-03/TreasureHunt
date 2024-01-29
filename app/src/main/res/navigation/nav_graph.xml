@@ -81,14 +81,13 @@
             android:id="@+id/action_detailFragment_to_saveLogFragment"
             app:destination="@id/saveLogFragment" />
     </dialog>
-<<<<<<< HEAD
 
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.treasurehunt.ui.profile.ProfileFragment"
         android:label="ProfileFragment"
         tools:layout="@layout/fragment_profile" />
-=======
+
     <dialog
         android:id="@+id/mapDialogFragment"
         android:name="com.treasurehunt.ui.home.MapDialogFragment"
@@ -104,5 +103,4 @@
             android:name="MapSymbol"
             app:argType="com.treasurehunt.ui.home.MapSymbol" />
     </dialog>
->>>>>>> d71dc85 (feat: 홈 지도 화면 장소 클릭시 다이얼로그 표시 구현)
 </navigation>

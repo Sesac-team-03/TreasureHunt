@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.storage.storage
@@ -25,10 +26,14 @@ import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.util.FusedLocationSource
 import com.treasurehunt.R
+import com.treasurehunt.data.local.model.LogEntity
+import com.treasurehunt.data.local.model.PlaceEntity
 import com.treasurehunt.data.remote.model.LogDTO
+import com.treasurehunt.data.remote.model.PlaceDTO
 import com.treasurehunt.databinding.FragmentSavelogBinding
 import com.treasurehunt.ui.savelog.adapter.SaveLogAdapter
 import com.treasurehunt.util.showSnackbar
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.time.LocalDateTime
@@ -54,6 +59,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
             setLocationTrackingMode(isGranted)
             setAddImage(isGranted)
         }
+    private val args: SaveLogFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -134,17 +140,34 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
 
     private fun saveLog() {
         binding.btnSave.setOnClickListener {
-            val createdDate = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
-            } else {
-                Date().time
-            }
-            // 임시 데이터
-            val place = "123"
-            val text = binding.etText.text.toString()
-            val theme = "123"
-            val uid = Firebase.auth.currentUser!!.uid
-            lifecycleScope.launch {
+            val (lat, lng, caption) = args.MapSymbol
+            val placeEntity = PlaceEntity(
+                lat,
+                lng,
+                false,
+                caption
+            )
+            val placeDTO = PlaceDTO(
+                lat,
+                lng,
+                false,
+                caption
+            )
+            viewLifecycleOwner.lifecycleScope.launch {
+                val localPlaceId = viewModel.insertPlace(placeEntity)
+                val remotePlaceId = viewModel.insertPlace(placeDTO)
+                val createdDate = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                } else {
+                    Date().time
+                }
+                // 임시 데이터
+                val place = "123"
+                val uid = Firebase.auth.currentUser!!.uid
+                val text = binding.etText.text.toString()
+                val user = 1
+                val theme = "123"
+                val images: MutableList<String> = arrayListOf()
                 for (i in 0 until viewModel.images.value.size) {
                     uploadImage(
                         i + 1,
@@ -153,14 +176,19 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
                         viewModel.images.value[i].url.toUri()
                     )
                 }
-                // 테스트용 데이터 전달
-                viewModel.insertLog(LogDTO(
+
+                // add to RemoteUser's logs & places
+                viewModel.insertLog(LogEntity(remotePlaceId, images, text, theme, createdDate))
+                viewModel.insertLog(
+                    LogDTO(
                         place,
-                    mapOf("st" to false),
+                        viewModel.imageUrl.value.associateWith { true },
                         text,
                         theme,
-                        createdDate))
-                findNavController().navigateUp()
+                        createdDate
+                    )
+                )
+                findNavController().navigate(R.id.action_saveLogFragment_to_homeFragment)
             }
         }
     }
