@@ -11,7 +11,7 @@ fun View.showSnackbar(resId: Int) {
     ).show()
 }
 
-fun View.showGetStringSnackbar(string: String) {
+fun View.showParameterSnackbar(string: String) {
     Snackbar.make(
         this,
         string,

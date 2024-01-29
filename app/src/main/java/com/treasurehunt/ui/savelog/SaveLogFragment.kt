@@ -27,7 +27,7 @@ import com.treasurehunt.R
 import com.treasurehunt.data.remote.model.LogDTO
 import com.treasurehunt.databinding.FragmentSavelogBinding
 import com.treasurehunt.ui.savelog.adapter.SaveLogAdapter
-import com.treasurehunt.util.showGetStringSnackbar
+import com.treasurehunt.util.showParameterSnackbar
 import com.treasurehunt.util.showSnackbar
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -156,7 +156,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         val uploadTask = mountainsRef.putFile(uri)
         uploadTask.addOnSuccessListener { taskSnapshot ->
             viewModel.addImageUrl(taskSnapshot.storage.toString())
-            binding.root.showGetStringSnackbar(
+            binding.root.showParameterSnackbar(
                 getString(
                     R.string.savelog_sb_upload_success,
                     currentCount,
