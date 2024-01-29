@@ -46,7 +46,6 @@ class DetailFragment : BottomSheetDialogFragment() {
         contentId = arguments?.getString("content_id")
 
         setImageSlider()
-        setImageSlider()
         setDotsIndicator()
         setShareButton()
         setCloseButton()
