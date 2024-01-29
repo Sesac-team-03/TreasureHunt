@@ -12,6 +12,7 @@ import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.storage.storage
@@ -48,9 +49,10 @@ class ProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initProfile()
+        observeProfile()
         setAlbumPermission()
         setEditButton()
-        initProfile()
     }
 
     override fun onDestroyView() {
@@ -63,6 +65,7 @@ class ProfileFragment : Fragment() {
             val uri = result.data?.data
             viewModel.addImage(uri.toString())
             viewModel.setProfileUri(uri.toString())
+            Glide.with(requireContext()).load(uri).into(binding.ivProfileImage)
         }
     }
 
@@ -105,6 +108,7 @@ class ProfileFragment : Fragment() {
         binding.tvCancel.visibility = View.VISIBLE
         binding.tvCompleted.visibility = View.VISIBLE
         binding.ibCamera.visibility = View.VISIBLE
+        binding.etNickname.setText(binding.tvNickname.text)
         binding.etNickname.visibility = View.VISIBLE
     }
 
@@ -121,6 +125,12 @@ class ProfileFragment : Fragment() {
         viewModel.getUserData()
     }
 
+    private fun observeProfile() {
+        viewModel.userData.observe(viewLifecycleOwner) { userDTO ->
+            updateProfile(userDTO)
+        }
+    }
+
     private suspend fun uploadProfileImage(uri: Uri) {
         val uid = Firebase.auth.currentUser!!.uid
         val storage = Firebase.storage
@@ -128,36 +138,57 @@ class ProfileFragment : Fragment() {
         val fileName = uri.toString().replace("[^0-9]".toRegex(), "")
         val mountainsRef = storageRef.child("${fileName}.png")
         val uploadTask = mountainsRef.putFile(uri)
-        uploadTask.await()
-        uploadTask.addOnProgressListener { taskSnapshot ->
+        uploadTask.addOnSuccessListener { taskSnapshot ->
             viewModel.setProfileUri(taskSnapshot.storage.toString())
-        }.addOnSuccessListener {
-            binding.root.showSnackbar(R.string.savelog_sb_upload_success)
         }.addOnFailureListener {
             binding.root.showSnackbar(R.string.savelog_sb_upload_failure)
         }
+        uploadTask.await()
     }
 
     private fun saveProfile() {
         lifecycleScope.launch {
-            if (viewModel.imageUri.value.isNotEmpty()) {
-                uploadProfileImage(viewModel.imageUri.value.toUri())
-                viewModel.insertUserData(
-                    UserDTO(
-                        email = binding.tvAccount.text.toString(),
-                        nickname = binding.etNickname.text.toString(),
-                        profileImage = viewModel.profileUri.value
-                    )
-                )
+            if (viewModel.imageUri.value.isNullOrEmpty()) {
+                insertUserData()
             } else {
-                viewModel.insertUserData(
-                    UserDTO(
-                        email = binding.tvAccount.text.toString(),
-                        nickname = binding.etNickname.text.toString(),
-                        profileImage = viewModel.profileUri.value
-                    )
-                )
+                uploadProfileImage(viewModel.imageUri.value!!.toUri())
+                insertUserData()
             }
+        }
+    }
+
+    private fun insertUserData() {
+        if (viewModel.userData.value!!.email.isEmpty()) {
+            viewModel.insertUserData(
+                UserDTO(
+                    email = Firebase.auth.currentUser!!.uid,
+                    nickname = binding.etNickname.text.toString(),
+                    profileImage = viewModel.profileUri.value
+                )
+            )
+        } else {
+            viewModel.insertUserData(
+                UserDTO(
+                    email = binding.tvAccount.text.toString(),
+                    nickname = binding.etNickname.text.toString(),
+                    profileImage = viewModel.profileUri.value
+                )
+            )
+        }
+    }
+
+    private fun updateProfile(userDTO: UserDTO) {
+        binding.tvNickname.text = userDTO.nickname.toString()
+        binding.tvAccount.text = userDTO.email
+        if (userDTO.profileImage.toString().contains("https://")) {
+            Glide.with(requireContext()).load(userDTO.profileImage.toString())
+                .into(binding.ivProfileImage)
+        } else if (userDTO.profileImage.toString().isEmpty()) {
+            Glide.with(requireContext()).load(R.drawable.ic_no_profile_image)
+                .into(binding.ivProfileImage)
+        } else {
+            val storageRef = Firebase.storage.getReferenceFromUrl(userDTO.profileImage.toString())
+            Glide.with(requireContext()).load(storageRef).into(binding.ivProfileImage)
         }
     }
 }

@@ -43,7 +43,6 @@
             android:layout_height="80dp"
             android:layout_marginStart="16dp"
             android:scaleType="centerCrop"
-            app:imageUrl="@{viewModel.profileUri}"
             app:layout_constraintBottom_toBottomOf="@+id/view_container"
             app:layout_constraintStart_toStartOf="@+id/view_container"
             app:layout_constraintTop_toTopOf="@+id/view_container"
@@ -68,7 +67,6 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
-            android:text="@{viewModel.nicknameData}"
             app:layout_constraintStart_toEndOf="@+id/iv_profile_image"
             app:layout_constraintTop_toTopOf="@+id/iv_profile_image"
             tools:text="@string/profile_tv_nickname" />
@@ -82,7 +80,6 @@
             android:layout_marginTop="16dp"
             android:background="@drawable/button_record"
             android:visibility="gone"
-            android:text="@{viewModel.nicknameData}"
             app:layout_constraintStart_toEndOf="@id/iv_profile_image"
             app:layout_constraintTop_toTopOf="@id/iv_profile_image"
             tools:text="@string/profile_tv_nickname" />
@@ -92,9 +89,8 @@
             style="@style/Font.ProfileAccount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="48dp"
             android:layout_marginStart="16dp"
-            android:text="@{viewModel.emailData}"
+            android:layout_marginTop="48dp"
             app:layout_constraintStart_toEndOf="@+id/iv_profile_image"
             app:layout_constraintTop_toTopOf="@+id/iv_profile_image"
             tools:text="@string/profile_tv_account" />
