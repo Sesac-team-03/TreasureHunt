@@ -163,7 +163,7 @@ class ProfileFragment : Fragment() {
         if (viewModel.userData.value!!.email.isEmpty()) {
             viewModel.insertUserData(
                 UserDTO(
-                    email = Firebase.auth.currentUser!!.uid,
+                    email = "",
                     nickname = binding.etNickname.text.toString(),
                     profileImage = viewModel.profileUri.value
                 )
@@ -180,33 +180,30 @@ class ProfileFragment : Fragment() {
     }
 
     private fun updateProfile(userDTO: UserDTO) {
-        if (userDTO.nickname.isNullOrEmpty()) {
+        if (userDTO.email.isEmpty() && userDTO.nickname.isNullOrEmpty()) {
             binding.tvNickname.text = Firebase.auth.currentUser!!.uid.substring(0, 16)
-            if (userDTO.profileImage.toString().contains("https://")) {
-                Glide.with(requireContext()).load(userDTO.profileImage.toString())
-                    .into(binding.ivProfileImage)
-            } else if (userDTO.profileImage.isNullOrEmpty()) {
-                Glide.with(requireContext()).load(R.drawable.ic_no_profile_image)
-                    .into(binding.ivProfileImage)
-            } else {
-                val storageRef =
-                    Firebase.storage.getReferenceFromUrl(userDTO.profileImage.toString())
-                Glide.with(requireContext()).load(storageRef).into(binding.ivProfileImage)
-            }
+            validateProfileImage(userDTO)
+        } else if (userDTO.email.isEmpty() && userDTO.nickname.toString().isNotEmpty()) {
+            binding.tvNickname.text = userDTO.nickname
+            validateProfileImage(userDTO)
         } else {
-            binding.tvNickname.text = userDTO.nickname.toString()
             binding.tvAccount.text = userDTO.email
-            if (userDTO.profileImage.toString().contains("https://")) {
-                Glide.with(requireContext()).load(userDTO.profileImage.toString())
-                    .into(binding.ivProfileImage)
-            } else if (userDTO.profileImage.isNullOrEmpty() || userDTO.profileImage.toString().contains("null")) {
-                Glide.with(requireContext()).load(R.drawable.ic_no_profile_image)
-                    .into(binding.ivProfileImage)
-            } else {
-                val storageRef =
-                    Firebase.storage.getReferenceFromUrl(userDTO.profileImage.toString())
-                Glide.with(requireContext()).load(storageRef).into(binding.ivProfileImage)
-            }
+            binding.tvNickname.text = userDTO.nickname
+            validateProfileImage(userDTO)
+        }
+    }
+
+    private fun validateProfileImage(userDTO: UserDTO) {
+        if (userDTO.profileImage.toString().contains(getString(R.string.profile_check_url))) {
+            Glide.with(requireContext()).load(userDTO.profileImage.toString())
+                .into(binding.ivProfileImage)
+        } else if (userDTO.profileImage.isNullOrEmpty()) {
+            Glide.with(requireContext()).load(R.drawable.ic_no_profile_image)
+                .into(binding.ivProfileImage)
+        } else {
+            val storageRef =
+                Firebase.storage.getReferenceFromUrl(userDTO.profileImage.toString())
+            Glide.with(requireContext()).load(storageRef).into(binding.ivProfileImage)
         }
     }
 }
