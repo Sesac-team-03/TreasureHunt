@@ -23,7 +23,7 @@ class PlaceRepositoryImpl(
 
     override fun getAllPlans(): Flow<List<PlaceEntity>> = placeDao.getAllPlans()
 
-    override fun update(place: PlaceEntity) = placeDao.update(place)
+    override suspend fun update(place: PlaceEntity) = placeDao.update(place)
 
     override suspend fun delete(vararg places: PlaceEntity) = placeDao.delete(*places)
 

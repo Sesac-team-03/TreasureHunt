@@ -18,7 +18,7 @@ interface PlaceRepository {
 
     fun getAllPlans(): Flow<List<PlaceEntity>>
 
-    fun update(place: PlaceEntity): Int
+    suspend fun update(place: PlaceEntity): Int
 
     suspend fun delete(vararg places: PlaceEntity): Int
 

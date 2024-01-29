@@ -25,7 +25,7 @@ interface PlaceDao {
     fun getAllPlans(): Flow<List<PlaceEntity>>
 
     @Update
-    fun update(place: PlaceEntity): Int
+    suspend fun update(place: PlaceEntity): Int
 
     @Delete
     suspend fun delete(vararg places: PlaceEntity): Int
