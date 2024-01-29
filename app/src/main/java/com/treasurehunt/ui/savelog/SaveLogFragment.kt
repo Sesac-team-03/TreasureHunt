@@ -113,7 +113,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun handleAccessAlbum(isGranted: Boolean) {
+    private fun setAddImage(isGranted: Boolean) {
         if (isGranted) {
             imageLauncher.launch(viewModel.getImage())
         }
