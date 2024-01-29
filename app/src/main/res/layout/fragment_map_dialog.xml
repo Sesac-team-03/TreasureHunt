@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:gravity="center"
-        android:text="이 장소를 보물상자로 지정할까요?"
+        android:text="@string/map_prompt"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -33,17 +33,17 @@
         android:id="@+id/btn_place"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="네, 가봤어요" />
+        android:text="@string/map_answer_place" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_plan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="네, 가볼래요" />
+        android:text="@string/map_answer_plan" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_cancel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="아니요" />
+        android:text="@string/map_answer_no" />
 </androidx.constraintlayout.widget.ConstraintLayout>
