@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.treasurehunt.R
+import com.treasurehunt.databinding.ItemImageBinding
 
 class ImageSliderAdapter(
     private val imageUrls: List<Any>
@@ -21,24 +22,31 @@ class ImageSliderAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_image, parent, false)
-        return ImageViewHolder(view)
+        val layoutInflater = LayoutInflater.from(parent.context)
+        val binding = ItemImageBinding.inflate(layoutInflater, parent, false)
+        return ImageViewHolder(binding.root)
     }
 
     override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
         val item = getItem(position)
-
-        if (item is String) {
-            Glide.with(holder.itemView.context)
-                .load(item)
-                .into(holder.imageView)
-        } else if (item is Int) {
-            Glide.with(holder.itemView.context)
-                .load(item)
-                .into(holder.imageView)
-        }
-
+        loadImage(holder, item)
         currentPage = position
+    }
+
+    private fun loadImage(holder: ImageViewHolder, item: Any) {
+        when (item) {
+            is String -> {
+                Glide.with(holder.itemView.context)
+                    .load(item)
+                    .into(holder.imageView)
+            }
+
+            is Int -> {
+                Glide.with(holder.itemView.context)
+                    .load(item)
+                    .into(holder.imageView)
+            }
+        }
     }
 
     fun getImageItems(): List<Any> {
