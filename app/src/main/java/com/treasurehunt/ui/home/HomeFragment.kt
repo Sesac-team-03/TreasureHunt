@@ -88,7 +88,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
         showMarkers()
 
-        setPlaceClick()
+        setSymbolClick()
 
         //TODO
 //        naverMap.setOnMapClickListener { coord, point ->
@@ -128,8 +128,10 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         locationOverlay.anchor = PointF(0.5f, 1f)
     }
 
-    private fun setPlaceClick() {
+    private fun setSymbolClick() {
         map.setOnSymbolClickListener { symbol ->
+            if (!viewModel.uiState.value.isOnline) return@setOnSymbolClickListener false
+
             val mapSymbol = MapSymbol(
                 symbol.position.latitude,
                 symbol.position.longitude,
