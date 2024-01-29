@@ -41,9 +41,11 @@ class HomeActivity : AppCompatActivity() {
     }
 
     //TODO
+//    val SCHEME_TREASUREHUNT = "treasurehunt"
+//    val HOST_DETAIL = "detail"
 //    private fun handleDeepLink(intent: Intent?) {
 //        intent?.data?.let { uri ->
-//            if (uri.scheme == "treasurehunt" && uri.host == "detail") {
+//            if (uri.scheme == "SCHEME_TREASUREHUNT" && uri.host == "HOST_DETAIL") {
 //                val identifier = uri.lastPathSegment
 //                navigateToDetailFragmentWithIdentifier(identifier)
 //            }
