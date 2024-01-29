@@ -134,6 +134,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
             } else {
                 Date().time
             }
+            // 임시 데이터
             val place = "123"
             val text = binding.etText.text.toString()
             val theme = "123"
@@ -142,6 +143,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
                 for (i in 0 until viewModel.images.value.size) {
                     uploadImage(i + 1, viewModel.images.value.size, uid, viewModel.images.value[i].url.toUri())
                 }
+                // 테스트용 데이터 전달
                 viewModel.insertLog(LogDTO(place, viewModel.imageUrl.value, text, theme, createdDate))
                 findNavController().navigateUp()
             }
