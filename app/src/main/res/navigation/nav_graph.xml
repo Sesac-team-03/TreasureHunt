@@ -43,6 +43,9 @@
         <action
             android:id="@+id/action_homeFragment_to_saveLogFragment"
             app:destination="@id/saveLogFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_detailFragment"
+            app:destination="@id/detailFragment" />
     </fragment>
 
     <fragment
