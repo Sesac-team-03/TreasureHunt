@@ -5,8 +5,9 @@ import com.treasurehunt.data.local.model.PlaceEntity
 
 data class MapUiState(
     val isSignedInAsMember: Boolean = false,
-    val places: List<PlaceEntity> = listOf(),
+    val visits: List<PlaceEntity> = listOf(),
     val plans: List<PlaceEntity> = listOf(),
-    val markers: List<Marker> = listOf(),
+    val visitMarkers: List<Marker> = listOf(),
+    val planMarkers: List<Marker> = listOf(),
     val isOnline: Boolean = false
 )

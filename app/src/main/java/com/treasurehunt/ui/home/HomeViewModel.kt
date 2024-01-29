@@ -15,11 +15,12 @@ import com.treasurehunt.data.LogRepository
 import com.treasurehunt.data.PlaceRepository
 import com.treasurehunt.data.local.model.PlaceEntity
 import com.treasurehunt.data.remote.model.MapUiState
+import com.treasurehunt.data.remote.model.PlaceDTO
 import com.treasurehunt.util.ConnectivityRepository
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.IOException
@@ -61,14 +62,25 @@ class HomeViewModel(
         }
     }
 
+    suspend fun getPlanById(id: String): PlaceDTO {
+        return viewModelScope.async {
+            return@async placeRepo.getRemotePlace(id)
+        }.await()
+    }
+
     private fun getAllMarkers() {
         fetchJob?.cancel()
 
         fetchJob = viewModelScope.launch {
             try {
-                merge(placeRepo.getAllVisits(), placeRepo.getAllPlans()).collect { placesAndPlans ->
+                placeRepo.getAllVisits().collect { visits ->
                     _uiState.update {
-                        it.copy(markers = placesAndPlans.mapToMarkers())
+                        it.copy(visitMarkers = visits.mapToMarkers())
+                    }
+                }
+                placeRepo.getAllPlans().collect { plans ->
+                    _uiState.update {
+                        it.copy(planMarkers = plans.mapToMarkers())
                     }
                 }
             } catch (e: IOException) {
@@ -83,7 +95,7 @@ class HomeViewModel(
     private fun Marker.from(place: PlaceEntity): Marker {
         return if (!place.plan) {
             apply {
-                tag = "place"
+                tag = place.remoteId
                 captionText = place.caption
                 icon = OverlayImage.fromResource(R.drawable.ic_chest_open)
                 width = 116
@@ -91,7 +103,7 @@ class HomeViewModel(
             }
         } else {
             apply {
-                tag = "plan"
+                tag = place.remoteId
                 captionText = place.caption
                 icon = OverlayImage.fromResource(R.drawable.ic_chest_closed)
                 width = 96

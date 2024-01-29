@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.PointF
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,6 +26,7 @@ import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentHomeBinding
 import kotlinx.coroutines.launch
 import com.treasurehunt.ui.detail.DetailFragment
+import com.treasurehunt.ui.home.HomeFragmentDirections.Companion.actionHomeFragmentToSaveLogFragment
 
 class HomeFragment : Fragment(), OnMapReadyCallback {
 
@@ -89,12 +89,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         showMarkers()
 
         setSymbolClick()
-
-        //TODO
-//        naverMap.setOnMapClickListener { coord, point ->
-//            val bottomSheetFragment = BottomSheetFragment()
-//            bottomSheetFragment.show(childFragmentManager, bottomSheetFragment.tag)
-//        }
     }
 
     private fun initMap(naverMap: NaverMap) {
@@ -147,27 +141,42 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { uiState ->
-                    uiState.markers.forEach { marker ->
+                    uiState.visitMarkers.forEach { marker ->
+                        val remotePlaceId = marker.tag.toString()
                         marker.map = map
-                        val placeId = ""
-                        marker.setClick(placeId)
+                        marker.setPlaceClick(remotePlaceId)
+                    }
+                    uiState.planMarkers.forEach { marker ->
+                        val remotePlaceId = marker.tag.toString()
+                        marker.map = map
+                        marker.setPlanClick(remotePlaceId)
                     }
                 }
             }
         }
     }
 
-    private fun Marker.setClick(contentId: String) {
+    private fun Marker.setPlaceClick(contentId: String) {
         setOnClickListener {
-            if (tag == "place") {
-                Log.d("test$", captionText)
-                // open specific detail
-                showMarkerBottomSheet(contentId)
-            } else {
-                Log.d("test$", captionText)
-                // navigate to save log
+            showMarkerBottomSheet(contentId)
+            true
+        }
+    }
+
+    private fun Marker.setPlanClick(contentId: String) {
+        setOnClickListener {
+            viewLifecycleOwner.lifecycleScope.launch {
+                val plan = viewModel.getPlanById(contentId)
+                val mapSymbol = MapSymbol(
+                    plan.lat,
+                    plan.lng,
+                    plan.caption
+                )
+                val action = HomeFragmentDirections.actionHomeFragmentToSaveLogFragment(mapSymbol)
+                findNavController().navigate(action)
             }
             true
+            // 함수 전체를 코루틴스코프에서 처리할 수 없나
         }
     }
 
