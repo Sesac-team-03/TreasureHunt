@@ -26,7 +26,6 @@ import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentHomeBinding
 import kotlinx.coroutines.launch
 import com.treasurehunt.ui.detail.DetailFragment
-import com.treasurehunt.ui.home.HomeFragmentDirections.Companion.actionHomeFragmentToSaveLogFragment
 
 class HomeFragment : Fragment(), OnMapReadyCallback {
 
@@ -166,7 +165,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     private fun Marker.setPlanClick(contentId: String) {
         setOnClickListener {
             viewLifecycleOwner.lifecycleScope.launch {
-                val plan = viewModel.getPlanById(contentId)
+                val plan = viewModel.getRemotePlaceById(contentId)
                 val mapSymbol = MapSymbol(
                     plan.lat,
                     plan.lng,

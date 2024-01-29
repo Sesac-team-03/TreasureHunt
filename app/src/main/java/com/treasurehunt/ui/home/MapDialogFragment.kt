@@ -56,7 +56,7 @@ class MapDialogFragment : BottomSheetDialogFragment() {
                 true,
                 caption
             )
-            viewModel.addPlan(plan)
+            viewModel.addPlace(plan)
             findNavController().navigateUp()
         }
     }

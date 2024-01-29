@@ -21,6 +21,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.IOException
@@ -56,13 +57,13 @@ class HomeViewModel(
         }
     }
 
-    fun addPlan(plan: PlaceEntity) {
+    fun addPlace(place: PlaceEntity) {
         viewModelScope.launch {
-            placeRepo.insert(plan)
+            placeRepo.insert(place)
         }
     }
 
-    suspend fun getPlanById(id: String): PlaceDTO {
+    suspend fun getRemotePlaceById(id: String): PlaceDTO {
         return viewModelScope.async {
             return@async placeRepo.getRemotePlace(id)
         }.await()
@@ -73,14 +74,14 @@ class HomeViewModel(
 
         fetchJob = viewModelScope.launch {
             try {
-                placeRepo.getAllVisits().collect { visits ->
-                    _uiState.update {
-                        it.copy(visitMarkers = visits.mapToMarkers())
-                    }
-                }
-                placeRepo.getAllPlans().collect { plans ->
-                    _uiState.update {
-                        it.copy(planMarkers = plans.mapToMarkers())
+                merge(placeRepo.getAllVisits(), placeRepo.getAllPlans()).collect { visitsAndPlans ->
+                    _uiState.update { uiState ->
+                        val places = visitsAndPlans.filter { !it.plan }
+                        val plans = visitsAndPlans.filter { it.plan }
+                        uiState.copy(
+                            visitMarkers = places.mapToMarkers(),
+                            planMarkers = plans.mapToMarkers()
+                        )
                     }
                 }
             } catch (e: IOException) {
@@ -109,22 +110,6 @@ class HomeViewModel(
                 width = 96
                 height = 80
             }
-        }
-    }
-
-    // TEST
-    private fun storeSampleData() {
-        viewModelScope.launch {
-            placeRepo.insert(
-                PlaceEntity(
-                    37.495401046241, 127.03978300094604, false, "탐앤탐스", "memory"
-                )
-            )
-            placeRepo.insert(
-                PlaceEntity(
-                    37.49220887221752, 127.0393967628479, true, "스타벅스"
-                )
-            )
         }
     }
 
