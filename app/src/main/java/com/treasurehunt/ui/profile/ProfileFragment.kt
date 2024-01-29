@@ -3,6 +3,7 @@ package com.treasurehunt.ui.profile
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -91,6 +92,7 @@ class ProfileFragment : Fragment() {
         }
         binding.tvCancel.setOnClickListener {
             hideEditView()
+            observeProfile()
         }
         binding.tvCompleted.setOnClickListener {
             if (binding.etNickname.text.isEmpty()) {
@@ -178,17 +180,33 @@ class ProfileFragment : Fragment() {
     }
 
     private fun updateProfile(userDTO: UserDTO) {
-        binding.tvNickname.text = userDTO.nickname.toString()
-        binding.tvAccount.text = userDTO.email
-        if (userDTO.profileImage.toString().contains("https://")) {
-            Glide.with(requireContext()).load(userDTO.profileImage.toString())
-                .into(binding.ivProfileImage)
-        } else if (userDTO.profileImage.toString().isEmpty()) {
-            Glide.with(requireContext()).load(R.drawable.ic_no_profile_image)
-                .into(binding.ivProfileImage)
+        if (userDTO.nickname.isNullOrEmpty()) {
+            binding.tvNickname.text = Firebase.auth.currentUser!!.uid.substring(0, 16)
+            if (userDTO.profileImage.toString().contains("https://")) {
+                Glide.with(requireContext()).load(userDTO.profileImage.toString())
+                    .into(binding.ivProfileImage)
+            } else if (userDTO.profileImage.isNullOrEmpty()) {
+                Glide.with(requireContext()).load(R.drawable.ic_no_profile_image)
+                    .into(binding.ivProfileImage)
+            } else {
+                val storageRef =
+                    Firebase.storage.getReferenceFromUrl(userDTO.profileImage.toString())
+                Glide.with(requireContext()).load(storageRef).into(binding.ivProfileImage)
+            }
         } else {
-            val storageRef = Firebase.storage.getReferenceFromUrl(userDTO.profileImage.toString())
-            Glide.with(requireContext()).load(storageRef).into(binding.ivProfileImage)
+            binding.tvNickname.text = userDTO.nickname.toString()
+            binding.tvAccount.text = userDTO.email
+            if (userDTO.profileImage.toString().contains("https://")) {
+                Glide.with(requireContext()).load(userDTO.profileImage.toString())
+                    .into(binding.ivProfileImage)
+            } else if (userDTO.profileImage.isNullOrEmpty()) {
+                Glide.with(requireContext()).load(R.drawable.ic_no_profile_image)
+                    .into(binding.ivProfileImage)
+            } else {
+                val storageRef =
+                    Firebase.storage.getReferenceFromUrl(userDTO.profileImage.toString())
+                Glide.with(requireContext()).load(storageRef).into(binding.ivProfileImage)
+            }
         }
     }
 }
