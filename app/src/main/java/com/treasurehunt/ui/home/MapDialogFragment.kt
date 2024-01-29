@@ -5,14 +5,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.treasurehunt.data.model.PlaceEntity
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.treasurehunt.data.local.model.PlaceEntity
 import com.treasurehunt.databinding.FragmentMapDialogBinding
 
-class MapDialogFragment : DialogFragment() {
+class MapDialogFragment : BottomSheetDialogFragment() {
 
     private var _binding: FragmentMapDialogBinding? = null
     private val binding get() = _binding!!
@@ -22,17 +22,17 @@ class MapDialogFragment : DialogFragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentMapDialogBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        dialog?.window?.setLayout(400, MATCH_PARENT)
 
         binding.btnPlace.setOnClickListener {
-            // findNavController() -> save log fragment
+            val action = MapDialogFragmentDirections.actionMapDialogFragmentToSaveLogFragment(args.MapSymbol)
+            findNavController().navigate(action)
         }
 
         binding.btnPlan.setOnClickListener {

@@ -59,6 +59,12 @@
         <action
             android:id="@+id/action_saveLogFragment_to_saveLogMapFragment"
             app:destination="@id/saveLogMapFragment" />
+        <action
+            android:id="@+id/action_saveLogFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+        <argument
+            android:name="MapSymbol"
+            app:argType="com.treasurehunt.ui.home.MapSymbol" />
     </fragment>
 
     <fragment
@@ -91,6 +97,9 @@
         <action
             android:id="@+id/action_mapDialogFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
+        <action
+            android:id="@+id/action_mapDialogFragment_to_saveLogFragment"
+            app:destination="@id/saveLogFragment" />
         <argument
             android:name="MapSymbol"
             app:argType="com.treasurehunt.ui.home.MapSymbol" />
