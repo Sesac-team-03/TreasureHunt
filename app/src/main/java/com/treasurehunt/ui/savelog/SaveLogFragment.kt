@@ -1,6 +1,5 @@
 package com.treasurehunt.ui.savelog
 
-import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -74,7 +73,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         setAlbumPermission()
         loadMap()
         saveLog()
-        backScreen()
+        setCancelButton()
     }
 
     override fun onDestroyView() {
@@ -141,7 +140,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
             val uid = Firebase.auth.currentUser!!.uid
             lifecycleScope.launch {
                 for (i in 0 until viewModel.images.value.size) {
-                    uploadImage(i + 1 , viewModel.images.value.size, uid, viewModel.images.value[i].url.toUri())
+                    uploadImage(i + 1, viewModel.images.value.size, uid, viewModel.images.value[i].url.toUri())
                 }
                 viewModel.insertLog(LogDTO(place, viewModel.imageUrl.value, text, theme, createdDate))
                 findNavController().navigateUp()
@@ -149,7 +148,6 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    @SuppressLint("SimpleDateFormat")
     private suspend fun uploadImage(currentCount: Int, maxCount: Int, uid: String, uri: Uri) {
         val storage = Firebase.storage
         val storageRef = storage.getReference("${uid}/log_images")
@@ -158,7 +156,13 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         val uploadTask = mountainsRef.putFile(uri)
         uploadTask.addOnSuccessListener { taskSnapshot ->
             viewModel.addImageUrl(taskSnapshot.storage.toString())
-            binding.root.showGetStringSnackbar(getString(R.string.savelog_sb_upload_success, currentCount, maxCount))
+            binding.root.showGetStringSnackbar(
+                getString(
+                    R.string.savelog_sb_upload_success,
+                    currentCount,
+                    maxCount
+                )
+            )
         }.addOnFailureListener {
             binding.root.showSnackbar(R.string.savelog_sb_upload_failure)
         }
@@ -201,7 +205,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun backScreen() {
+    private fun setCancelButton() {
         binding.ibCancel.setOnClickListener {
             findNavController().navigateUp()
         }
