@@ -87,8 +87,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         showMarkers()
 
         naverMap.setOnMapClickListener { coord, point ->
-            val detailDialogId = R.id.detailFragment
-            findNavController().navigate(detailDialogId)
+            findNavController().navigate(R.id.action_homeFragment_to_detailFragment)
         }
     }
 
