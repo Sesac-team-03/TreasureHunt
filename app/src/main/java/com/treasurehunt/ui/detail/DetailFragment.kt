@@ -25,9 +25,6 @@ class DetailFragment : BottomSheetDialogFragment() {
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = FragmentDetailBinding.inflate(inflater, container, false)
-        contentId = arguments?.getString("content_id")
-
-        setImageSlider()
 
         return binding.root
     }
@@ -45,6 +42,10 @@ class DetailFragment : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        contentId = arguments?.getString("content_id")
+
+        setImageSlider()
         setImageSlider()
         setDotsIndicator()
         setShareButton()
