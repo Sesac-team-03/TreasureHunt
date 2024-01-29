@@ -43,6 +43,9 @@
         <action
             android:id="@+id/action_homeFragment_to_saveLogFragment"
             app:destination="@id/saveLogFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_detailFragment"
+            app:destination="@id/detailFragment" />
     </fragment>
 
     <fragment
@@ -62,7 +65,11 @@
         tools:layout="@layout/fragment_savelog_map" />
 
     <dialog
-        android:id="@+id/bottomSheetFragment"
-        android:name="com.treasurehunt.ui.detail.BottomSheetFragment"
-        android:label="BottomSheetFragment"></dialog>
+        android:id="@+id/detailFragment"
+        android:name="com.treasurehunt.ui.detail.DetailFragment"
+        android:label="detailFragment">
+        <action
+            android:id="@+id/action_detailFragment_to_saveLogFragment"
+            app:destination="@id/saveLogFragment" />
+    </dialog>
 </navigation>

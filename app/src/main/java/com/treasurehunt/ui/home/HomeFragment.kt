@@ -14,6 +14,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import com.naver.maps.map.LocationTrackingMode
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
@@ -23,7 +24,7 @@ import com.naver.maps.map.util.FusedLocationSource
 import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentHomeBinding
 import kotlinx.coroutines.launch
-import com.treasurehunt.ui.detail.BottomSheetFragment
+import com.treasurehunt.ui.detail.DetailFragment
 
 class HomeFragment : Fragment(), OnMapReadyCallback {
 
@@ -85,11 +86,9 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
         showMarkers()
 
-        //TODO
-//        naverMap.setOnMapClickListener { coord, point ->
-//            val bottomSheetFragment = BottomSheetFragment()
-//            bottomSheetFragment.show(childFragmentManager, bottomSheetFragment.tag)
-//        }
+        naverMap.setOnMapClickListener { coord, point ->
+            findNavController().navigate(R.id.action_homeFragment_to_detailFragment)
+        }
     }
 
     private fun initMap(naverMap: NaverMap) {
@@ -137,8 +136,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
     //데이터베이스에 저장된 각각의 마커와 연동시 사용
     fun showMarkerBottomSheet(contentId: String) {
-        val bottomSheetFragment = BottomSheetFragment.newInstance(contentId)
-        bottomSheetFragment.show(childFragmentManager, bottomSheetFragment.tag)
+        val detailFragment = DetailFragment.newInstance(contentId)
+        detailFragment.show(childFragmentManager, detailFragment.tag)
     }
 
     companion object {
