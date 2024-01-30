@@ -83,8 +83,18 @@ class SaveLogViewModel(
         }.await()
     }
 
+    suspend fun getRemotePlaceById(id: String): PlaceDTO {
+        return viewModelScope.async {
+            return@async placeRepo.getRemotePlace(id)
+        }.await()
+    }
+
     suspend fun updatePlace(place: PlaceEntity) {
         placeRepo.update(place)
+    }
+
+    suspend fun updatePlace(id: String, place: PlaceDTO) {
+        placeRepo.update(id, place)
     }
 
     companion object {

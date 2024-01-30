@@ -153,10 +153,19 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
                 caption
             )
             viewLifecycleOwner.lifecycleScope.launch {
-                val localPlaceId = viewModel.insertPlace(placeEntity)
-                val remotePlaceId = viewModel.insertPlace(placeDTO)
-
-                viewModel.updatePlace(placeEntity.copy(id = localPlaceId, remoteId = remotePlaceId))
+                val remotePlaceId: String
+                val localPlaceId: Long
+                if (args.mapSymbol.isPlan) {
+                    remotePlaceId = args.mapSymbol.remoteId ?: return@launch
+                    val remotePlace = viewModel.getRemotePlaceById(remotePlaceId)
+                    localPlaceId = remotePlace.id
+                    viewModel.updatePlace(placeEntity.copy(id = localPlaceId, remoteId = remotePlaceId, plan = false))
+                    viewModel.updatePlace(remotePlaceId, remotePlace.copy(plan = false))
+                } else {
+                    remotePlaceId = viewModel.insertPlace(placeDTO)
+                    localPlaceId = viewModel.insertPlace(placeEntity)
+                    viewModel.updatePlace(placeEntity.copy(id = localPlaceId, remoteId = remotePlaceId))
+                }
 
                 val createdDate = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
