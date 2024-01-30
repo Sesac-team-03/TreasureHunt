@@ -48,6 +48,9 @@
         <action
             android:id="@+id/action_homeFragment_to_detailFragment"
             app:destination="@id/detailFragment" />
+        <argument
+            android:name="uid"
+            app:argType="string" />
     </fragment>
 
     <fragment
@@ -62,7 +65,10 @@
             android:id="@+id/action_saveLogFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
         <argument
-            android:name="MapSymbol"
+            android:name="uid"
+            app:argType="string" />
+        <argument
+            android:name="mapSymbol"
             app:argType="com.treasurehunt.ui.home.MapSymbol" />
     </fragment>
 
@@ -91,7 +97,7 @@
         android:id="@+id/mapDialogFragment"
         android:name="com.treasurehunt.ui.home.MapDialogFragment"
         android:label="fragment_map_dialog"
-        tools:layout="@layout/fragment_map_dialog" >
+        tools:layout="@layout/fragment_map_dialog">
         <action
             android:id="@+id/action_mapDialogFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
@@ -99,7 +105,10 @@
             android:id="@+id/action_mapDialogFragment_to_saveLogFragment"
             app:destination="@id/saveLogFragment" />
         <argument
-            android:name="MapSymbol"
+            android:name="uid"
+            app:argType="string" />
+        <argument
+            android:name="mapSymbol"
             app:argType="com.treasurehunt.ui.home.MapSymbol" />
     </dialog>
 </navigation>

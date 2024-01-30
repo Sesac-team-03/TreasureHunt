@@ -46,11 +46,13 @@ class SplashFragment : Fragment() {
         binding.animationView.playAnimation()
         lifecycleScope.launch {
             delay(2000)
-            if (Firebase.auth.currentUser == null) findNavController().navigate(R.id.action_splashFragment_to_logInFragment)
+            val currentUser = Firebase.auth.currentUser
+            if (currentUser == null) findNavController().navigate(R.id.action_splashFragment_to_logInFragment)
             else {
                 lifecycleScope.launch {
                     viewModel.initLocalData()
-                    findNavController().navigate(R.id.action_splashFragment_to_homeFragment)
+                    val action = SplashFragmentDirections.actionSplashFragmentToHomeFragment(currentUser.uid)
+                    findNavController().navigate(action)
                 }
             }
         }
