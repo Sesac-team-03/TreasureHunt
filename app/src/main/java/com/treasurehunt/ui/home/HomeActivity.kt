@@ -32,12 +32,11 @@ class HomeActivity : AppCompatActivity() {
         val navController = navHostFragment.navController
         val bottomNavigationView = binding.bnvHome
         bottomNavigationView.setupWithNavController(navController)
-        setBottomNavigationView(navController)
+        setBottomNavigationViewVisibility(navController)
     }
 
-    private fun setBottomNavigationView(navController: NavController) {
+    private fun setBottomNavigationViewVisibility(navController: NavController) {
         navController.addOnDestinationChangedListener { _, destination, _ ->
-
             binding.bnvHome.visibility = when (destination.id) {
                 R.id.splashFragment -> View.GONE
                 R.id.logInFragment -> View.GONE
