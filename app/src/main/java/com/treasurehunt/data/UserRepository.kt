@@ -15,9 +15,8 @@ interface UserRepository {
     fun getAllUsers(): Flow<List<UserEntity>>
 
     fun update(user: UserEntity): Int
-    suspend fun update(id: String, data: UserDTO)
 
-    suspend fun update(uid: String, user: UserDTO)
+    suspend fun update(id: String, data: UserDTO)
 
     suspend fun delete(vararg users: UserEntity): Int
 }

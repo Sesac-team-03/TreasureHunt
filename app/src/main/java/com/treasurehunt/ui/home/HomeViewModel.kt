@@ -43,7 +43,6 @@ class HomeViewModel(
     private val _uiState = MutableStateFlow(MapUiState())
     val uiState: StateFlow<MapUiState> = _uiState
     private var fetchJob: Job? = null
-    private val uid = HomeFragmentArgs.fromSavedStateHandle(savedStateHandle).uid
 
     init {
         initUser()
@@ -57,6 +56,8 @@ class HomeViewModel(
     }
 
     private fun initUser() {
+        val uid = HomeFragmentArgs.fromSavedStateHandle(savedStateHandle).uid
+
         viewModelScope.launch {
             _uiState.update {
                 it.copy(uid = uid)
@@ -80,23 +81,18 @@ class HomeViewModel(
         userRepo.update(uid, user)
     }
 
-    suspend fun addPlace(place: PlaceEntity): Long {
-        return viewModelScope.async {
-            return@async placeRepo.insert(place)
-        }.await()
-    }
+    suspend fun addPlace(place: PlaceEntity): Long = viewModelScope.async {
+        return@async placeRepo.insert(place)
+    }.await()
 
-    suspend fun addPlace(place: PlaceDTO): String {
-        return viewModelScope.async {
-            return@async placeRepo.insert(place)
-        }.await()
-    }
 
-    suspend fun getRemotePlaceById(id: String): PlaceDTO {
-        return viewModelScope.async {
-            return@async placeRepo.getRemotePlace(id)
-        }.await()
-    }
+    suspend fun addPlace(place: PlaceDTO): String = viewModelScope.async {
+        return@async placeRepo.insert(place)
+    }.await()
+
+    suspend fun getRemotePlaceById(id: String): PlaceDTO = viewModelScope.async {
+        return@async placeRepo.getRemotePlace(id)
+    }.await()
 
     suspend fun updatePlace(place: PlaceEntity) {
         placeRepo.update(place)
@@ -113,8 +109,7 @@ class HomeViewModel(
             try {
                 merge(placeRepo.getAllVisits(), placeRepo.getAllPlans()).collect { visitsAndPlans ->
                     _uiState.update { uiState ->
-                        val places = visitsAndPlans.filter { !it.plan }
-                        val plans = visitsAndPlans.filter { it.plan }
+                        val (places, plans) = visitsAndPlans.partition { !it.plan }
                         uiState.copy(
                             visitMarkers = places.mapToMarkers(),
                             planMarkers = plans.mapToMarkers()
@@ -126,32 +121,43 @@ class HomeViewModel(
         }
     }
 
-    private fun List<PlaceEntity>.mapToMarkers() = map {
-        Marker(LatLng(it.lat, it.lng)).from(it)
+    private fun List<PlaceEntity>.mapToMarkers() = map { place ->
+        if (!place.plan) {
+            Marker(LatLng(place.lat, place.lng)).from(
+                place.remoteId,
+                place.caption,
+                OverlayImage.fromResource(R.drawable.ic_chest_open),
+                116,
+                80
+            )
+        } else {
+            Marker(LatLng(place.lat, place.lng)).from(
+                place.remoteId,
+                place.caption,
+                OverlayImage.fromResource(R.drawable.ic_chest_closed),
+                96,
+                80
+            )
+        }
     }
 
-    private fun Marker.from(place: PlaceEntity): Marker {
-        return if (!place.plan) {
-            apply {
-                tag = place.remoteId
-                captionText = place.caption
-                icon = OverlayImage.fromResource(R.drawable.ic_chest_open)
-                width = 116
-                height = 80
-            }
-        } else {
-            apply {
-                tag = place.remoteId
-                captionText = place.caption
-                icon = OverlayImage.fromResource(R.drawable.ic_chest_closed)
-                width = 96
-                height = 80
-            }
-        }
+    private fun Marker.from(
+        tag: String?,
+        captionText: String,
+        icon: OverlayImage,
+        width: Int,
+        height: Int
+    ): Marker = apply {
+        this.tag = tag
+        this.captionText = captionText
+        this.icon = icon
+        this.width = width
+        this.height = height
     }
 
     companion object {
         val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(
                 modelClass: Class<T>,
                 extras: CreationExtras

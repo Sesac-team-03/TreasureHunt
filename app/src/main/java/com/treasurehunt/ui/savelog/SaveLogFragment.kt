@@ -31,8 +31,10 @@ import com.treasurehunt.data.local.model.PlaceEntity
 import com.treasurehunt.data.remote.model.LogDTO
 import com.treasurehunt.data.remote.model.PlaceDTO
 import com.treasurehunt.databinding.FragmentSavelogBinding
+import com.treasurehunt.ui.home.MapSymbol
 import com.treasurehunt.ui.savelog.adapter.SaveLogAdapter
 import com.treasurehunt.util.showSnackbar
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.time.LocalDateTime
@@ -139,46 +141,19 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
 
     private fun saveLog() {
         binding.btnSave.setOnClickListener {
-            val (lat, lng, caption) = args.mapSymbol
-            val placeEntity = PlaceEntity(
-                lat,
-                lng,
-                false,
-                caption
-            )
-            val placeDTO = PlaceDTO(
-                lat,
-                lng,
-                false,
-                caption
-            )
             viewLifecycleOwner.lifecycleScope.launch {
-                val remotePlaceId: String
-                val localPlaceId: Long
-                if (args.mapSymbol.isPlan) {
-                    remotePlaceId = args.mapSymbol.remoteId ?: return@launch
-                    val remotePlace = viewModel.getRemotePlaceById(remotePlaceId)
-                    localPlaceId = remotePlace.id
-                    viewModel.updatePlace(placeEntity.copy(id = localPlaceId, remoteId = remotePlaceId, plan = false))
-                    viewModel.updatePlace(remotePlaceId, remotePlace.copy(plan = false))
-                } else {
-                    remotePlaceId = viewModel.insertPlace(placeDTO)
-                    localPlaceId = viewModel.insertPlace(placeEntity)
-                    viewModel.updatePlace(placeEntity.copy(id = localPlaceId, remoteId = remotePlaceId))
-                }
+                val (remotePlaceId, localPlaceId) = insertPlaceOrUpdatePlan(args.mapSymbol)
 
                 val createdDate = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
                 } else {
                     Date().time
                 }
-                // 임시 데이터
-                val place = "123"
                 val uid = Firebase.auth.currentUser!!.uid
                 val text = binding.etText.text.toString()
-                val user = 1
                 val theme = "123"
                 val images: MutableList<String> = arrayListOf()
+
                 for (i in 0 until viewModel.images.value.size) {
                     uploadImage(
                         i + 1,
@@ -188,11 +163,11 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
                     )
                 }
 
-                // add to RemoteUser's logs & places
+                // add to RemoteUser's logs & places // update & sync ids
                 viewModel.insertLog(LogEntity(remotePlaceId, images, text, theme, createdDate))
                 viewModel.insertLog(
                     LogDTO(
-                        place,
+                        remotePlaceId,
                         viewModel.imageUrl.value.associateWith { true },
                         text,
                         theme,
@@ -202,6 +177,48 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
                 findNavController().navigate(R.id.action_saveLogFragment_to_homeFragment)
             }
         }
+    }
+
+    private suspend fun insertPlaceOrUpdatePlan(mapSymbol: MapSymbol): Pair<String, Long> {
+        val (lat, lng, caption) = mapSymbol
+        val placeEntity = PlaceEntity(
+            lat,
+            lng,
+            false,
+            caption
+        )
+        val placeDTO = PlaceDTO(
+            lat,
+            lng,
+            false,
+            caption
+        )
+
+        return viewLifecycleOwner.lifecycleScope.async {
+            val remotePlaceId: String
+            val remotePlace: PlaceDTO
+            val localPlaceId: Long
+
+            if (args.mapSymbol.isPlan) {
+                remotePlaceId = args.mapSymbol.remoteId!!
+                remotePlace = viewModel.getRemotePlaceById(remotePlaceId)
+                localPlaceId = remotePlace.id
+                viewModel.updatePlace(
+                    placeEntity.copy(
+                        id = localPlaceId,
+                        remoteId = remotePlaceId,
+                        plan = false
+                    )
+                )
+                viewModel.updatePlace(remotePlaceId, remotePlace.copy(plan = false))
+            } else {
+                remotePlaceId = viewModel.insertPlace(placeDTO)
+                localPlaceId = viewModel.insertPlace(placeEntity)
+                viewModel.updatePlace(placeEntity.copy(id = localPlaceId, remoteId = remotePlaceId))
+            }
+
+            return@async (remotePlaceId to localPlaceId)
+        }.await()
     }
 
     private suspend fun uploadImage(currentCount: Int, maxCount: Int, uid: String, uri: Uri) {
