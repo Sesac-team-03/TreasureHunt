@@ -18,7 +18,7 @@ import com.treasurehunt.data.LogRepository
 import com.treasurehunt.data.PlaceRepository
 import com.treasurehunt.data.UserRepository
 import com.treasurehunt.data.local.model.PlaceEntity
-import com.treasurehunt.data.remote.model.MapUiState
+import com.treasurehunt.ui.model.MapUiState
 import com.treasurehunt.data.remote.model.PlaceDTO
 import com.treasurehunt.data.remote.model.UserDTO
 import com.treasurehunt.util.ConnectivityRepository

@@ -80,7 +80,7 @@ class MapDialogFragment : BottomSheetDialogFragment() {
                     remotePlanId,
                     planDTO.copy(id = localPlanId, remoteId = remotePlanId)
                 )
-                viewModel.updateUser(uid, user.copy(plans = user.plans + remotePlanId))
+                viewModel.updateUser(uid, user.copy(plans = user.plans + (remotePlanId to true)))
 
                 findNavController().navigateUp()
             }
