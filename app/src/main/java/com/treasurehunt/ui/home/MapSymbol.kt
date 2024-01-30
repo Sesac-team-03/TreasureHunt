@@ -7,6 +7,8 @@ import android.os.Parcelable
 data class MapSymbol(
     val lat: Double,
     val lng: Double,
-    val caption: String
+    val caption: String,
+    val isPlan: Boolean = false,
+    val remoteId: String? = null
 ) : Parcelable
 

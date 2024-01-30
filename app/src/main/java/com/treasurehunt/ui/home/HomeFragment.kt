@@ -15,6 +15,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.naver.maps.map.LocationTrackingMode
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
@@ -24,8 +25,8 @@ import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.util.FusedLocationSource
 import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentHomeBinding
-import kotlinx.coroutines.launch
 import com.treasurehunt.ui.detail.DetailFragment
+import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment(), OnMapReadyCallback {
 
@@ -39,6 +40,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         registerForActivityResult(RequestPermission()) { isGranted ->
             setLocationTrackingMode(isGranted)
         }
+    private val args: HomeFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -125,12 +127,18 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         map.setOnSymbolClickListener { symbol ->
             if (!viewModel.uiState.value.isOnline) return@setOnSymbolClickListener false
 
+            val uid = viewModel.uiState.value.uid ?: return@setOnSymbolClickListener false
             val mapSymbol = MapSymbol(
                 symbol.position.latitude,
                 symbol.position.longitude,
                 symbol.caption
             )
-            val action = HomeFragmentDirections.actionHomeFragmentToMapDialogFragment(mapSymbol)
+            val action =
+                HomeFragmentDirections.actionHomeFragmentToMapDialogFragment(
+                    uid,
+                    mapSymbol
+                )
+
             findNavController().navigate(action)
             true
         }
@@ -155,23 +163,30 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun Marker.setPlaceClick(contentId: String) {
+    private fun Marker.setPlaceClick(placeId: String) {
         setOnClickListener {
-            showMarkerBottomSheet(contentId)
+            showMarkerBottomSheet(placeId)
             true
         }
     }
 
-    private fun Marker.setPlanClick(contentId: String) {
+    private fun Marker.setPlanClick(placeId: String) {
         setOnClickListener {
+            val uid = viewModel.uiState.value.uid ?: return@setOnClickListener false
+
             viewLifecycleOwner.lifecycleScope.launch {
-                val plan = viewModel.getRemotePlaceById(contentId)
+                val plan = viewModel.getRemotePlaceById(placeId)
                 val mapSymbol = MapSymbol(
                     plan.lat,
                     plan.lng,
-                    plan.caption
+                    plan.caption,
+                    true,
+                    placeId
                 )
-                val action = HomeFragmentDirections.actionHomeFragmentToSaveLogFragment(mapSymbol)
+                val action = HomeFragmentDirections.actionHomeFragmentToSaveLogFragment(
+                    uid,
+                    mapSymbol
+                )
                 findNavController().navigate(action)
             }
             true
@@ -180,8 +195,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     }
 
     //데이터베이스에 저장된 각각의 마커와 연동시 사용
-    fun showMarkerBottomSheet(contentId: String) {
-        val detailFragment = DetailFragment.newInstance(contentId)
+    fun showMarkerBottomSheet(placeId: String) {
+        val detailFragment = DetailFragment.newInstance(placeId)
         detailFragment.show(childFragmentManager, detailFragment.tag)
     }
 
