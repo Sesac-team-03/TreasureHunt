@@ -31,7 +31,7 @@ import com.treasurehunt.data.local.model.PlaceEntity
 import com.treasurehunt.data.remote.model.LogDTO
 import com.treasurehunt.data.remote.model.PlaceDTO
 import com.treasurehunt.databinding.FragmentSavelogBinding
-import com.treasurehunt.ui.home.MapSymbol
+import com.treasurehunt.ui.model.MapSymbol
 import com.treasurehunt.ui.savelog.adapter.SaveLogAdapter
 import com.treasurehunt.util.showSnackbar
 import kotlinx.coroutines.async

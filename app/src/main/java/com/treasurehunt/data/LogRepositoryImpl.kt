@@ -12,12 +12,12 @@ class LogRepositoryImpl(
 ) : LogRepository {
 
     override suspend fun insert(log: LogEntity) = logDao.insert(log)
-    override suspend fun getRemoteLog(id: String): LogDTO = logRemoteDataSource.getLog(id)
-    override suspend fun getRemoteAllLogs(): List<LogDTO> = logRemoteDataSource.getAllLogs()
 
-    override suspend fun insert(logDTD: LogDTO) {
-        logRemoteDataSource.insert(logDTD)
-    }
+    override suspend fun insert(logDTD: LogDTO) = logRemoteDataSource.insert(logDTD).name
+
+    override suspend fun getRemoteLog(id: String): LogDTO = logRemoteDataSource.getLog(id)
+
+    override suspend fun getRemoteAllLogs(): List<LogDTO> = logRemoteDataSource.getAllLogs()
 
     override fun getLogById(id: String): Flow<LogEntity> = logDao.getLogById(id)
 
@@ -26,8 +26,8 @@ class LogRepositoryImpl(
     override fun update(log: LogEntity) = logDao.update(log)
 
     override suspend fun delete(vararg logs: LogEntity) = logDao.delete(*logs)
+
     override suspend fun deleteAll() {
         logDao.deleteAllLogs()
     }
-
 }

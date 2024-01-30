@@ -3,6 +3,7 @@ package com.treasurehunt.data.remote
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.treasurehunt.BuildConfig
 import com.treasurehunt.data.remote.model.LogDTO
+import com.treasurehunt.data.remote.model.RemoteIdWrapper
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
@@ -29,7 +30,7 @@ interface LogService {
     suspend fun getAllLogs(): List<LogDTO>
 
     @POST("logs.json")
-    suspend fun insert(@Body logDTO: LogDTO)
+    suspend fun insert(@Body logDTO: LogDTO): RemoteIdWrapper
 
     companion object {
 

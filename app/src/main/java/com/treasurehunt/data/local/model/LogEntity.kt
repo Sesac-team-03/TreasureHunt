@@ -3,6 +3,7 @@ package com.treasurehunt.data.local.model
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.treasurehunt.data.remote.model.LogDTO
 
 @Entity(tableName = "logs")
 data class LogEntity(
@@ -17,3 +18,8 @@ data class LogEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0
 )
+
+fun LogEntity.toLogDTO(): LogDTO {
+    val (place, images, text, theme, createdDate) = this
+    return LogDTO(place, images, text, theme, createdDate)
+}
