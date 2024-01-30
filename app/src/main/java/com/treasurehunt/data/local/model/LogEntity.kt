@@ -21,5 +21,5 @@ data class LogEntity(
 
 fun LogEntity.toLogDTO(): LogDTO {
     val (place, images, text, theme, createdDate) = this
-    return LogDTO(place, images, text, theme, createdDate)
+    return LogDTO(place, images.associateWith { true }, text, theme, createdDate)
 }
