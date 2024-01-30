@@ -25,6 +25,10 @@ class PlaceRepositoryImpl(
 
     override suspend fun update(place: PlaceEntity) = placeDao.update(place)
 
+    override suspend fun update(id: String, placeDTO: PlaceDTO) {
+        placeRemoteDataSource.update(id, placeDTO)
+    }
+
     override suspend fun delete(vararg places: PlaceEntity) = placeDao.delete(*places)
 
     override suspend fun deleteAll() {

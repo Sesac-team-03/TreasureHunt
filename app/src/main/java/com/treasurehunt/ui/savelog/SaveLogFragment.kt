@@ -139,7 +139,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
 
     private fun saveLog() {
         binding.btnSave.setOnClickListener {
-            val (lat, lng, caption) = args.MapSymbol
+            val (lat, lng, caption) = args.mapSymbol
             val placeEntity = PlaceEntity(
                 lat,
                 lng,
