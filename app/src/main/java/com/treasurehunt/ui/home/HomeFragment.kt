@@ -15,7 +15,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import com.naver.maps.map.LocationTrackingMode
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
@@ -26,7 +25,6 @@ import com.naver.maps.map.util.FusedLocationSource
 import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentHomeBinding
 import com.treasurehunt.ui.detail.DetailFragment
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment(), OnMapReadyCallback {
@@ -41,7 +39,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         registerForActivityResult(RequestPermission()) { isGranted ->
             setLocationTrackingMode(isGranted)
         }
-    private val args: HomeFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -179,7 +176,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         setOnClickListener {
             val uid = viewModel.uiState.value.uid ?: return@setOnClickListener false
 
-            viewLifecycleOwner.lifecycleScope.async {
+            viewLifecycleOwner.lifecycleScope.launch {
                 val plan = viewModel.getRemotePlaceById(remotePlaceId)
                 val mapSymbol = MapSymbol(
                     plan.lat,
