@@ -153,22 +153,23 @@ class ProfileFragment : Fragment() {
 
     private fun saveProfile() {
         lifecycleScope.launch {
+            val userData = viewModel.userData.value ?: return@launch
             if (viewModel.imageUri.value.isNullOrEmpty()) {
-                if (viewModel.userData.value!!.email.isEmpty()) {
+                if (userData.email.isEmpty()) {
                     insertUserData(
                         "",
                         binding.etNickname.text.toString(),
-                        viewModel.userData.value!!.profileImage.toString()
+                        userData.profileImage.toString()
                     )
                 } else {
                     insertUserData(
                         binding.tvAccount.text.toString(),
                         binding.etNickname.text.toString(),
-                        viewModel.userData.value!!.profileImage.toString()
+                        userData.profileImage.toString()
                     )
                 }
             } else {
-                if (viewModel.userData.value!!.email.isEmpty()) {
+                if (userData.email.isEmpty()) {
                     uploadProfileImage(viewModel.imageUri.value!!.toUri())
                     insertUserData(
                         "",
@@ -199,17 +200,15 @@ class ProfileFragment : Fragment() {
     }
 
     private fun updateProfile(userDTO: UserDTO) {
-        if (userDTO.email.isEmpty() && userDTO.nickname.isNullOrEmpty()) {
-            binding.tvNickname.text = Firebase.auth.currentUser!!.uid.substring(0, 16)
-            validateProfileImage(userDTO)
-        } else if (userDTO.email.isEmpty() && userDTO.nickname.toString().isNotEmpty()) {
-            binding.tvNickname.text = userDTO.nickname
-            validateProfileImage(userDTO)
-        } else {
+        if (userDTO.email.isNotEmpty()) {
             binding.tvAccount.text = userDTO.email
-            binding.tvNickname.text = userDTO.nickname
-            validateProfileImage(userDTO)
         }
+        if (userDTO.nickname.isNullOrEmpty()) {
+            binding.tvNickname.text = Firebase.auth.currentUser!!.uid.substring(0, 16)
+        } else {
+            binding.tvNickname.text = userDTO.nickname
+        }
+        validateProfileImage(userDTO)
     }
 
     private fun validateProfileImage(userDTO: UserDTO) {
