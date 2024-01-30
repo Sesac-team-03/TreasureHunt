@@ -11,5 +11,5 @@ data class UserDTO(
     val friends: List<String> = emptyList(),
     val logs: List<String> = emptyList(),
     val places: List<String> = emptyList(),
-    val plans: List<String> = emptyList(),
+    val plans: Map<String, Boolean> = emptyMap(),
 )
