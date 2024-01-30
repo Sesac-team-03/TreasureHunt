@@ -131,6 +131,20 @@
             app:layout_constraintEnd_toEndOf="@+id/view_container"
             app:layout_constraintTop_toTopOf="@+id/view_container" />
 
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/visible_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="visible"
+            app:constraint_referenced_ids="ib_edit,tv_nickname" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/invisible_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:constraint_referenced_ids="tv_cancel,tv_completed,ib_camera,et_nickname" />
+
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tl_notification"
             android:layout_width="0dp"
