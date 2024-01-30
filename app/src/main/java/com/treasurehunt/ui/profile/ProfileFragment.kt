@@ -3,7 +3,6 @@ package com.treasurehunt.ui.profile
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -50,7 +49,7 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initProfile()
-        observeProfile()
+        syncProfile()
         setAlbumPermission()
         setEditButton()
     }
@@ -96,7 +95,7 @@ class ProfileFragment : Fragment() {
         }
         binding.tvCancel.setOnClickListener {
             hideEditView()
-            observeProfile()
+            syncProfile()
         }
         binding.tvCompleted.setOnClickListener {
             if (binding.etNickname.text.isEmpty()) {
@@ -131,7 +130,7 @@ class ProfileFragment : Fragment() {
         viewModel.getUserData()
     }
 
-    private fun observeProfile() {
+    private fun syncProfile() {
         viewModel.userData.observe(viewLifecycleOwner) { userDTO ->
             updateProfile(userDTO)
         }
