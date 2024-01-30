@@ -16,7 +16,7 @@ class PlaceRepositoryImpl(
 
     override fun getPlaceById(id: String): Flow<PlaceEntity> = placeDao.getPlaceById(id)
 
-    override fun getAllPlaces(): Flow<List<PlaceEntity>> = placeDao.getAllPlaces()
+    override fun getAllVisits(): Flow<List<PlaceEntity>> = placeDao.getAllVisits()
 
     override fun getAllPlans(): Flow<List<PlaceEntity>> = placeDao.getAllPlans()
 
