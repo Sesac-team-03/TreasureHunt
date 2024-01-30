@@ -26,6 +26,7 @@ import com.naver.maps.map.util.FusedLocationSource
 import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentHomeBinding
 import com.treasurehunt.ui.detail.DetailFragment
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment(), OnMapReadyCallback {
@@ -51,9 +52,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         initSegmentedButton()
-
         loadMap()
     }
 
@@ -82,13 +81,9 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
     override fun onMapReady(naverMap: NaverMap) {
         initMap(naverMap)
-
         handleLocationAccessPermission()
-
         setLocationOverlay()
-
         showMarkers()
-
         setSymbolClick()
     }
 
@@ -140,6 +135,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                 )
 
             findNavController().navigate(action)
+
             true
         }
     }
@@ -148,40 +144,49 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { uiState ->
+                    if (uiState.uid == null) return@collect
+
                     uiState.visitMarkers.forEach { marker ->
-                        val remotePlaceId = marker.tag.toString()
-                        marker.map = map
-                        marker.setPlaceClick(remotePlaceId)
+                        marker.show()
+                        marker.setPlaceClick()
                     }
+
                     uiState.planMarkers.forEach { marker ->
-                        val remotePlaceId = marker.tag.toString()
-                        marker.map = map
-                        marker.setPlanClick(remotePlaceId)
+                        marker.show()
+                        marker.setPlanClick()
                     }
                 }
             }
         }
     }
 
-    private fun Marker.setPlaceClick(placeId: String) {
+    private fun Marker.show() {
+        map = this@HomeFragment.map
+    }
+
+    private fun Marker.setPlaceClick() {
+        val remotePlaceId = tag.toString()
+
         setOnClickListener {
-            showMarkerBottomSheet(placeId)
+            showLogDetailBottomSheet(remotePlaceId)
             true
         }
     }
 
-    private fun Marker.setPlanClick(placeId: String) {
+    private fun Marker.setPlanClick() {
+        val remotePlaceId = tag.toString()
+
         setOnClickListener {
             val uid = viewModel.uiState.value.uid ?: return@setOnClickListener false
 
-            viewLifecycleOwner.lifecycleScope.launch {
-                val plan = viewModel.getRemotePlaceById(placeId)
+            viewLifecycleOwner.lifecycleScope.async {
+                val plan = viewModel.getRemotePlaceById(remotePlaceId)
                 val mapSymbol = MapSymbol(
                     plan.lat,
                     plan.lng,
                     plan.caption,
                     true,
-                    placeId
+                    remotePlaceId
                 )
                 val action = HomeFragmentDirections.actionHomeFragmentToSaveLogFragment(
                     uid,
@@ -189,13 +194,12 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                 )
                 findNavController().navigate(action)
             }
+
             true
-            // 함수 전체를 코루틴스코프에서 처리할 수 없나
         }
     }
 
-    //데이터베이스에 저장된 각각의 마커와 연동시 사용
-    fun showMarkerBottomSheet(placeId: String) {
+    private fun showLogDetailBottomSheet(placeId: String) {
         val detailFragment = DetailFragment.newInstance(placeId)
         detailFragment.show(childFragmentManager, detailFragment.tag)
     }
