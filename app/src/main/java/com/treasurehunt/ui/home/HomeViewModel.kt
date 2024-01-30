@@ -1,8 +1,10 @@
 package com.treasurehunt.ui.home
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.naver.maps.geometry.LatLng
@@ -11,11 +13,14 @@ import com.naver.maps.map.overlay.OverlayImage
 import com.treasurehunt.R
 import com.treasurehunt.TreasureHuntApplication.Companion.logRepo
 import com.treasurehunt.TreasureHuntApplication.Companion.placeRepo
+import com.treasurehunt.TreasureHuntApplication.Companion.userRepo
 import com.treasurehunt.data.LogRepository
 import com.treasurehunt.data.PlaceRepository
+import com.treasurehunt.data.UserRepository
 import com.treasurehunt.data.local.model.PlaceEntity
 import com.treasurehunt.data.remote.model.MapUiState
 import com.treasurehunt.data.remote.model.PlaceDTO
+import com.treasurehunt.data.remote.model.UserDTO
 import com.treasurehunt.util.ConnectivityRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -29,15 +34,19 @@ import java.io.IOException
 class HomeViewModel(
     private val logRepo: LogRepository,
     private val placeRepo: PlaceRepository,
-    private val connectivityRepo: ConnectivityRepository
+    private val userRepo: UserRepository,
+    private val connectivityRepo: ConnectivityRepository,
+    private val savedStateHandle: SavedStateHandle
 ) :
     ViewModel() {
 
     private val _uiState = MutableStateFlow(MapUiState())
     val uiState: StateFlow<MapUiState> = _uiState
     private var fetchJob: Job? = null
+    private val uid = HomeFragmentArgs.fromSavedStateHandle(savedStateHandle).uid
 
     init {
+        initUser()
         updateNetworkConnectivity()
         getAllMarkers()
     }
@@ -45,6 +54,14 @@ class HomeViewModel(
     override fun onCleared() {
         connectivityRepo.release()
         super.onCleared()
+    }
+
+    private fun initUser() {
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(uid = uid)
+            }
+        }
     }
 
     private fun updateNetworkConnectivity() {
@@ -57,16 +74,36 @@ class HomeViewModel(
         }
     }
 
-    fun addPlace(place: PlaceEntity) {
-        viewModelScope.launch {
-            placeRepo.insert(place)
-        }
+    suspend fun getRemoteUser(uid: String): UserDTO = userRepo.getRemoteUser(uid)
+
+    suspend fun updateUser(uid: String, user: UserDTO) {
+        userRepo.update(uid, user)
+    }
+
+    suspend fun addPlace(place: PlaceEntity): Long {
+        return viewModelScope.async {
+            return@async placeRepo.insert(place)
+        }.await()
+    }
+
+    suspend fun addPlace(place: PlaceDTO): String {
+        return viewModelScope.async {
+            return@async placeRepo.insert(place)
+        }.await()
     }
 
     suspend fun getRemotePlaceById(id: String): PlaceDTO {
         return viewModelScope.async {
             return@async placeRepo.getRemotePlace(id)
         }.await()
+    }
+
+    suspend fun updatePlace(place: PlaceEntity) {
+        placeRepo.update(place)
+    }
+
+    suspend fun updatePlace(id: String, place: PlaceDTO) {
+        placeRepo.update(id, place)
     }
 
     private fun getAllMarkers() {
@@ -123,7 +160,9 @@ class HomeViewModel(
                 return HomeViewModel(
                     logRepo,
                     placeRepo,
-                    ConnectivityRepository(application.applicationContext)
+                    userRepo,
+                    ConnectivityRepository(application.applicationContext),
+                    extras.createSavedStateHandle()
                 ) as T
             }
         }
