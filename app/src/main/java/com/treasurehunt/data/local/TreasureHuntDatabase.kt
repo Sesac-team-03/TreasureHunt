@@ -17,7 +17,9 @@ import com.treasurehunt.data.local.model.UserEntity
 )
 @TypeConverters(Converters::class)
 abstract class TreasureHuntDatabase : RoomDatabase() {
+
     abstract fun logDao(): LogDao
+
     abstract fun placeDao(): PlaceDao
 
     abstract fun userDao(): UserDao

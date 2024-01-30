@@ -19,7 +19,7 @@ interface PlaceDao {
     fun getPlaceById(id: String): Flow<PlaceEntity>
 
     @Query("SELECT * from places WHERE `plan` = 0")
-    fun getAllPlaces(): Flow<List<PlaceEntity>>
+    fun getAllVisits(): Flow<List<PlaceEntity>>
 
     @Query("SELECT * from places WHERE `plan` = 1")
     fun getAllPlans(): Flow<List<PlaceEntity>>

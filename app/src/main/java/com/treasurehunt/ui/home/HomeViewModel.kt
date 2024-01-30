@@ -40,7 +40,7 @@ class HomeViewModel(private val logRepo: LogRepository, private val placeRepo: P
 
         fetchJob = viewModelScope.launch {
             try {
-                merge(placeRepo.getAllPlaces(), placeRepo.getAllPlans()).collect { placesAndPlans ->
+                merge(placeRepo.getAllVisits(), placeRepo.getAllPlans()).collect { placesAndPlans ->
                     _uiState.update {
                         it.copy(markers = placesAndPlans.mapToMarkers())
                     }
