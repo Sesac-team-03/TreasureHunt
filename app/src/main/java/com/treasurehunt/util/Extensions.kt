@@ -10,3 +10,11 @@ fun View.showSnackbar(resId: Int) {
         Snackbar.LENGTH_SHORT
     ).show()
 }
+
+fun View.showSnackbar(string: String) {
+    Snackbar.make(
+        this,
+        string,
+        Snackbar.LENGTH_SHORT
+    ).show()
+}

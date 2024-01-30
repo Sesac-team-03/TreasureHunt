@@ -1,6 +1,5 @@
 package com.treasurehunt.ui.savelog
 
-import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -17,6 +16,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import com.google.firebase.storage.storage
 import com.naver.maps.map.LocationTrackingMode
 import com.naver.maps.map.MapFragment
@@ -29,6 +29,7 @@ import com.treasurehunt.databinding.FragmentSavelogBinding
 import com.treasurehunt.ui.savelog.adapter.SaveLogAdapter
 import com.treasurehunt.util.showSnackbar
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.Date
@@ -50,6 +51,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             setLocationTrackingMode(isGranted)
+            setAddImage(isGranted)
         }
 
     override fun onCreateView(
@@ -67,9 +69,10 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         super.onViewCreated(view, savedInstanceState)
         showMapFullScreen()
         initAdapter()
-        setAddImage()
+        setAlbumPermission()
         loadMap()
         saveLog()
+        setCancelButton()
     }
 
     override fun onDestroyView() {
@@ -107,9 +110,19 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun setAddImage() {
-        binding.ibSelectPhoto.setOnClickListener {
+    private fun setAddImage(isGranted: Boolean) {
+        if (isGranted) {
             imageLauncher.launch(viewModel.getImage())
+        }
+    }
+
+    private fun setAlbumPermission() {
+        binding.ibSelectPhoto.setOnClickListener {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                requestPermissionLauncher.launch(android.Manifest.permission.READ_MEDIA_IMAGES)
+            } else {
+                requestPermissionLauncher.launch(android.Manifest.permission.READ_EXTERNAL_STORAGE)
+            }
         }
     }
 
@@ -120,33 +133,41 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
             } else {
                 Date().time
             }
+            // 임시 데이터
             val place = "123"
             val text = binding.etText.text.toString()
-            val user = 1
             val theme = "123"
-            val images: MutableList<String> = arrayListOf()
-            for (i in 0 until viewModel.images.value.size) {
-                uploadImage(viewModel.images.value[i].url.toUri())
-                images.add("${viewModel.images.value[i].url.replace("[^0-9]".toRegex(), "")}.png")
-            }
+            val uid = Firebase.auth.currentUser!!.uid
             lifecycleScope.launch {
-                viewModel.insertLog(LogDTO(place, images, text, theme, createdDate))
+                for (i in 0 until viewModel.images.value.size) {
+                    uploadImage(i + 1, viewModel.images.value.size, uid, viewModel.images.value[i].url.toUri())
+                }
+                // 테스트용 데이터 전달
+                viewModel.insertLog(LogDTO(place, viewModel.imageUrl.value, text, theme, createdDate))
+                findNavController().navigateUp()
             }
         }
     }
 
-    @SuppressLint("SimpleDateFormat")
-    private fun uploadImage(uri: Uri) {
+    private suspend fun uploadImage(currentCount: Int, maxCount: Int, uid: String, uri: Uri) {
         val storage = Firebase.storage
-        val storageRef = storage.getReference("uid/image")
+        val storageRef = storage.getReference("${uid}/log_images")
         val fileName = uri.toString().replace("[^0-9]".toRegex(), "")
         val mountainsRef = storageRef.child("${fileName}.png")
         val uploadTask = mountainsRef.putFile(uri)
         uploadTask.addOnSuccessListener { taskSnapshot ->
-            binding.root.showSnackbar(R.string.savelog_sb_upload_success)
+            viewModel.addImageUrl(taskSnapshot.storage.toString())
+            binding.root.showSnackbar(
+                getString(
+                    R.string.savelog_sb_upload_success,
+                    currentCount,
+                    maxCount
+                )
+            )
         }.addOnFailureListener {
             binding.root.showSnackbar(R.string.savelog_sb_upload_failure)
         }
+        uploadTask.await()
     }
 
     private fun setLocationTrackingMode(isGranted: Boolean) {
@@ -182,6 +203,12 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
             else -> {
                 requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_COARSE_LOCATION)
             }
+        }
+    }
+
+    private fun setCancelButton() {
+        binding.ibCancel.setOnClickListener {
+            findNavController().navigateUp()
         }
     }
 
