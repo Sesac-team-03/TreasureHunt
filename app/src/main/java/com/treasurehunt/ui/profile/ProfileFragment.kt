@@ -200,7 +200,7 @@ class ProfileFragment : Fragment() {
         if (userDTO.profileImage.toString().contains(getString(R.string.profile_check_url))) {
             Glide.with(requireContext()).load(userDTO.profileImage.toString())
                 .into(binding.ivProfileImage)
-        } else if (userDTO.profileImage.isNullOrEmpty()) {
+        } else if (userDTO.profileImage.isNullOrEmpty() || userDTO.profileImage == "null") {
             Glide.with(requireContext()).load(R.drawable.ic_no_profile_image)
                 .into(binding.ivProfileImage)
         } else {
