@@ -98,7 +98,7 @@ class DetailFragment : BottomSheetDialogFragment() {
 
     private fun setEditButton() {
         binding.btnEdit.setOnClickListener {
-            findNavController().navigate(R.id.action_detailFragment_to_saveLogFragment)
+            findNavController().navigate(R.id.action_homeFragment_to_saveLogFragment)
         }
     }
 
