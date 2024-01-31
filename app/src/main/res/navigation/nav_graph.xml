@@ -79,6 +79,9 @@
         <action
             android:id="@+id/action_detailFragment_to_saveLogFragment"
             app:destination="@id/saveLogFragment" />
+        <argument
+            android:name="remotePlaceId"
+            app:argType="string" />
     </dialog>
 
     <fragment

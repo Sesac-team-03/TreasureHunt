@@ -167,7 +167,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         val remotePlaceId = tag.toString()
 
         setOnClickListener {
-            showLogDetailBottomSheet(remotePlaceId)
+            val action = HomeFragmentDirections.actionHomeFragmentToDetailFragment(remotePlaceId)
+            findNavController().navigate(action)
             true
         }
     }
@@ -197,11 +198,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
             true
         }
-    }
-
-    private fun showLogDetailBottomSheet(placeId: String) {
-        val detailFragment = DetailFragment.newInstance(placeId)
-        detailFragment.show(childFragmentManager, detailFragment.tag)
     }
 
     companion object {

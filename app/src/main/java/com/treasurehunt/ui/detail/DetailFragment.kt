@@ -98,7 +98,7 @@ class DetailFragment : BottomSheetDialogFragment() {
 
     private fun setEditButton() {
         binding.btnEdit.setOnClickListener {
-            findNavController().navigate(R.id.action_homeFragment_to_saveLogFragment)
+            findNavController().navigate(R.id.action_detailFragment_to_saveLogFragment)
         }
     }
 
@@ -111,15 +111,5 @@ class DetailFragment : BottomSheetDialogFragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    companion object {
-        fun newInstance(contentId: String): DetailFragment {
-            return DetailFragment().apply {
-                arguments = Bundle().apply {
-                    putString("content_id", contentId)
-                }
-            }
-        }
     }
 }
