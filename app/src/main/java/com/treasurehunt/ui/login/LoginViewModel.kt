@@ -1,7 +1,6 @@
 package com.treasurehunt.ui.login
 
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
@@ -41,8 +40,9 @@ class LoginViewModel(
 
     suspend fun insertGuestUser() {
         val currentUser = Firebase.auth.currentUser!!
-        // 테스트 샘플
-        val userDTO = UserDTO(email = "")
+        val userDTO = UserDTO(
+            email = currentUser.email ?: ""
+        )
         userRepository.insert(currentUser.uid, userDTO)
     }
 
