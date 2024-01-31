@@ -146,49 +146,22 @@ class ProfileFragment : Fragment() {
     private fun saveProfile() {
         lifecycleScope.launch {
             val userData = viewModel.userData.value ?: return@launch
+            val email = userData.email.ifEmpty { "" }
+            val nickname = binding.etNickname.text.toString()
             if (viewModel.imageUri.value.isNullOrEmpty()) {
-                if (userData.email.isEmpty()) {
-                    insertUserData(
-                        "",
-                        binding.etNickname.text.toString(),
-                        userData.profileImage.toString()
-                    )
-                } else {
-                    insertUserData(
-                        binding.tvAccount.text.toString(),
-                        binding.etNickname.text.toString(),
-                        userData.profileImage.toString()
-                    )
-                }
+                viewModel.insertUserData(UserDTO(email, nickname, userData.profileImage.toString()))
             } else {
-                if (userData.email.isEmpty()) {
-                    uploadProfileImage(viewModel.imageUri.value!!.toUri())
-                    insertUserData(
-                        "",
-                        binding.etNickname.text.toString(),
+                uploadProfileImage(viewModel.imageUri.value!!.toUri())
+                viewModel.insertUserData(
+                    UserDTO(
+                        email,
+                        nickname,
                         viewModel.profileUri.value.toString()
                     )
-                } else {
-                    uploadProfileImage(viewModel.imageUri.value!!.toUri())
-                    insertUserData(
-                        binding.tvAccount.text.toString(),
-                        binding.etNickname.text.toString(),
-                        viewModel.profileUri.value.toString()
-                    )
-                }
+                )
             }
         }
 
-    }
-
-    private fun insertUserData(email: String, nickname: String, profileImage: String) {
-        viewModel.insertUserData(
-            UserDTO(
-                email = email,
-                nickname = nickname,
-                profileImage = profileImage
-            )
-        )
     }
 
     private fun updateProfile(userDTO: UserDTO) {
