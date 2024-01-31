@@ -149,10 +149,10 @@ class ProfileFragment : Fragment() {
             val email = userData.email.ifEmpty { "" }
             val nickname = binding.etNickname.text.toString()
             if (viewModel.imageUri.value.isNullOrEmpty()) {
-                viewModel.insertUserData(UserDTO(email, nickname, userData.profileImage.toString()))
+                viewModel.updateUserData(UserDTO(email, nickname, userData.profileImage.toString()))
             } else {
                 uploadProfileImage(viewModel.imageUri.value!!.toUri())
-                viewModel.insertUserData(
+                viewModel.updateUserData(
                     UserDTO(
                         email,
                         nickname,
