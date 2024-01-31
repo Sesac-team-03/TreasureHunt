@@ -1,6 +1,7 @@
 package com.treasurehunt.ui.login
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
@@ -34,8 +35,8 @@ class LoginViewModel(
             email = currentUser.email!!,
             nickname = currentUser.displayName,
             profileImage = currentUser.photoUrl.toString(),
-            logs = listOf("-NoV18iQHObalOr66Yh4", "0"),
-            places = listOf("0")
+            logs = mapOf("-NpSO_DCjziPZMvpRxGE" to false),
+            places = mapOf("0" to false,"123" to false)
         )
         userRepository.insert(currentUser.uid, userDTO)
     }
@@ -45,8 +46,8 @@ class LoginViewModel(
         // 테스트 샘플
         val userDTO = UserDTO(
             email = currentUser.email ?: "",
-            logs = listOf("-NoV18iQHObalOr66Yh4", "0"),
-            places = listOf("0")
+            logs = mapOf("-NpSO_DCjziPZMvpRxGE" to false),
+            places = mapOf("0" to false,"askjd" to false)
         )
         userRepository.insert(currentUser.uid, userDTO)
     }
@@ -69,15 +70,15 @@ class LoginViewModel(
     private suspend fun initLocalLogs(userDTO: UserDTO) {
         logRepository.deleteAll()
         userDTO.logs.map {
-            val log = logRepository.getRemoteLog(it)
-            logRepository.insert(log.toLogEntity(it))
+            val log = logRepository.getRemoteLog(it.key)
+            logRepository.insert(log.toLogEntity(it.key))
         }
     }
 
     private suspend fun initLocalPlaces(userDTO: UserDTO) {
         placeRepository.deleteAll()
         userDTO.places.map {
-            val place = placeRepository.getRemotePlace(it)
+            val place = placeRepository.getRemotePlace(it.key)
             placeRepository.insert(place.toPlaceEntity())
         }
     }
