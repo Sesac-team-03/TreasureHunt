@@ -34,9 +34,7 @@ class LoginViewModel(
         val userDTO = UserDTO(
             email = currentUser.email,
             nickname = currentUser.displayName,
-            profileImage = currentUser.photoUrl.toString(),
-            logs = mapOf("-NpSO_DCjziPZMvpRxGE" to false),
-            places = mapOf("0" to false, "123" to false)
+            profileImage = currentUser.photoUrl.toString()
         )
         userRepository.insert(currentUser.uid, userDTO)
     }
@@ -44,11 +42,7 @@ class LoginViewModel(
     suspend fun insertGuestUser() {
         val currentUser = Firebase.auth.currentUser!!
         // 테스트 샘플
-        val userDTO = UserDTO(
-            email = currentUser.email ?: "",
-            logs = mapOf("-NpSO_DCjziPZMvpRxGE" to false),
-            places = mapOf("0" to false, "askjd" to false)
-        )
+        val userDTO = UserDTO()
         userRepository.insert(currentUser.uid, userDTO)
     }
 
