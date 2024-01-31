@@ -132,14 +132,14 @@
             app:layout_constraintTop_toTopOf="@+id/view_container" />
 
         <androidx.constraintlayout.widget.Group
-            android:id="@+id/visible_group"
+            android:id="@+id/group_profile_box"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="visible"
             app:constraint_referenced_ids="ib_edit,tv_nickname" />
 
         <androidx.constraintlayout.widget.Group
-            android:id="@+id/invisible_group"
+            android:id="@+id/group_edit_profile_box"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="gone"

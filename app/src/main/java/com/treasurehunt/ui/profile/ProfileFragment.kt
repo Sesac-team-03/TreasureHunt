@@ -108,14 +108,14 @@ class ProfileFragment : Fragment() {
     }
 
     private fun showEditView() {
-        binding.visibleGroup.visibility = View.GONE
-        binding.invisibleGroup.visibility = View.VISIBLE
+        binding.groupProfileBox.visibility = View.GONE
+        binding.groupEditProfileBox.visibility = View.VISIBLE
         binding.etNickname.setText(binding.tvNickname.text)
     }
 
     private fun hideEditView() {
-        binding.visibleGroup.visibility = View.VISIBLE
-        binding.invisibleGroup.visibility = View.GONE
+        binding.groupProfileBox.visibility = View.VISIBLE
+        binding.groupEditProfileBox.visibility = View.GONE
     }
 
     private fun initProfile() {
