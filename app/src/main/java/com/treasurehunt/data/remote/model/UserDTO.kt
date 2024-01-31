@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class UserDTO(
-    val email: String? = null,
+    val email: String?,
     val nickname: String? = null,
     val profileImage: String? = null,
     val public: Boolean = false,

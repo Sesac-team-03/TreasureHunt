@@ -42,7 +42,7 @@ class LoginViewModel(
     suspend fun insertGuestUser() {
         val currentUser = Firebase.auth.currentUser!!
         // 테스트 샘플
-        val userDTO = UserDTO()
+        val userDTO = UserDTO(email = "")
         userRepository.insert(currentUser.uid, userDTO)
     }
 
