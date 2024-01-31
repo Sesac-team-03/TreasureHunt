@@ -114,9 +114,7 @@ class LogInFragment : Fragment() {
                 if (task.isSuccessful) {
                     lifecycleScope.launch {
                         viewModel.initLocalData()
-                        val action =
-                            LogInFragmentDirections.actionLogInFragmentToHomeFragment(user.id)
-                        findNavController().navigate(action)
+                        findNavController().navigate(R.id.action_logInFragment_to_homeFragment)
                     }
                 } else {
                     createAccount(user)
@@ -131,9 +129,7 @@ class LogInFragment : Fragment() {
                 if (task.isSuccessful) {
                     lifecycleScope.launch {
                         viewModel.insertNaverUser(user)
-                        val action =
-                            LogInFragmentDirections.actionLogInFragmentToHomeFragment(user.id)
-                        findNavController().navigate(action)
+                        findNavController().navigate(R.id.action_logInFragment_to_homeFragment)
                     }
                 }
             }
@@ -146,9 +142,7 @@ class LogInFragment : Fragment() {
                     if (task.isSuccessful) {
                         lifecycleScope.launch {
                             viewModel.insertGuestUser()
-                            val action =
-                                LogInFragmentDirections.actionLogInFragmentToHomeFragment(Firebase.auth.currentUser!!.uid)
-                            findNavController().navigate(action)
+                            findNavController().navigate(R.id.action_logInFragment_to_homeFragment)
                         }
                     }
                 }

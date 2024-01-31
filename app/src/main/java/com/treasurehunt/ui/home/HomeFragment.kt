@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.PointF
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -118,9 +119,10 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
     private fun setSymbolClick() {
         map.setOnSymbolClickListener { symbol ->
-            if (!viewModel.uiState.value.isOnline) return@setOnSymbolClickListener false
+            if (!viewModel.uiState.value.isOnline || viewModel.uiState.value.uid.isNullOrEmpty()) {
+                return@setOnSymbolClickListener false
+            }
 
-            val uid = viewModel.uiState.value.uid ?: return@setOnSymbolClickListener false
             val mapSymbol = MapSymbol(
                 symbol.position.latitude,
                 symbol.position.longitude,
@@ -128,7 +130,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
             )
             val action =
                 HomeFragmentDirections.actionHomeFragmentToMapDialogFragment(
-                    uid,
                     mapSymbol
                 )
 
@@ -141,7 +142,9 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     private fun showMarkers() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
+                Log.d("fm test$", "before collecting")
                 viewModel.uiState.collect { uiState ->
+                    Log.d("fm test$", uiState.uid.toString())
                     if (uiState.uid == null) return@collect
 
                     uiState.visitMarkers.forEach { marker ->
@@ -187,7 +190,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                     remotePlaceId
                 )
                 val action = HomeFragmentDirections.actionHomeFragmentToSaveLogFragment(
-                    uid,
                     mapSymbol
                 )
                 findNavController().navigate(action)

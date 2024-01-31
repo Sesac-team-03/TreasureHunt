@@ -44,10 +44,12 @@ class MapDialogFragment : BottomSheetDialogFragment() {
 
     private fun setBtnPlace() {
         binding.btnPlace.setOnClickListener {
-            val uid = viewModel.uiState.value.uid ?: return@setOnClickListener
+            if (viewModel.uiState.value.uid.isNullOrEmpty()) {
+                findNavController().navigateUp()
+            }
+
             val action =
                 MapDialogFragmentDirections.actionMapDialogFragmentToSaveLogFragment(
-                    uid,
                     args.mapSymbol
                 )
             findNavController().navigate(action)
@@ -56,6 +58,10 @@ class MapDialogFragment : BottomSheetDialogFragment() {
 
     private fun setBtnPlan() {
         binding.btnPlan.setOnClickListener {
+            if (viewModel.uiState.value.uid.isNullOrEmpty()) {
+                findNavController().navigateUp()
+            }
+
             val uid = viewModel.uiState.value.uid ?: return@setOnClickListener
             val (lat, lng, caption) = args.mapSymbol
             val planEntity = PlaceEntity(

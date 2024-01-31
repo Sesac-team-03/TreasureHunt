@@ -51,8 +51,7 @@ class SplashFragment : Fragment() {
             else {
                 lifecycleScope.launch {
                     viewModel.initLocalData()
-                    val action = SplashFragmentDirections.actionSplashFragmentToHomeFragment(currentUser.uid)
-                    findNavController().navigate(action)
+                    findNavController().navigate(R.id.action_splashFragment_to_homeFragment)
                 }
             }
         }

@@ -1,5 +1,6 @@
 package com.treasurehunt.ui.home
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -7,6 +8,8 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
@@ -35,8 +38,7 @@ class HomeViewModel(
     private val logRepo: LogRepository,
     private val placeRepo: PlaceRepository,
     private val userRepo: UserRepository,
-    private val connectivityRepo: ConnectivityRepository,
-    private val savedStateHandle: SavedStateHandle
+    private val connectivityRepo: ConnectivityRepository
 ) :
     ViewModel() {
 
@@ -56,10 +58,11 @@ class HomeViewModel(
     }
 
     private fun initUser() {
-        val uid = HomeFragmentArgs.fromSavedStateHandle(savedStateHandle).uid
+        val uid = Firebase.auth.currentUser?.uid
 
         viewModelScope.launch {
             _uiState.update {
+                Log.d("vm test$", uid.toString())
                 it.copy(uid = uid)
             }
         }
@@ -167,8 +170,7 @@ class HomeViewModel(
                     logRepo,
                     placeRepo,
                     userRepo,
-                    ConnectivityRepository(application.applicationContext),
-                    extras.createSavedStateHandle()
+                    ConnectivityRepository(application.applicationContext)
                 ) as T
             }
         }
