@@ -8,6 +8,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.PATCH
 import retrofit2.http.PUT
 import retrofit2.http.Path
 
@@ -22,6 +23,12 @@ interface UserService {
 
     @PUT("/users/{id}.json")
     suspend fun insert(
+        @Path("id") id: String,
+        @Body data: UserDTO
+    )
+
+    @PATCH("/users/{id}.json")
+    suspend fun update(
         @Path("id") id: String,
         @Body data: UserDTO
     )

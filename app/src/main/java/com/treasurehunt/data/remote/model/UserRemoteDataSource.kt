@@ -8,6 +8,10 @@ class UserRemoteDataSource(private val userService: UserService) {
         userService.insert(uid, data)
     }
 
+    suspend fun update(uid: String, data: UserDTO) {
+        userService.update(uid, data)
+    }
+
     suspend fun getUserData(uid: String) = userService.getUser(uid)
 
 }

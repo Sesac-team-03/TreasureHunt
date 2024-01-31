@@ -47,7 +47,7 @@ class ProfileViewModel(
 
     fun updateUserData(userDTO: UserDTO) {
         viewModelScope.launch {
-            userRepository.insert(
+            userRepository.update(
                 Firebase.auth.currentUser!!.uid,
                 userDTO
             )
