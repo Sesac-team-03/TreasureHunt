@@ -109,7 +109,7 @@ class LogInFragment : Fragment() {
 
     private fun loginAccount(user: User) {
         val auth = Firebase.auth
-        auth.signInWithEmailAndPassword(user.email, user.id)
+        auth.signInWithEmailAndPassword(user.email!!, user.id)
             .addOnCompleteListener(requireActivity()) { task ->
                 if (task.isSuccessful) {
                     lifecycleScope.launch {
@@ -124,7 +124,7 @@ class LogInFragment : Fragment() {
 
     private fun createAccount(user: User) {
         val auth = Firebase.auth
-        auth.createUserWithEmailAndPassword(user.email, user.id)
+        auth.createUserWithEmailAndPassword(user.email!!, user.id)
             .addOnCompleteListener(requireActivity()) { task ->
                 if (task.isSuccessful) {
                     lifecycleScope.launch {
