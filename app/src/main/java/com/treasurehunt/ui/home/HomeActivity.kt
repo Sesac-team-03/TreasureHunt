@@ -4,7 +4,9 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
 import com.treasurehunt.R
 import com.treasurehunt.databinding.ActivityHomeBinding
 
@@ -13,16 +15,28 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var binding: ActivityHomeBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        initNavigation()
+        //handleDeepLink(intent)
+    }
 
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        //handleDeepLink(intent)
+    }
+
+    private fun initNavigation() {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fcv_home) as NavHostFragment
         val navController = navHostFragment.navController
+        val bottomNavigationView = binding.bnvHome
+        bottomNavigationView.setupWithNavController(navController)
+        setBottomNavigationViewVisibility(navController)
+    }
 
+    private fun setBottomNavigationViewVisibility(navController: NavController) {
         navController.addOnDestinationChangedListener { _, destination, _ ->
-
             binding.bnvHome.visibility = when (destination.id) {
                 R.id.splashFragment -> View.GONE
                 R.id.logInFragment -> View.GONE
@@ -31,14 +45,8 @@ class HomeActivity : AppCompatActivity() {
                 else -> View.VISIBLE
             }
         }
-
-        //handleDeepLink(intent)
     }
 
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-        //handleDeepLink(intent)
-    }
 
     //TODO
 //    val SCHEME_TREASUREHUNT = "treasurehunt"

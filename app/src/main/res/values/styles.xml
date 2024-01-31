@@ -15,7 +15,7 @@
 
     <style name="Font.Login">
         <item name="android:textStyle">bold</item>
-        <item name="android:textSize">16dp</item>
+        <item name="android:textSize">@dimen/middle</item>
         <item name="cornerRadius">100dp</item>
     </style>
 
@@ -31,7 +31,7 @@
     </style>
 
     <style name="Font.Login.TreasureHunt">
-        <item name="android:textSize">40dp</item>
+        <item name="android:textSize">40sp</item>
         <item name="android:elevation">20dp</item>
         <item name="android:textColor">@color/white</item>
 
@@ -54,7 +54,7 @@
         <item name="android:background">@drawable/button_record</item>
         <item name="android:gravity">top|start</item>
         <item name="android:textColor">@color/black</item>
-        <item name="android:textSize">14sp</item>
+        <item name="android:textSize">@dimen/small</item>
     </style>
 
     <style name="Font.SaveLogSave">
@@ -72,5 +72,20 @@
     <style name="Font.SaveLogMapTitle">
         <item name="android:textColor">@color/black</item>
         <item name="android:textSize">@dimen/xLarge</item>
+    </style>
+
+    <!-- 프로필 화면 -->
+    <style name="Font.ProfileNickname">
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">@dimen/middle</item>
+    </style>
+
+    <style name="Font.ProfileAccount">
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">@dimen/small</item>
+    </style>
+
+    <style name="ProfileImage">
+        <item name="cornerSize">24dp</item>
     </style>
 </resources>

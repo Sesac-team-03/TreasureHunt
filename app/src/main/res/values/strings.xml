@@ -24,4 +24,14 @@
     <string name="savelog_sb_warning_count">사진은 5개까지만 등록 가능합니다.</string>
     <string name="savelog_sb_upload_success">사진 업로드 (%1$d/%2$d)</string>
     <string name="savelog_sb_upload_failure">사진 업로드 실패</string>
+
+    <!-- 프로필 화면-->
+    <string name="profile_tv_nickname">닉네임</string>
+    <string name="profile_tv_account">abc@naver.com</string>
+    <string name="profile_tv_cancel">취소</string>
+    <string name="profile_tv_completed">완료</string>
+    <string name="profile_tl_friend">친구</string>
+    <string name="profile_tl_comment">댓글</string>
+    <string name="profile_tl_tag">태그</string>
+    <string name="profile_check_url">https://</string>
 </resources>

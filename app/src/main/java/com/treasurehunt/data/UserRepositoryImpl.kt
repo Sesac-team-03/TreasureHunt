@@ -25,5 +25,9 @@ class UserRepositoryImpl(
 
     override fun update(user: UserEntity) = userDao.update(user)
 
+    override suspend fun update(id: String, data: UserDTO) {
+        userRemoteDataSource.update(id, data)
+    }
+
     override suspend fun delete(vararg users: UserEntity) = userDao.delete(*users)
 }

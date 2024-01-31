@@ -72,4 +72,10 @@
             android:id="@+id/action_detailFragment_to_saveLogFragment"
             app:destination="@id/saveLogFragment" />
     </dialog>
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.treasurehunt.ui.profile.ProfileFragment"
+        android:label="ProfileFragment"
+        tools:layout="@layout/fragment_profile" />
 </navigation>
