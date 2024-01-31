@@ -60,12 +60,13 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentSavelogBinding.inflate(inflater, container, false)
-        initViewModel()
+
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initViewModel()
         showMapFullScreen()
         initAdapter()
         setAlbumPermission()
