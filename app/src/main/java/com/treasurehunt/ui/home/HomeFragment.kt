@@ -142,9 +142,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     private fun showMarkers() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                Log.d("fm test$", "before collecting")
                 viewModel.uiState.collect { uiState ->
-                    Log.d("fm test$", uiState.uid.toString())
                     if (uiState.uid == null) return@collect
 
                     uiState.visitMarkers.forEach { marker ->
@@ -178,7 +176,9 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         val remotePlaceId = tag.toString()
 
         setOnClickListener {
-            val uid = viewModel.uiState.value.uid ?: return@setOnClickListener false
+            if (!viewModel.uiState.value.isOnline || viewModel.uiState.value.uid.isNullOrEmpty()) {
+                return@setOnClickListener false
+            }
 
             viewLifecycleOwner.lifecycleScope.launch {
                 val plan = viewModel.getRemotePlaceById(remotePlaceId)

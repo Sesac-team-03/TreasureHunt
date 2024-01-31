@@ -1,11 +1,8 @@
 package com.treasurehunt.ui.home
 
-import android.util.Log
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
-import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.google.firebase.auth.ktx.auth
@@ -21,9 +18,9 @@ import com.treasurehunt.data.LogRepository
 import com.treasurehunt.data.PlaceRepository
 import com.treasurehunt.data.UserRepository
 import com.treasurehunt.data.local.model.PlaceEntity
-import com.treasurehunt.ui.model.MapUiState
 import com.treasurehunt.data.remote.model.PlaceDTO
 import com.treasurehunt.data.remote.model.UserDTO
+import com.treasurehunt.ui.model.MapUiState
 import com.treasurehunt.util.ConnectivityRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -62,7 +59,6 @@ class HomeViewModel(
 
         viewModelScope.launch {
             _uiState.update {
-                Log.d("vm test$", uid.toString())
                 it.copy(uid = uid)
             }
         }
