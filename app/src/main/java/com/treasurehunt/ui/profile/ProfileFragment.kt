@@ -200,10 +200,10 @@ class ProfileFragment : Fragment() {
         } else {
             binding.tvNickname.text = userDTO.nickname
         }
-        validateProfileImage(userDTO)
+        loadProfileImage(userDTO)
     }
 
-    private fun validateProfileImage(userDTO: UserDTO) {
+    private fun loadProfileImage(userDTO: UserDTO) {
         if (userDTO.profileImage.toString().contains(getString(R.string.profile_check_url))) {
             Glide.with(requireContext()).load(userDTO.profileImage.toString())
                 .into(binding.ivProfileImage)
