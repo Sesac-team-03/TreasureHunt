@@ -22,6 +22,7 @@ class SplashFragment : Fragment() {
 
     private val viewModel: LoginViewModel by viewModels { LoginViewModel.Factory }
 
+    private var isInitialized = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -37,6 +38,13 @@ class SplashFragment : Fragment() {
         initSplashScreen()
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (isInitialized) {
+            checkLoginAndNavigate()
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
@@ -45,16 +53,22 @@ class SplashFragment : Fragment() {
     private fun initSplashScreen() {
         binding.animationView.setAnimation(R.raw.iv_treasure)
         binding.animationView.playAnimation()
+
         lifecycleScope.launch {
             delay(2000)
-            if (Firebase.auth.currentUser == null) findNavController().navigate(R.id.action_splashFragment_to_logInFragment)
-            else {
-                lifecycleScope.launch {
-                    viewModel.initLocalData()
-                    findNavController().navigate(R.id.action_splashFragment_to_homeFragment)
-                }
-            }
+            isInitialized = true
+            checkLoginAndNavigate()
         }
     }
 
+    private fun checkLoginAndNavigate() {
+        if (Firebase.auth.currentUser == null) {
+            findNavController().navigate(R.id.action_splashFragment_to_logInFragment)
+        } else {
+            lifecycleScope.launch {
+                viewModel.initLocalData()
+                findNavController().navigate(R.id.action_splashFragment_to_homeFragment)
+            }
+        }
+    }
 }
