@@ -19,12 +19,13 @@ import com.naver.maps.map.LocationTrackingMode
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
+import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.util.FusedLocationSource
 import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentHomeBinding
+import com.treasurehunt.ui.model.MapSymbol
 import kotlinx.coroutines.launch
-import com.treasurehunt.ui.detail.DetailFragment
 
 class HomeFragment : Fragment(), OnMapReadyCallback {
 
@@ -48,9 +49,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         initSegmentedButton()
-
         loadMap()
     }
 
@@ -79,16 +78,10 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
     override fun onMapReady(naverMap: NaverMap) {
         initMap(naverMap)
-
         handleLocationAccessPermission()
-
         setLocationOverlay()
-
         showMarkers()
-
-        naverMap.setOnMapClickListener { coord, point ->
-            findNavController().navigate(R.id.action_homeFragment_to_detailFragment)
-        }
+        setSymbolClick()
     }
 
     private fun initMap(naverMap: NaverMap) {
@@ -122,22 +115,87 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         locationOverlay.anchor = PointF(0.5f, 1f)
     }
 
+    private fun setSymbolClick() {
+        map.setOnSymbolClickListener { symbol ->
+            if (!viewModel.uiState.value.isOnline || viewModel.uiState.value.uid.isNullOrEmpty()) {
+                return@setOnSymbolClickListener false
+            }
+
+            val mapSymbol = MapSymbol(
+                symbol.position.latitude,
+                symbol.position.longitude,
+                symbol.caption
+            )
+            val action =
+                HomeFragmentDirections.actionHomeFragmentToMapDialogFragment(
+                    mapSymbol
+                )
+
+            findNavController().navigate(action)
+
+            true
+        }
+    }
+
     private fun showMarkers() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { uiState ->
-                    uiState.markers.forEach { marker ->
-                        marker.map = map
+                    if (uiState.uid == null) return@collect
+
+                    uiState.visitMarkers.forEach { marker ->
+                        marker.show()
+                        marker.setPlaceClick()
+                    }
+
+                    uiState.planMarkers.forEach { marker ->
+                        marker.show()
+                        marker.setPlanClick()
                     }
                 }
             }
         }
     }
 
-    //데이터베이스에 저장된 각각의 마커와 연동시 사용
-    fun showMarkerBottomSheet(contentId: String) {
-        val detailFragment = DetailFragment.newInstance(contentId)
-        detailFragment.show(childFragmentManager, detailFragment.tag)
+    private fun Marker.show() {
+        map = this@HomeFragment.map
+    }
+
+    private fun Marker.setPlaceClick() {
+        val remotePlaceId = tag.toString()
+
+        setOnClickListener {
+            val action = HomeFragmentDirections.actionHomeFragmentToDetailFragment(remotePlaceId)
+            findNavController().navigate(action)
+            true
+        }
+    }
+
+    private fun Marker.setPlanClick() {
+        val remotePlaceId = tag.toString()
+
+        setOnClickListener {
+            if (!viewModel.uiState.value.isOnline || viewModel.uiState.value.uid.isNullOrEmpty()) {
+                return@setOnClickListener false
+            }
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                val plan = viewModel.getRemotePlaceById(remotePlaceId)
+                val mapSymbol = MapSymbol(
+                    plan.lat,
+                    plan.lng,
+                    plan.caption,
+                    true,
+                    remotePlaceId
+                )
+                val action = HomeFragmentDirections.actionHomeFragmentToSaveLogFragment(
+                    mapSymbol
+                )
+                findNavController().navigate(action)
+            }
+
+            true
+        }
     }
 
     companion object {

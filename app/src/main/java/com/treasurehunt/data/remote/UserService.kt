@@ -27,16 +27,16 @@ interface UserService {
         @Body userDTO: UserDTO
     )
 
+    @GET("/users/{id}.json")
+    suspend fun getUser(
+        @Path("id") id: String
+    ): UserDTO
+
     @PATCH("/users/{id}.json")
     suspend fun update(
         @Path("id") id: String,
         @Body userDTO: UserDTO
     )
-
-    @GET("/users/{id}.json")
-    suspend fun getUser(
-        @Path("id") id: String
-    ): UserDTO
 
     companion object {
 

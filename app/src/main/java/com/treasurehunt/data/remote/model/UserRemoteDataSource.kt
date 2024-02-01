@@ -13,5 +13,4 @@ class UserRemoteDataSource(private val userService: UserService) {
     }
 
     suspend fun getUserData(id: String) = userService.getUser(id)
-
 }

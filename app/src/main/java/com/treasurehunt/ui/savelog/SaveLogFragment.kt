@@ -1,10 +1,8 @@
 package com.treasurehunt.ui.savelog
 
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,24 +14,27 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
-import com.google.firebase.storage.storage
 import com.naver.maps.map.LocationTrackingMode
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.util.FusedLocationSource
 import com.treasurehunt.R
-import com.treasurehunt.data.remote.model.LogDTO
 import com.treasurehunt.databinding.FragmentSavelogBinding
+import com.treasurehunt.ui.model.LogModel
+import com.treasurehunt.ui.model.MapSymbol
+import com.treasurehunt.ui.model.asLogDTO
+import com.treasurehunt.ui.model.asLogEntity
+import com.treasurehunt.ui.model.asPlaceDTO
+import com.treasurehunt.ui.model.asPlaceEntity
+import com.treasurehunt.ui.model.toPlace
 import com.treasurehunt.ui.savelog.adapter.SaveLogAdapter
+import com.treasurehunt.util.getCurrentTime
 import com.treasurehunt.util.showSnackbar
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.util.Date
 
 class SaveLogFragment : Fragment(), OnMapReadyCallback {
 
@@ -54,6 +55,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
             setLocationTrackingMode(isGranted)
             setAddImage(isGranted)
         }
+    private val args: SaveLogFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -61,7 +63,6 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentSavelogBinding.inflate(inflater, container, false)
-
         return binding.root
     }
 
@@ -72,7 +73,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         initAdapter()
         setAlbumPermission()
         loadMap()
-        saveLog()
+        setSaveButton()
         setCancelButton()
     }
 
@@ -132,58 +133,124 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun saveLog() {
+    private fun setSaveButton() {
         binding.btnSave.setOnClickListener {
-            val createdDate = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
-            } else {
-                Date().time
+            if (args.mapSymbol.remoteId == null) {
+                binding.root.showSnackbar(R.string.savelog_sb_save_failure)
+                findNavController().navigate(R.id.action_saveLogFragment_to_homeFragment)
+                return@setOnClickListener
             }
-            // 임시 데이터
-            val place = "123"
-            val text = binding.etText.text.toString()
-            val theme = "123"
-            val uid = Firebase.auth.currentUser!!.uid
-            lifecycleScope.launch {
-                for (i in 0 until viewModel.images.value.size) {
-                    uploadImage(
-                        i + 1,
-                        viewModel.images.value.size,
-                        uid,
-                        viewModel.images.value[i].url.toUri()
-                    )
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                uploadImages()
+
+                val remotePlaceId = if (args.mapSymbol.isPlan) {
+                    insertPlace(args.mapSymbol)!!
+                } else {
+                    updatePlace(args.mapSymbol)
                 }
-                // 테스트용 데이터 전달
-                viewModel.insertLog(LogDTO(
-                        place,
-                    mapOf("st" to false),
-                        text,
-                        theme,
-                        createdDate))
-                findNavController().navigateUp()
+
+                val text = binding.etText.text.toString()
+                val theme = "123"
+                val createdDate = getCurrentTime()
+
+                val log = LogModel(
+                    remotePlaceId,
+                    viewModel.imageUrl.value,
+                    text,
+                    theme,
+                    createdDate
+                )
+                val remoteLogId = insertLog(log)
+
+                updateUser(remotePlaceId, remoteLogId)
+
+                findNavController().navigate(R.id.action_saveLogFragment_to_homeFragment)
             }
         }
     }
 
-    private suspend fun uploadImage(currentCount: Int, maxCount: Int, uid: String, uri: Uri) {
-        val storage = Firebase.storage
-        val storageRef = storage.getReference("${uid}/log_images")
-        val fileName = uri.toString().replace("[^0-9]".toRegex(), "")
-        val mountainsRef = storageRef.child("${fileName}.png")
-        val uploadTask = mountainsRef.putFile(uri)
-        uploadTask.addOnSuccessListener { taskSnapshot ->
-            viewModel.addImageUrl(taskSnapshot.storage.toString())
-            binding.root.showSnackbar(
-                getString(
-                    R.string.savelog_sb_upload_success,
-                    currentCount,
-                    maxCount
-                )
+    private suspend fun uploadImages() {
+        val uid = Firebase.auth.currentUser!!.uid
+
+        for (i in 0 until viewModel.images.value.size) {
+            val result = viewModel.uploadImage(
+                i + 1,
+                viewModel.images.value.size,
+                uid,
+                viewModel.images.value[i].url.toUri()
             )
-        }.addOnFailureListener {
-            binding.root.showSnackbar(R.string.savelog_sb_upload_failure)
+            if (result) {
+                binding.root.showSnackbar(
+                    getString(
+                        R.string.savelog_sb_upload_success,
+                        i + 1,
+                        viewModel.images.value.size
+                    )
+                )
+            } else {
+                binding.root.showSnackbar(R.string.savelog_sb_upload_failure)
+            }
         }
-        uploadTask.await()
+    }
+
+    private suspend fun insertLog(log: LogModel): String {
+        viewModel.insertLog(log.asLogEntity())
+        return viewModel.insertLog(log.asLogDTO())
+    }
+
+    private suspend fun updateUser(remotePlaceId: String, remoteLogId: String) {
+        val uid = Firebase.auth.currentUser!!.uid
+        val userDTO = viewModel.getUserById(uid)
+        if (args.mapSymbol.isPlan) {
+            viewModel.updateUser(
+                uid, userDTO.copy(plans = userDTO.plans.minus(remotePlaceId))
+            )
+        }
+        viewModel.updateUser(
+            uid,
+            userDTO.copy(
+                places = userDTO.places.plus(remotePlaceId to true),
+                logs = userDTO.logs.plus(remoteLogId to true)
+            )
+        )
+    }
+
+    private suspend fun getPlaceId(mapSymbol: MapSymbol): Pair<String, Long>? {
+        val remotePlaceId: String = mapSymbol.remoteId ?: return null
+        val localPlaceId = viewModel.getRemotePlaceById(remotePlaceId).id
+
+        return (remotePlaceId to localPlaceId)
+    }
+
+    private suspend fun insertPlace(mapSymbol: MapSymbol): String? {
+        val place = mapSymbol.toPlace()
+        val (remotePlaceId, localPlaceId) = getPlaceId(mapSymbol)
+            ?: return null
+        val remotePlace = viewModel.getRemotePlaceById(remotePlaceId)
+
+        viewModel.updatePlace(
+            place.asPlaceEntity(remotePlaceId, localPlaceId)
+                .copy(plan = false)
+        )
+        viewModel.updatePlace(
+            remotePlaceId, remotePlace.copy(plan = false)
+        )
+
+        return remotePlaceId
+    }
+
+    private suspend fun updatePlace(mapSymbol: MapSymbol): String {
+        val place = mapSymbol.toPlace()
+        val remotePlaceId = viewModel.insertPlace(place.asPlaceDTO())
+        val localPlaceId = viewModel.insertPlace(place.asPlaceEntity())
+
+        viewModel.updatePlace(
+            place.asPlaceEntity(remotePlaceId, localPlaceId)
+        )
+        viewModel.updatePlace(remotePlaceId, place.asPlaceDTO(remotePlaceId, localPlaceId))
+
+        return remotePlaceId
     }
 
     private fun setLocationTrackingMode(isGranted: Boolean) {

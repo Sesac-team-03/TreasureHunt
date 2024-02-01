@@ -8,7 +8,7 @@ interface LogRepository {
 
     suspend fun insert(log: LogEntity): Long
 
-    suspend fun insert(log: LogDTO)
+    suspend fun insert(log: LogDTO): String
 
     suspend fun getRemoteLog(id: String): LogDTO
 

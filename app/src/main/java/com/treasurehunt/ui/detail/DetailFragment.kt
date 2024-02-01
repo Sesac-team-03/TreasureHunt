@@ -112,14 +112,4 @@ class DetailFragment : BottomSheetDialogFragment() {
         super.onDestroyView()
         _binding = null
     }
-
-    companion object {
-        fun newInstance(contentId: String): DetailFragment {
-            return DetailFragment().apply {
-                arguments = Bundle().apply {
-                    putString("content_id", contentId)
-                }
-            }
-        }
-    }
 }
