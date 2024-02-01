@@ -18,5 +18,5 @@ fun LogModel.asLogEntity(remoteId: String? = null, localId: Long = 0): LogEntity
 
 fun LogModel.asLogDTO(remoteId: String? = null, localId: Long = 0): LogDTO {
     val (place, images, text, theme, createdDate) = this
-    return LogDTO(place, images, text, theme, createdDate)
+    return LogDTO(place, images.associateWith { true }, text, theme, createdDate)
 }
