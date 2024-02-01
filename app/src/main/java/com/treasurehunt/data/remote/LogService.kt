@@ -43,5 +43,4 @@ interface LogService {
                 .create(LogService::class.java)
         }
     }
-
 }

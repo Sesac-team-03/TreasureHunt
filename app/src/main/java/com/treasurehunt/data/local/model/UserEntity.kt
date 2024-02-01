@@ -12,5 +12,5 @@ data class UserEntity(
     @ColumnInfo("remote_id")
     val remoteId: String? = null,
     @PrimaryKey(autoGenerate = true)
-    val id: Long = 0,
+    val id: Long = 0
 )
