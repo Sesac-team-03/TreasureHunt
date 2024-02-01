@@ -23,15 +23,14 @@ import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.util.FusedLocationSource
 import com.treasurehunt.R
-import com.treasurehunt.data.remote.model.PlaceDTO
 import com.treasurehunt.databinding.FragmentSavelogBinding
 import com.treasurehunt.ui.model.LogModel
 import com.treasurehunt.ui.model.MapSymbol
-import com.treasurehunt.ui.model.PlaceModel
 import com.treasurehunt.ui.model.asLogDTO
 import com.treasurehunt.ui.model.asLogEntity
 import com.treasurehunt.ui.model.asPlaceDTO
 import com.treasurehunt.ui.model.asPlaceEntity
+import com.treasurehunt.ui.model.toPlace
 import com.treasurehunt.ui.savelog.adapter.SaveLogAdapter
 import com.treasurehunt.util.getCurrentTime
 import com.treasurehunt.util.showSnackbar
@@ -136,10 +135,21 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
 
     private fun setSaveButton() {
         binding.btnSave.setOnClickListener {
+            if (args.mapSymbol.remoteId == null) {
+                binding.root.showSnackbar(R.string.savelog_sb_save_failure)
+                findNavController().navigate(R.id.action_saveLogFragment_to_homeFragment)
+                return@setOnClickListener
+            }
+
             viewLifecycleOwner.lifecycleScope.launch {
                 uploadImages()
 
-                val remotePlaceId = insertOrUpdatePlace(args.mapSymbol)
+                val remotePlaceId = if (args.mapSymbol.isPlan) {
+                    insertPlace(args.mapSymbol)!!
+                } else {
+                    updatePlace(args.mapSymbol)
+                }
+
                 val text = binding.etText.text.toString()
                 val theme = "123"
                 val createdDate = getCurrentTime()
@@ -206,38 +216,39 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         )
     }
 
-    private suspend fun insertOrUpdatePlace(mapSymbol: MapSymbol): String {
-        val (lat, lng, caption) = mapSymbol
-        val place = PlaceModel(
-            lat,
-            lng,
-            false,
-            caption
+    private suspend fun getRemoteAndLocalPlaceIdFromPlanMarker(mapSymbol: MapSymbol): Pair<String, Long>? {
+        val remotePlaceId: String = mapSymbol.remoteId ?: return null
+        val localPlaceId = viewModel.getRemotePlaceById(remotePlaceId).id
+
+        return (remotePlaceId to localPlaceId)
+    }
+
+    private suspend fun insertPlace(mapSymbol: MapSymbol): String? {
+        val place = mapSymbol.toPlace()
+        val (remotePlaceId, localPlaceId) = getRemoteAndLocalPlaceIdFromPlanMarker(mapSymbol)
+            ?: return null
+        val remotePlace = viewModel.getRemotePlaceById(remotePlaceId)
+
+        viewModel.updatePlace(
+            place.asPlaceEntity(remotePlaceId, localPlaceId)
+                .copy(plan = false)
+        )
+        viewModel.updatePlace(
+            remotePlaceId, remotePlace.copy(plan = false)
         )
 
-        val remotePlaceId: String
-        val remotePlace: PlaceDTO
-        val localPlaceId: Long
+        return remotePlaceId
+    }
 
-        if (args.mapSymbol.isPlan) {
-            remotePlaceId = args.mapSymbol.remoteId!!
-            remotePlace = viewModel.getRemotePlaceById(remotePlaceId)
-            localPlaceId = remotePlace.id
-            viewModel.updatePlace(
-                place.asPlaceEntity(remotePlaceId, localPlaceId)
-                    .copy(plan = false)
-            )
-            viewModel.updatePlace(
-                remotePlaceId, remotePlace.copy(plan = false)
-            )
-        } else {
-            remotePlaceId = viewModel.insertPlace(place.asPlaceDTO())
-            localPlaceId = viewModel.insertPlace(place.asPlaceEntity())
-            viewModel.updatePlace(
-                place.asPlaceEntity(remotePlaceId, localPlaceId)
-            )
-            viewModel.updatePlace(remotePlaceId, place.asPlaceDTO(remotePlaceId, localPlaceId))
-        }
+    private suspend fun updatePlace(mapSymbol: MapSymbol): String {
+        val place = mapSymbol.toPlace()
+        val remotePlaceId = viewModel.insertPlace(place.asPlaceDTO())
+        val localPlaceId = viewModel.insertPlace(place.asPlaceEntity())
+
+        viewModel.updatePlace(
+            place.asPlaceEntity(remotePlaceId, localPlaceId)
+        )
+        viewModel.updatePlace(remotePlaceId, place.asPlaceDTO(remotePlaceId, localPlaceId))
 
         return remotePlaceId
     }

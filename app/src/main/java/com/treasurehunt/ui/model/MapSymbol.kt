@@ -12,3 +12,12 @@ data class MapSymbol(
     val remoteId: String? = null
 ) : Parcelable
 
+fun MapSymbol.toPlace(): PlaceModel {
+    val (lat, lng, caption) = this
+    return PlaceModel(
+        lat,
+        lng,
+        false,
+        caption
+    )
+}
