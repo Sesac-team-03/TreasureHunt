@@ -26,7 +26,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.IOException
@@ -106,7 +106,11 @@ class HomeViewModel(
 
         fetchJob = viewModelScope.launch {
             try {
-                merge(placeRepo.getAllVisits(), placeRepo.getAllPlans()).collect { visitsAndPlans ->
+                placeRepo.getAllVisits().combine(placeRepo.getAllPlans()) { visits, plans ->
+                    visits + plans
+                }
+//                merge(placeRepo.getAllPlaces(), placeRepo.getAllPlans())
+                    .collect { visitsAndPlans ->
                     _uiState.update { uiState ->
                         val (places, plans) = visitsAndPlans.partition { !it.plan }
                         uiState.copy(

@@ -234,10 +234,9 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
             remotePlaceId = viewModel.insertPlace(place.asPlaceDTO())
             localPlaceId = viewModel.insertPlace(place.asPlaceEntity())
             viewModel.updatePlace(
-                place.asPlaceEntity(remotePlaceId).copy(
-                    id = localPlaceId
-                )
+                place.asPlaceEntity(remotePlaceId, localPlaceId)
             )
+            viewModel.updatePlace(remotePlaceId, place.asPlaceDTO(remotePlaceId, localPlaceId))
         }
 
         return remotePlaceId
