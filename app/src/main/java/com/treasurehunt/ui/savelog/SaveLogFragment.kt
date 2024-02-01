@@ -216,7 +216,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         )
     }
 
-    private suspend fun getRemoteAndLocalPlaceIdFromPlanMarker(mapSymbol: MapSymbol): Pair<String, Long>? {
+    private suspend fun getPlaceId(mapSymbol: MapSymbol): Pair<String, Long>? {
         val remotePlaceId: String = mapSymbol.remoteId ?: return null
         val localPlaceId = viewModel.getRemotePlaceById(remotePlaceId).id
 
@@ -225,7 +225,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
 
     private suspend fun insertPlace(mapSymbol: MapSymbol): String? {
         val place = mapSymbol.toPlace()
-        val (remotePlaceId, localPlaceId) = getRemoteAndLocalPlaceIdFromPlanMarker(mapSymbol)
+        val (remotePlaceId, localPlaceId) = getPlaceId(mapSymbol)
             ?: return null
         val remotePlace = viewModel.getRemotePlaceById(remotePlaceId)
 
