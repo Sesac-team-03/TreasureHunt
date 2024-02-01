@@ -108,8 +108,8 @@ class HomeViewModel(
 
         fetchJob = viewModelScope.launch {
             try {
-                placeRepo.getAllVisits().combine(placeRepo.getAllPlans()) { visits, plans ->
-                    visits + plans
+                combine(placeRepo.getAllVisits(), placeRepo.getAllPlans()) { places, plans ->
+                    places + plans
                 }
                     .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
                     .collect { visitsAndPlans ->
