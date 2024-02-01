@@ -25,8 +25,10 @@ import com.treasurehunt.util.ConnectivityRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.IOException
@@ -109,16 +111,16 @@ class HomeViewModel(
                 placeRepo.getAllVisits().combine(placeRepo.getAllPlans()) { visits, plans ->
                     visits + plans
                 }
-//                merge(placeRepo.getAllPlaces(), placeRepo.getAllPlans())
+                    .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
                     .collect { visitsAndPlans ->
-                    _uiState.update { uiState ->
-                        val (places, plans) = visitsAndPlans.partition { !it.plan }
-                        uiState.copy(
-                            visitMarkers = places.mapToMarkers(),
-                            planMarkers = plans.mapToMarkers()
-                        )
+                        _uiState.update { uiState ->
+                            val (places, plans) = visitsAndPlans.partition { !it.plan }
+                            uiState.copy(
+                                visitMarkers = places.mapToMarkers(),
+                                planMarkers = plans.mapToMarkers()
+                            )
+                        }
                     }
-                }
             } catch (e: IOException) {
             }
         }

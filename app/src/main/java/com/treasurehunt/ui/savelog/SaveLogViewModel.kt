@@ -9,7 +9,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.google.firebase.Firebase
 import com.google.firebase.storage.storage
-import com.treasurehunt.R
 import com.treasurehunt.TreasureHuntApplication
 import com.treasurehunt.data.LogRepository
 import com.treasurehunt.data.PlaceRepository
@@ -19,11 +18,9 @@ import com.treasurehunt.data.local.model.PlaceEntity
 import com.treasurehunt.data.remote.model.LogDTO
 import com.treasurehunt.data.remote.model.PlaceDTO
 import com.treasurehunt.data.remote.model.UserDTO
-import com.treasurehunt.util.showSnackbar
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 class SaveLogViewModel(
