@@ -3,6 +3,7 @@ package com.treasurehunt.ui.savelog
 import android.content.Intent
 import android.net.Uri
 import android.provider.MediaStore
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -52,8 +53,9 @@ class SaveLogViewModel(
             }.addOnFailureListener {
                 result = false
             }
-            uploadTask.await()
-            result
+//            uploadTask.await() //  retrofit2.HttpException: HTTP 400 Bad Request 오류 발생
+
+            return@async result
         }.await()
     }
 
