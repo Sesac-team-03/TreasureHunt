@@ -4,6 +4,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -145,10 +146,20 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
             val uid = Firebase.auth.currentUser!!.uid
             lifecycleScope.launch {
                 for (i in 0 until viewModel.images.value.size) {
-                    uploadImage(i + 1, viewModel.images.value.size, uid, viewModel.images.value[i].url.toUri())
+                    uploadImage(
+                        i + 1,
+                        viewModel.images.value.size,
+                        uid,
+                        viewModel.images.value[i].url.toUri()
+                    )
                 }
                 // 테스트용 데이터 전달
-                viewModel.insertLog(LogDTO(place, viewModel.imageUrl.value, text, theme, createdDate))
+                viewModel.insertLog(LogDTO(
+                        place,
+                    mapOf("st" to false),
+                        text,
+                        theme,
+                        createdDate))
                 findNavController().navigateUp()
             }
         }

@@ -146,7 +146,7 @@ class ProfileFragment : Fragment() {
     private fun saveProfile() {
         lifecycleScope.launch {
             val userData = viewModel.userData.value ?: return@launch
-            val email = userData.email.ifEmpty { "" }
+            val email = userData.email ?: ""
             val nickname = binding.etNickname.text.toString()
             if (viewModel.imageUri.value.isNullOrEmpty()) {
                 viewModel.updateUserData(UserDTO(email, nickname, userData.profileImage.toString()))
@@ -165,7 +165,7 @@ class ProfileFragment : Fragment() {
     }
 
     private fun updateProfile(userDTO: UserDTO) {
-        if (userDTO.email.isNotEmpty()) {
+        if (userDTO.email != null) {
             binding.tvAccount.text = userDTO.email
         }
         if (userDTO.nickname.isNullOrEmpty()) {
