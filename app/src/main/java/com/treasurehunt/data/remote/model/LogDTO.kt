@@ -1,7 +1,5 @@
 package com.treasurehunt.data.remote.model
 
-import androidx.room.ColumnInfo
-import androidx.room.PrimaryKey
 import com.treasurehunt.data.local.model.LogEntity
 import kotlinx.serialization.Serializable
 

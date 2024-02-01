@@ -4,14 +4,14 @@ import com.treasurehunt.data.remote.UserService
 
 class UserRemoteDataSource(private val userService: UserService) {
 
-    suspend fun insert(uid: String, data: UserDTO) {
-        userService.insert(uid, data)
+    suspend fun insert(id: String, userDTO: UserDTO) {
+        userService.insert(id, userDTO)
     }
 
-    suspend fun update(uid: String, data: UserDTO) {
-        userService.update(uid, data)
+    suspend fun update(id: String, userDTO: UserDTO) {
+        userService.update(id, userDTO)
     }
 
-    suspend fun getUserData(uid: String) = userService.getUser(uid)
+    suspend fun getUserData(id: String) = userService.getUser(id)
 
 }

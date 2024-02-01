@@ -24,13 +24,13 @@ interface UserService {
     @PUT("/users/{id}.json")
     suspend fun insert(
         @Path("id") id: String,
-        @Body data: UserDTO
+        @Body userDTO: UserDTO
     )
 
     @PATCH("/users/{id}.json")
     suspend fun update(
         @Path("id") id: String,
-        @Body data: UserDTO
+        @Body userDTO: UserDTO
     )
 
     @GET("/users/{id}.json")
