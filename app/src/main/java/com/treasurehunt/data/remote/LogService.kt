@@ -1,23 +1,11 @@
 package com.treasurehunt.data.remote
 
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
-import com.treasurehunt.BuildConfig
 import com.treasurehunt.data.remote.model.LogDTO
 import com.treasurehunt.data.remote.model.RemoteIdWrapper
-import kotlinx.serialization.json.Json
-import okhttp3.MediaType.Companion.toMediaType
-import retrofit2.Retrofit
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
-
-private const val BASE_URL = BuildConfig.BASE_URL
-private val jsonRule = Json {
-    isLenient = true
-    ignoreUnknownKeys = true
-    coerceInputValues = true
-}
 
 interface LogService {
 
@@ -31,17 +19,4 @@ interface LogService {
 
     @POST("logs.json")
     suspend fun insert(@Body logDTO: LogDTO): RemoteIdWrapper
-
-    companion object {
-
-        fun create(): LogService {
-            val contentType = "application/json".toMediaType()
-            return Retrofit.Builder()
-                .client(Client.getClient())
-                .baseUrl(BASE_URL)
-                .addConverterFactory(jsonRule.asConverterFactory(contentType))
-                .build()
-                .create(LogService::class.java)
-        }
-    }
 }

@@ -81,6 +81,10 @@ class SaveLogViewModel(
 
     suspend fun insertLog(logDTO: LogDTO) = logRepo.insert(logDTO)
 
+    suspend fun insertLog(logEntity: LogEntity) {
+        logRepo.insert(logEntity)
+    }
+
     fun removeImage(image: ImageModel) {
         _images.value -= image
         setButtonState()
