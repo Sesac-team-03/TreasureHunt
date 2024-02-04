@@ -1,6 +1,5 @@
 package com.treasurehunt.ui.login
 
-import android.app.Activity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -21,6 +20,7 @@ import com.treasurehunt.BuildConfig
 import com.treasurehunt.R
 import com.treasurehunt.data.User
 import com.treasurehunt.databinding.FragmentLoginBinding
+import com.treasurehunt.util.showSnackbar
 import kotlinx.coroutines.launch
 
 private const val NAVER_LOGIN_CLIENT_ID = BuildConfig.NAVER_LOGIN_CLIENT_ID
@@ -55,7 +55,7 @@ class LogInFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setNaverLogin()
-        guestLogin()
+        setGuestLogin()
     }
 
     override fun onDestroyView() {
@@ -68,7 +68,7 @@ class LogInFragment : Fragment() {
             NaverIdLoginSDK.behavior = NidOAuthBehavior.NAVERAPP
             NaverIdLoginSDK.authenticate(requireContext(), object : OAuthLoginCallback {
                 override fun onSuccess() {
-                    loginNaverAccount()
+                    fetchNaverAccount()
                 }
 
                 override fun onFailure(httpStatus: Int, message: String) {
@@ -83,18 +83,18 @@ class LogInFragment : Fragment() {
         }
     }
 
-    private fun loginNaverAccount() {
+    private fun fetchNaverAccount() {
         NidOAuthLogin().callProfileApi(object : NidProfileCallback<NidProfileResponse> {
-            override fun onSuccess(response: NidProfileResponse) {
-                val naverProfile = response.profile!!
-                val user =
-                    User(
-                        naverProfile.email!!,
-                        naverProfile.id!!,
-                        naverProfile.nickname,
-                        naverProfile.profileImage
-                    )
-                loginAccount(user)
+            override fun onSuccess(result: NidProfileResponse) {
+                val naverProfile = result.profile!!
+                val user = User(
+                    naverProfile.email!!,
+                    naverProfile.id!!,
+                    naverProfile.nickname,
+                    naverProfile.profileImage
+                )
+
+                createAccount(user)
             }
 
             override fun onFailure(httpStatus: Int, message: String) {
@@ -107,9 +107,22 @@ class LogInFragment : Fragment() {
         })
     }
 
+    private fun createAccount(user: User) {
+        Firebase.auth.createUserWithEmailAndPassword(user.email!!, user.id)
+            .addOnCompleteListener(requireActivity()) { task ->
+                if (task.isSuccessful) {
+                    lifecycleScope.launch {
+                        viewModel.insertNaverUser(user)
+                        loginAccount(user)
+                    }
+                } else {
+                    binding.root.showSnackbar(R.string.login_create_account_error)
+                }
+            }
+    }
+
     private fun loginAccount(user: User) {
-        val auth = Firebase.auth
-        auth.signInWithEmailAndPassword(user.email!!, user.id)
+        Firebase.auth.signInWithEmailAndPassword(user.email!!, user.id)
             .addOnCompleteListener(requireActivity()) { task ->
                 if (task.isSuccessful) {
                     lifecycleScope.launch {
@@ -117,33 +130,22 @@ class LogInFragment : Fragment() {
                         findNavController().navigate(R.id.action_logInFragment_to_homeFragment)
                     }
                 } else {
-                    createAccount(user)
+                    binding.root.showSnackbar(R.string.login_naver_login_error)
                 }
             }
     }
 
-    private fun createAccount(user: User) {
-        val auth = Firebase.auth
-        auth.createUserWithEmailAndPassword(user.email!!, user.id)
-            .addOnCompleteListener(requireActivity()) { task ->
-                if (task.isSuccessful) {
-                    lifecycleScope.launch {
-                        viewModel.insertNaverUser(user)
-                        findNavController().navigate(R.id.action_logInFragment_to_homeFragment)
-                    }
-                }
-            }
-    }
-
-    private fun guestLogin() {
+    private fun setGuestLogin() {
         binding.btnGuestLogin.setOnClickListener {
             Firebase.auth.signInAnonymously()
-                .addOnCompleteListener(Activity()) { task ->
+                .addOnCompleteListener(requireActivity()) { task ->
                     if (task.isSuccessful) {
                         lifecycleScope.launch {
                             viewModel.insertGuestUser()
                             findNavController().navigate(R.id.action_logInFragment_to_homeFragment)
                         }
+                    } else {
+                        binding.root.showSnackbar(R.string.login_guest_login_error)
                     }
                 }
         }
