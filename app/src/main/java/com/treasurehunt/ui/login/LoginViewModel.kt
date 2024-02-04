@@ -58,7 +58,7 @@ class LoginViewModel(
         val curUserUid = Firebase.auth.currentUser!!.uid
         val userDTO = userRepository.getRemoteUser(curUserUid)
         initLocalLogs(userDTO)
-//            castingRemotePlaces(userDTO)
+        initLocalPlaces(userDTO)
     }
 
     private suspend fun initLocalLogs(userDTO: UserDTO) {
