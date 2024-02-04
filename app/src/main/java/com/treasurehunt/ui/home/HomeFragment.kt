@@ -1,20 +1,28 @@
 package com.treasurehunt.ui.home
 
 import android.Manifest
+import android.content.ContentValues.TAG
 import android.content.pm.PackageManager
 import android.graphics.PointF
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.LocationTrackingMode
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
@@ -24,6 +32,7 @@ import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.util.FusedLocationSource
 import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentHomeBinding
+import com.treasurehunt.ui.model.LogModel
 import com.treasurehunt.ui.model.MapSymbol
 import kotlinx.coroutines.launch
 
@@ -51,12 +60,24 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         super.onViewCreated(view, savedInstanceState)
         initSegmentedButton()
         loadMap()
+        //observeLogData()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
+
+//    private fun observeLogData() {
+//        viewModel.logData.observe(viewLifecycleOwner) { logModel ->
+//            logModel?.let {
+//                // 상세화면으로 이동
+////                val action = HomeFragmentDirections.actionHomeFragmentToDetailFragment(logModel)
+////                findNavController().navigate(action)
+//                moveDetail(logModel)
+//            }
+//        }
+//    }
 
     private fun setLocationTrackingMode(isGranted: Boolean) {
         map.locationTrackingMode =
@@ -66,6 +87,31 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                 LocationTrackingMode.None
             }
     }
+
+//    private fun fetchPosts() {
+//        val database = FirebaseDatabase.getInstance()
+//        val myRef = database.getReference("users")
+//
+//        myRef.addValueEventListener(object : ValueEventListener {
+//            override fun onDataChange(dataSnapshot: DataSnapshot) {
+//                for (userSnapshot in dataSnapshot.children) {
+//                    val userId = userSnapshot.key
+//                    val userLogs = userSnapshot.child("logs")
+//                    for (logSnapshot in userLogs.children) {
+//                        val logId = logSnapshot.key
+//                        // 마커 생성
+//                        val marker = map.addMarker(MarkerOptions().position(LatLng(/*위도*/, /*경도*/)).title(/*제목*/))
+//                        marker.tag = logId
+//                    }
+//                }
+//            }
+//
+//            override fun onCancelled(error: DatabaseError) {
+//                // Failed to read value
+//                Log.w(TAG, "Failed to read value.", error.toException())
+//            }
+//        })
+//    }
 
     private fun initSegmentedButton() {
         binding.btnMap.isSelected = true
@@ -165,11 +211,28 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         val remotePlaceId = tag.toString()
 
         setOnClickListener {
-            val action = HomeFragmentDirections.actionHomeFragmentToDetailFragment(remotePlaceId)
-            findNavController().navigate(action)
+            if (!viewModel.uiState.value.isOnline || viewModel.uiState.value.uid.isNullOrEmpty()) {
+                return@setOnClickListener false
+            }
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                try {
+                    viewModel.fetchLogData(remotePlaceId)
+                    moveDetail(viewModel.logData.value!!)
+                } catch (e: Exception) {
+                    // 예외 처리
+                }
+            }
+
             true
         }
     }
+
+    private fun moveDetail(logData: LogModel) {
+        val bundle = bundleOf("logModel" to logData)
+        findNavController().navigate(R.id.action_homeFragment_to_detailFragment, bundle)
+    }
+
 
     private fun Marker.setPlanClick() {
         val remotePlaceId = tag.toString()
@@ -197,6 +260,11 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
             true
         }
     }
+
+//    private fun showLogDetailBottomSheet(placeId: String) {
+//        val detailFragment = DetailFragment.newInstance(placeId)
+//        detailFragment.show(childFragmentManager, detailFragment.tag)
+//    }
 
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1000
