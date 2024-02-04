@@ -1,5 +1,7 @@
 package com.treasurehunt.ui.home
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
@@ -20,15 +22,15 @@ import com.treasurehunt.data.UserRepository
 import com.treasurehunt.data.local.model.PlaceEntity
 import com.treasurehunt.data.remote.model.PlaceDTO
 import com.treasurehunt.data.remote.model.UserDTO
+import com.treasurehunt.data.remote.model.asLogModel
+import com.treasurehunt.ui.model.LogModel
 import com.treasurehunt.ui.model.MapUiState
 import com.treasurehunt.util.ConnectivityRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.IOException
@@ -40,6 +42,9 @@ class HomeViewModel(
     private val connectivityRepo: ConnectivityRepository
 ) :
     ViewModel() {
+
+    private val _logData = MutableLiveData<LogModel?>()
+    val logData: LiveData<LogModel?> = _logData
 
     private val _uiState = MutableStateFlow(MapUiState())
     val uiState: StateFlow<MapUiState> = _uiState
@@ -55,6 +60,7 @@ class HomeViewModel(
         connectivityRepo.release()
         super.onCleared()
     }
+
 
     private fun initUser() {
         val uid = Firebase.auth.currentUser?.uid
@@ -73,6 +79,16 @@ class HomeViewModel(
                     it.copy(isOnline = value)
                 }
             }
+        }
+    }
+
+    suspend fun fetchLogData(logId: String) {
+        try {
+            val logDTO = logRepo.getRemoteLog(logId)
+            val logModel = logDTO.asLogModel()
+            _logData.postValue(logModel)
+        } catch (e: Exception) {
+            _logData.postValue(null)
         }
     }
 
@@ -108,19 +124,15 @@ class HomeViewModel(
 
         fetchJob = viewModelScope.launch {
             try {
-                combine(placeRepo.getAllVisits(), placeRepo.getAllPlans()) { places, plans ->
-                    places + plans
-                }
-                    .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
-                    .collect { visitsAndPlans ->
-                        _uiState.update { uiState ->
-                            val (places, plans) = visitsAndPlans.partition { !it.plan }
-                            uiState.copy(
-                                visitMarkers = places.mapToMarkers(),
-                                planMarkers = plans.mapToMarkers()
-                            )
-                        }
+                merge(placeRepo.getAllVisits(), placeRepo.getAllPlans()).collect { placesAndPlans ->
+                    _uiState.update { uiState ->
+                        val (places, plans) = placesAndPlans.partition { !it.plan }
+                        uiState.copy(
+                            visitMarkers = places.mapToMarkers(),
+                            planMarkers = plans.mapToMarkers()
+                        )
                     }
+                }
             } catch (e: IOException) {
             }
         }
