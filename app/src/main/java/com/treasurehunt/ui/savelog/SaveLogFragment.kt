@@ -3,6 +3,7 @@ package com.treasurehunt.ui.savelog
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,6 +24,8 @@ import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.util.FusedLocationSource
 import com.treasurehunt.R
+import com.treasurehunt.data.remote.model.ImageDTO
+import com.treasurehunt.data.remote.model.LogDTO
 import com.treasurehunt.databinding.FragmentSavelogBinding
 import com.treasurehunt.ui.model.LogModel
 import com.treasurehunt.ui.model.MapSymbol
@@ -135,34 +138,35 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
 
     private fun setSaveButton() {
         binding.btnSave.setOnClickListener {
-            if (args.mapSymbol.remoteId == null) {
-                binding.root.showSnackbar(R.string.savelog_sb_save_failure)
-                findNavController().navigate(R.id.action_saveLogFragment_to_homeFragment)
-                return@setOnClickListener
-            }
-
             viewLifecycleOwner.lifecycleScope.launch {
                 uploadImages()
+                // check if uploaded correctly and show snackbar
 
-                val remotePlaceId = if (args.mapSymbol.isPlan) {
-                    insertPlace(args.mapSymbol)!!
+                val remotePlaceId = if (!args.mapSymbol.isPlan) {
+                    insertPlace(args.mapSymbol)
                 } else {
-                    updatePlace(args.mapSymbol)
+                    updatePlace(args.mapSymbol)!!
                 }
 
                 val text = binding.etText.text.toString()
                 val theme = "123"
                 val createdDate = getCurrentTime()
+                val imageIds: MutableList<String> = mutableListOf()
+                viewModel.imageUrl.value.forEach {
+                    imageIds.add(viewModel.insertImage(ImageDTO(it)))
+                }
 
                 val log = LogModel(
                     remotePlaceId,
-                    viewModel.imageUrl.value,
+                    imageIds,
                     text,
                     theme,
                     createdDate
                 )
+
                 val remoteLogId = insertLog(log)
 
+                // update place for log
                 updateUser(remotePlaceId, remoteLogId)
 
                 findNavController().navigate(R.id.action_saveLogFragment_to_homeFragment)
@@ -180,6 +184,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
                 uid,
                 viewModel.images.value[i].url.toUri()
             )
+
             if (result) {
                 binding.root.showSnackbar(
                     getString(
@@ -202,11 +207,13 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
     private suspend fun updateUser(remotePlaceId: String, remoteLogId: String) {
         val uid = Firebase.auth.currentUser!!.uid
         val userDTO = viewModel.getUserById(uid)
+
         if (args.mapSymbol.isPlan) {
             viewModel.updateUser(
                 uid, userDTO.copy(plans = userDTO.plans.minus(remotePlaceId))
             )
         }
+
         viewModel.updateUser(
             uid,
             userDTO.copy(
@@ -218,12 +225,12 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
 
     private suspend fun getPlaceId(mapSymbol: MapSymbol): Pair<String, Long>? {
         val remotePlaceId: String = mapSymbol.remoteId ?: return null
-        val localPlaceId = viewModel.getRemotePlaceById(remotePlaceId).id
+        val localPlaceId = viewModel.getRemotePlaceById(remotePlaceId).localId
 
         return (remotePlaceId to localPlaceId)
     }
 
-    private suspend fun insertPlace(mapSymbol: MapSymbol): String? {
+    private suspend fun updatePlace(mapSymbol: MapSymbol): String? {
         val place = mapSymbol.toPlace()
         val (remotePlaceId, localPlaceId) = getPlaceId(mapSymbol)
             ?: return null
@@ -240,7 +247,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         return remotePlaceId
     }
 
-    private suspend fun updatePlace(mapSymbol: MapSymbol): String {
+    private suspend fun insertPlace(mapSymbol: MapSymbol): String {
         val place = mapSymbol.toPlace()
         val remotePlaceId = viewModel.insertPlace(place.asPlaceDTO())
         val localPlaceId = viewModel.insertPlace(place.asPlaceEntity())

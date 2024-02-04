@@ -3,7 +3,6 @@ package com.treasurehunt.ui.savelog
 import android.content.Intent
 import android.net.Uri
 import android.provider.MediaStore
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -16,6 +15,8 @@ import com.treasurehunt.data.PlaceRepository
 import com.treasurehunt.data.UserRepository
 import com.treasurehunt.data.local.model.LogEntity
 import com.treasurehunt.data.local.model.PlaceEntity
+import com.treasurehunt.data.ImageRepository
+import com.treasurehunt.data.remote.model.ImageDTO
 import com.treasurehunt.data.remote.model.LogDTO
 import com.treasurehunt.data.remote.model.PlaceDTO
 import com.treasurehunt.data.remote.model.UserDTO
@@ -28,6 +29,7 @@ class SaveLogViewModel(
     private val logRepo: LogRepository,
     private val placeRepo: PlaceRepository,
     private val userRepo: UserRepository,
+    private val imageRepo: ImageRepository
 ) : ViewModel() {
 
     private val _images: MutableStateFlow<List<ImageModel>> = MutableStateFlow(emptyList())
@@ -40,23 +42,22 @@ class SaveLogViewModel(
     val isEnabled = _isEnabled.asStateFlow()
 
     suspend fun uploadImage(currentCount: Int, maxCount: Int, uid: String, uri: Uri): Boolean {
-        return viewModelScope.async {
-            val storage = Firebase.storage
-            val storageRef = storage.getReference("${uid}/log_images")
-            val fileName = uri.toString().replace("[^0-9]".toRegex(), "")
-            val mountainsRef = storageRef.child("${fileName}.png")
-            val uploadTask = mountainsRef.putFile(uri)
-            var result: Boolean = false
-            uploadTask.addOnSuccessListener { taskSnapshot ->
-                addImageUrl(taskSnapshot.storage.toString())
-                result = true
-            }.addOnFailureListener {
-                result = false
-            }
-//            uploadTask.await() //  retrofit2.HttpException: HTTP 400 Bad Request 오류 발생
+        val storage = Firebase.storage
+        val storageRef = storage.getReference("${uid}/log_images")
+        val fileName = uri.toString().replace("[^0-9]".toRegex(), "")
+        val mountainsRef = storageRef.child("${fileName}.png")
+        val uploadTask = mountainsRef.putFile(uri)
+        var result = false
 
-            return@async result
-        }.await()
+        uploadTask.addOnSuccessListener { taskSnapshot ->
+            addImageUrl(taskSnapshot.storage.toString())
+            result = true
+        }.addOnFailureListener {
+            result = false
+        }
+        uploadTask.await()
+
+        return result
     }
 
     fun getImage(): Intent {
@@ -75,9 +76,7 @@ class SaveLogViewModel(
         setButtonState()
     }
 
-    suspend fun insertLog(logEntity: LogEntity) {
-        logRepo.insert(logEntity)
-    }
+    suspend fun insertLog(logEntity: LogEntity) = logRepo.insert(logEntity)
 
     suspend fun insertLog(logDTO: LogDTO) = logRepo.insert(logDTO)
 
@@ -128,6 +127,8 @@ class SaveLogViewModel(
         userRepo.update(uid, user)
     }
 
+    suspend fun insertImage(image: ImageDTO) = imageRepo.insertImage(image)
+
     companion object {
         val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(
@@ -137,7 +138,8 @@ class SaveLogViewModel(
                 return SaveLogViewModel(
                     TreasureHuntApplication.logRepo,
                     TreasureHuntApplication.placeRepo,
-                    TreasureHuntApplication.userRepo
+                    TreasureHuntApplication.userRepo,
+                    TreasureHuntApplication.imageRepo
                 ) as T
             }
         }
