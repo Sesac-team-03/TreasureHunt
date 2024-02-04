@@ -1,7 +1,7 @@
 package com.treasurehunt.ui.model
 
-import kotlinx.parcelize.Parcelize
 import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class MapSymbol(
