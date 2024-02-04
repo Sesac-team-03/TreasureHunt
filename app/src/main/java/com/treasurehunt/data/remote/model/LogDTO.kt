@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class LogDTO(
     val place: String,
-    val images: Map<String,Boolean>,
+    val images: Map<String,Boolean> = emptyMap(),
     val text: String,
     val theme: String,
     val createdDate: Long,
