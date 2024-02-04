@@ -2,6 +2,7 @@ package com.treasurehunt.ui.detail
 
 import android.content.Intent
 import android.content.res.Resources
+import android.net.Uri
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,6 +11,8 @@ import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.firebase.dynamiclinks.DynamicLink
+import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
 import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentDetailBinding
 
@@ -46,7 +49,6 @@ class DetailFragment : BottomSheetDialogFragment() {
 
         setImageSlider()
         setDotsIndicator()
-        setShareButton()
         setCloseButton()
         setBottomSheet()
         setEditButton()
@@ -56,13 +58,6 @@ class DetailFragment : BottomSheetDialogFragment() {
         binding.viewPager.adapter = imageSliderAdapter
 
         binding.dotsIndicator.setViewPager2(binding.viewPager)
-    }
-
-    private fun setShareButton() {
-        binding.btnShareContent.setOnClickListener {
-            val contentToShare = collectDataForSharing()
-            shareContent(contentToShare)
-        }
     }
 
     //테스트용 데이터
@@ -79,18 +74,31 @@ class DetailFragment : BottomSheetDialogFragment() {
                 behavior.state = BottomSheetBehavior.STATE_EXPANDED
             }
         }
+
+        binding.btnShareContent.setOnClickListener {
+            createDynamicLinkAndShare()
+        }
     }
 
-    private fun collectDataForSharing(): String {
-        val textViewContent = binding.textView.text.toString()
-        val currentImageUrl = imageSliderAdapter.getImageItems()[imageSliderAdapter.currentPage]
-        return "TextView 내용: $textViewContent\n이미지 URL: $currentImageUrl"
+    private fun createDynamicLinkAndShare() {
+        val dynamicLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
+            .setLink(Uri.parse("https://treasurehuntsesac.page.link/KPo2"))
+            .setDomainUriPrefix("https://treasurehuntsesac.page.link")
+            .setAndroidParameters(
+                DynamicLink.AndroidParameters.Builder()
+                    .setMinimumVersion(1)
+                    .build()
+            )
+            .buildDynamicLink()
+
+        val dynamicLinkUri = dynamicLink.uri
+        shareContent(dynamicLinkUri.toString())
     }
 
-    private fun shareContent(content: String) {
+    private fun shareContent(link: String) {
         val intent = Intent().apply {
             action = Intent.ACTION_SEND
-            putExtra(Intent.EXTRA_TEXT, content)
+            putExtra(Intent.EXTRA_TEXT, "Check out Treasure Hunt: $link")
             type = "text/plain"
         }
         startActivity(Intent.createChooser(intent, "내용 공유하기"))
