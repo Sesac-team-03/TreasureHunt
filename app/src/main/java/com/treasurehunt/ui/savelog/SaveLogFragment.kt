@@ -24,6 +24,7 @@ import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.util.FusedLocationSource
 import com.treasurehunt.R
 import com.treasurehunt.data.remote.model.ImageDTO
+import com.treasurehunt.data.remote.model.toPlaceEntity
 import com.treasurehunt.databinding.FragmentSavelogBinding
 import com.treasurehunt.ui.model.LogModel
 import com.treasurehunt.ui.model.MapSymbol
@@ -138,33 +139,12 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         binding.btnSave.setOnClickListener {
             viewLifecycleOwner.lifecycleScope.launch {
                 uploadImages()
-                // check if uploaded correctly and show snackbar
 
-                val remotePlaceId = if (!args.mapSymbol.isPlan) {
-                    insertPlace(args.mapSymbol)
-                } else {
-                    updatePlace(args.mapSymbol)!!
-                }
-
-                val text = binding.etText.text.toString()
-                val theme = "123"
-                val createdDate = getCurrentTime()
-                val imageIds: MutableList<String> = mutableListOf()
-                viewModel.imageUrl.value.forEach {
-                    imageIds.add(viewModel.insertImage(ImageDTO(it)))
-                }
-
-                val log = LogModel(
-                    remotePlaceId,
-                    imageIds,
-                    text,
-                    theme,
-                    createdDate
-                )
-
+                val remotePlaceId = getRemotePlaceId()
+                val log = getLogFor(remotePlaceId)
                 val remoteLogId = insertLog(log)
 
-                // update place for log
+                updatePlaceWithLog(remotePlaceId, remoteLogId)
                 updateUser(remotePlaceId, remoteLogId)
 
                 findNavController().navigate(R.id.action_saveLogFragment_to_homeFragment)
@@ -197,52 +177,14 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private suspend fun insertLog(log: LogModel): String {
-        viewModel.insertLog(log.asLogEntity())
-        return viewModel.insertLog(log.asLogDTO())
-    }
-
-    private suspend fun updateUser(remotePlaceId: String, remoteLogId: String) {
-        val uid = Firebase.auth.currentUser!!.uid
-        val userDTO = viewModel.getUserById(uid)
-
-        if (args.mapSymbol.isPlan) {
-            viewModel.updateUser(
-                uid, userDTO.copy(plans = userDTO.plans.minus(remotePlaceId))
-            )
+    private suspend fun getRemotePlaceId(): String {
+        val planId = args.mapSymbol.remoteId
+        return if (planId.isNullOrEmpty()) {
+            insertPlace(args.mapSymbol)
+        } else {
+            updatePlaceFromPlanToVisit(planId)
+            planId
         }
-
-        viewModel.updateUser(
-            uid,
-            userDTO.copy(
-                places = userDTO.places.plus(remotePlaceId to true),
-                logs = userDTO.logs.plus(remoteLogId to true)
-            )
-        )
-    }
-
-    private suspend fun getPlaceId(mapSymbol: MapSymbol): Pair<String, Long>? {
-        val remotePlaceId: String = mapSymbol.remoteId ?: return null
-        val localPlaceId = viewModel.getRemotePlaceById(remotePlaceId).localId
-
-        return (remotePlaceId to localPlaceId)
-    }
-
-    private suspend fun updatePlace(mapSymbol: MapSymbol): String? {
-        val place = mapSymbol.toPlace()
-        val (remotePlaceId, localPlaceId) = getPlaceId(mapSymbol)
-            ?: return null
-        val remotePlace = viewModel.getRemotePlaceById(remotePlaceId)
-
-        viewModel.updatePlace(
-            place.asPlaceEntity(remotePlaceId, localPlaceId)
-                .copy(plan = false)
-        )
-        viewModel.updatePlace(
-            remotePlaceId, remotePlace.copy(plan = false)
-        )
-
-        return remotePlaceId
     }
 
     private suspend fun insertPlace(mapSymbol: MapSymbol): String {
@@ -253,9 +195,75 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         viewModel.updatePlace(
             place.asPlaceEntity(remotePlaceId, localPlaceId)
         )
-        viewModel.updatePlace(remotePlaceId, place.asPlaceDTO(localPlaceId))
+        viewModel.updatePlace(
+            remotePlaceId,
+            place.asPlaceDTO(localPlaceId)
+        )
 
         return remotePlaceId
+    }
+
+    private suspend fun updatePlaceFromPlanToVisit(remotePlaceId: String) {
+        val placeDTO = viewModel.getRemotePlaceById(remotePlaceId)
+
+        viewModel.updatePlace(
+            placeDTO.toPlaceEntity(remotePlaceId)
+                .copy(plan = false)
+        )
+        viewModel.updatePlace(
+            remotePlaceId, placeDTO.copy(plan = false)
+        )
+    }
+
+    private suspend fun getLogFor(remotePlaceId: String): LogModel {
+        val text = binding.etText.text.toString()
+        val theme = "123"
+        val createdDate = getCurrentTime()
+        val imageIds = viewModel.imageUrl.value.map { imageUrl ->
+            viewModel.insertImage(
+                ImageDTO(url = imageUrl)
+            )
+        }
+
+        return LogModel(
+            remotePlaceId,
+            imageIds,
+            text,
+            theme,
+            createdDate
+        )
+    }
+
+    private suspend fun insertLog(log: LogModel): String {
+        viewModel.insertLog(log.asLogEntity())
+        return viewModel.insertLog(log.asLogDTO())
+    }
+
+    private suspend fun updatePlaceWithLog(remotePlaceId: String, remoteLogId: String) {
+        val updatedPlace = viewModel.getRemotePlaceById(remotePlaceId).copy(log = remoteLogId)
+        viewModel.updatePlace(remotePlaceId, updatedPlace)
+    }
+
+    private suspend fun updateUser(remotePlaceId: String, remoteLogId: String) {
+        val uid = Firebase.auth.currentUser!!.uid
+        val userDTO = viewModel.getUserById(uid)
+
+        if (!args.mapSymbol.remoteId.isNullOrEmpty()) {
+            viewModel.updateUser(
+                uid,
+                userDTO.copy(
+                    plans = userDTO.plans.minus(remotePlaceId)
+                )
+            )
+        }
+
+        viewModel.updateUser(
+            uid,
+            userDTO.copy(
+                places = userDTO.places.plus(remotePlaceId to true),
+                logs = userDTO.logs.plus(remoteLogId to true)
+            )
+        )
     }
 
     private fun setLocationTrackingMode(isGranted: Boolean) {
