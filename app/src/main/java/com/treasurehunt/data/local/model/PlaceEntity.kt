@@ -19,6 +19,6 @@ data class PlaceEntity(
 )
 
 fun PlaceEntity.toPlaceDTO(): PlaceDTO {
-    val (lat, lng, plan, caption, log, remoteId, id) = this
-    return PlaceDTO(lat, lng, plan, caption, log, remoteId, id)
+    val (lat, lng, plan, caption, log, _, localId) = this
+    return PlaceDTO(lat, lng, plan, caption, log, localId)
 }

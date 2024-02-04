@@ -3,7 +3,6 @@ package com.treasurehunt.ui.savelog
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,7 +24,6 @@ import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.util.FusedLocationSource
 import com.treasurehunt.R
 import com.treasurehunt.data.remote.model.ImageDTO
-import com.treasurehunt.data.remote.model.LogDTO
 import com.treasurehunt.databinding.FragmentSavelogBinding
 import com.treasurehunt.ui.model.LogModel
 import com.treasurehunt.ui.model.MapSymbol
@@ -255,7 +253,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         viewModel.updatePlace(
             place.asPlaceEntity(remotePlaceId, localPlaceId)
         )
-        viewModel.updatePlace(remotePlaceId, place.asPlaceDTO(remotePlaceId, localPlaceId))
+        viewModel.updatePlace(remotePlaceId, place.asPlaceDTO(localPlaceId))
 
         return remotePlaceId
     }

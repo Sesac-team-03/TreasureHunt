@@ -10,12 +10,12 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import com.google.firebase.Firebase
 import com.google.firebase.storage.storage
 import com.treasurehunt.TreasureHuntApplication
+import com.treasurehunt.data.ImageRepository
 import com.treasurehunt.data.LogRepository
 import com.treasurehunt.data.PlaceRepository
 import com.treasurehunt.data.UserRepository
 import com.treasurehunt.data.local.model.LogEntity
 import com.treasurehunt.data.local.model.PlaceEntity
-import com.treasurehunt.data.ImageRepository
 import com.treasurehunt.data.remote.model.ImageDTO
 import com.treasurehunt.data.remote.model.LogDTO
 import com.treasurehunt.data.remote.model.PlaceDTO

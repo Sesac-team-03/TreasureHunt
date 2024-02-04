@@ -73,7 +73,7 @@ class LoginViewModel(
         placeRepository.deleteAll()
         userDTO.places.map {
             val place = placeRepository.getRemotePlace(it.key)
-            placeRepository.insert(place.toPlaceEntity())
+            placeRepository.insert(place.toPlaceEntity(it.key))
         }
     }
 
