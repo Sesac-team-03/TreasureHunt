@@ -1,6 +1,6 @@
-package com.treasurehunt.data.remote.model
+package com.treasurehunt.data.remote
 
-import com.treasurehunt.data.remote.LogService
+import com.treasurehunt.data.remote.model.LogDTO
 
 class LogRemoteDataSource(private val logService: LogService) {
 

@@ -1,6 +1,6 @@
-package com.treasurehunt.data.remote.model
+package com.treasurehunt.data.remote
 
-import com.treasurehunt.data.remote.UserService
+import com.treasurehunt.data.remote.model.UserDTO
 
 class UserRemoteDataSource(private val userService: UserService) {
 

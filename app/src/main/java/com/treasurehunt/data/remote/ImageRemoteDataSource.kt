@@ -1,6 +1,6 @@
-package com.treasurehunt.data.remote.model
+package com.treasurehunt.data.remote
 
-import com.treasurehunt.data.remote.ImageService
+import com.treasurehunt.data.remote.model.ImageDTO
 
 class ImageRemoteDataSource(private val imageService: ImageService) {
 

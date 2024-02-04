@@ -1,6 +1,6 @@
-package com.treasurehunt.data.remote.model
+package com.treasurehunt.data.remote
 
-import com.treasurehunt.data.remote.PlaceService
+import com.treasurehunt.data.remote.model.PlaceDTO
 
 class PlaceRemoteDataSource(private val placeService: PlaceService) {
 
