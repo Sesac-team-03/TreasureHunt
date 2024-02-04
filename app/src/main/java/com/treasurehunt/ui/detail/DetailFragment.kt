@@ -4,57 +4,77 @@ import android.content.Intent
 import android.content.res.Resources
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentDetailBinding
+import com.treasurehunt.ui.home.HomeViewModel
+import com.treasurehunt.ui.model.LogModel
+import kotlinx.coroutines.launch
 
 class DetailFragment : BottomSheetDialogFragment() {
 
     private var _binding: FragmentDetailBinding? = null
     private val binding get() = _binding!!
-    private var contentId: String? = null
     private lateinit var imageSliderAdapter: ImageSliderAdapter
+    private lateinit var viewModel: HomeViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = FragmentDetailBinding.inflate(inflater, container, false)
-
+        viewModel = ViewModelProvider(requireActivity()).get(HomeViewModel::class.java)
         return binding.root
-    }
-
-    private fun setImageSlider() {
-        val imageUrls = listOf(
-            "https://firebasestorage.googleapis.com/v0/b/treasurehunt-32565.appspot.com/o/uid%2Fimage%2F52.png?alt=media&token=4323ef4c-8380-46e5-91af-911e51011c41",
-            "https://firebasestorage.googleapis.com/v0/b/treasurehunt-32565.appspot.com/o/uid%2Fimage%2F1000003321.png?alt=media&token=34cae484-ef2e-48a7-bd2f-54daa74a00c8",
-            R.drawable.gajwa, R.drawable.gajwa, R.drawable.gajwa
-        ) as List<Any>
-        imageSliderAdapter = ImageSliderAdapter(imageUrls)
-        imageSliderAdapter.submitList(imageUrls)
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        contentId = arguments?.getString("content_id")
+        setupUIComponents()
 
-        setImageSlider()
+        val logId = arguments?.getString("logId") ?: return
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.fetchLogData(logId)
+        }
+
+        viewModel.logData.observe(viewLifecycleOwner) { logModel ->
+            logModel?.let {
+                updateUI(it)
+            } ?: run {
+                Log.e("DetailFragment", "logModel is null")
+            }
+        }
+    }
+
+
+    private fun setupUIComponents() {
         setDotsIndicator()
         setShareButton()
         setCloseButton()
-        setBottomSheet()
         setEditButton()
+        setBottomSheet()
+    }
+
+    private fun updateUI(logModel: LogModel) {
+        binding.textView.text = logModel.text
+        setImageSlider(logModel.images)
+    }
+
+    private fun setImageSlider(imageUrls: List<String>) {
+        imageSliderAdapter = ImageSliderAdapter(imageUrls)
+        binding.viewPager.adapter = imageSliderAdapter
+        imageSliderAdapter.submitList(imageUrls)
     }
 
     private fun setDotsIndicator() {
-        binding.viewPager.adapter = imageSliderAdapter
-
         binding.dotsIndicator.setViewPager2(binding.viewPager)
     }
 
@@ -65,7 +85,18 @@ class DetailFragment : BottomSheetDialogFragment() {
         }
     }
 
-    //테스트용 데이터
+    private fun setCloseButton() {
+        binding.btnClose.setOnClickListener {
+            dismiss()
+        }
+    }
+
+    private fun setEditButton() {
+        binding.btnEdit.setOnClickListener {
+            findNavController().navigate(R.id.action_homeFragment_to_saveLogFragment)
+        }
+    }
+
     private fun setBottomSheet() {
         dialog?.setOnShowListener {
             val bottomSheet =
@@ -96,20 +127,13 @@ class DetailFragment : BottomSheetDialogFragment() {
         startActivity(Intent.createChooser(intent, "내용 공유하기"))
     }
 
-    private fun setEditButton() {
-        binding.btnEdit.setOnClickListener {
-            findNavController().navigate(R.id.action_detailFragment_to_saveLogFragment)
+    companion object {
+        fun newInstance(userId: String): DetailFragment {
+            return DetailFragment().apply {
+                arguments = Bundle().apply {
+                    putString("userId", userId)
+                }
+            }
         }
-    }
-
-    private fun setCloseButton() {
-        binding.btnClose.setOnClickListener {
-            dismiss()
-        }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 }
