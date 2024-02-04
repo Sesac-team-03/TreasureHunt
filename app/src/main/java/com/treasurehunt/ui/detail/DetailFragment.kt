@@ -7,6 +7,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupMenu
+import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -97,10 +99,33 @@ class DetailFragment : BottomSheetDialogFragment() {
     }
 
     private fun setEditButton() {
-        binding.btnEdit.setOnClickListener {
-            findNavController().navigate(R.id.action_detailFragment_to_saveLogFragment)
+        binding.btnEdit.setOnClickListener { view ->
+
+            val popup = PopupMenu(requireContext(), view)
+
+            popup.menuInflater.inflate(R.menu.edit_menu, popup.menu)
+
+            popup.setOnMenuItemClickListener { menuItem ->
+                when (menuItem.itemId) {
+                    R.id.action_edit -> {
+                        findNavController().navigate(R.id.action_detailFragment_to_saveLogFragment)
+                        true
+                    }
+                    R.id.action_delete -> {
+                        Toast.makeText(requireContext(), "삭제", Toast.LENGTH_SHORT).show()
+                        true
+                    }
+                    R.id.action_no -> {
+                        Toast.makeText(requireContext(), "아니요", Toast.LENGTH_SHORT).show()
+                        true
+                    }
+                    else -> false
+                }
+            }
+            popup.show()
         }
     }
+
 
     private fun setCloseButton() {
         binding.btnClose.setOnClickListener {
