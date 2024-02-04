@@ -1,7 +1,7 @@
 package com.treasurehunt.data
 
 import com.treasurehunt.data.local.PlaceDao
-import com.treasurehunt.data.remote.model.PlaceRemoteDataSource
+import com.treasurehunt.data.remote.PlaceRemoteDataSource
 import com.treasurehunt.data.local.model.PlaceEntity
 import com.treasurehunt.data.remote.model.PlaceDTO
 import kotlinx.coroutines.flow.Flow

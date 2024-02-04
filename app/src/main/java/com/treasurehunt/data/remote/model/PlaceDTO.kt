@@ -10,11 +10,10 @@ data class PlaceDTO(
     val plan: Boolean,
     val caption: String,
     val log: String? = null,
-    val remoteId: String? = null,
-    val id: Long = 0
+    val localId: Long = 0
 )
 
-fun PlaceDTO.toPlaceEntity(): PlaceEntity {
-    val (lat, lng, plan, caption, log, remoteId, id) = this
-    return PlaceEntity(lat, lng, plan, caption, log, remoteId, id)
+fun PlaceDTO.toPlaceEntity(remoteId: String): PlaceEntity {
+    val (lat, lng, plan, caption, log, localId) = this
+    return PlaceEntity(lat, lng, plan, caption, log, remoteId, localId)
 }

@@ -3,7 +3,7 @@ package com.treasurehunt.data
 import com.treasurehunt.data.local.UserDao
 import com.treasurehunt.data.local.model.UserEntity
 import com.treasurehunt.data.remote.model.UserDTO
-import com.treasurehunt.data.remote.model.UserRemoteDataSource
+import com.treasurehunt.data.remote.UserRemoteDataSource
 import kotlinx.coroutines.flow.Flow
 
 class UserRepositoryImpl(
