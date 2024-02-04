@@ -48,6 +48,11 @@
         <action
             android:id="@+id/action_homeFragment_to_detailFragment"
             app:destination="@id/detailFragment" />
+        <argument
+            android:name="logModel"
+            app:argType="com.treasurehunt.ui.model.LogModel"
+            android:defaultValue="@null"
+            app:nullable="true" />
     </fragment>
 
     <fragment
@@ -79,17 +84,7 @@
         <action
             android:id="@+id/action_detailFragment_to_saveLogFragment"
             app:destination="@id/saveLogFragment" />
-        <argument
-            android:name="remotePlaceId"
-            app:argType="string" />
     </dialog>
-
-    <fragment
-        android:id="@+id/profileFragment"
-        android:name="com.treasurehunt.ui.profile.ProfileFragment"
-        android:label="ProfileFragment"
-        tools:layout="@layout/fragment_profile" />
-
     <dialog
         android:id="@+id/mapDialogFragment"
         android:name="com.treasurehunt.ui.home.MapDialogFragment"
