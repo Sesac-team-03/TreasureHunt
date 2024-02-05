@@ -12,13 +12,11 @@ import com.treasurehunt.R
 import com.treasurehunt.databinding.ItemImageBinding
 
 class ImageSliderAdapter(
-    private val imageUrls: List<Any>
-) : ListAdapter<Any, ImageSliderAdapter.ImageViewHolder>(ImageDiffCallback()) {
-
-    internal var currentPage: Int = 0
+    imageItems: List<ImageItem>
+) : ListAdapter<ImageItem, ImageSliderAdapter.ImageViewHolder>(ImageDiffCallback()) {
 
     init {
-        submitList(imageUrls)
+        submitList(imageItems)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
@@ -29,40 +27,31 @@ class ImageSliderAdapter(
 
     override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
         val item = getItem(position)
-        loadImage(holder, item)
-        currentPage = position
-    }
-
-    private fun loadImage(holder: ImageViewHolder, item: Any) {
         when (item) {
-            is String -> {
-                Glide.with(holder.itemView.context)
-                    .load(item)
-                    .into(holder.imageView)
+            is ImageItem.Url -> {
+                Glide.with(holder.itemView.context).load(item.url).into(holder.imageView)
             }
 
-            is Int -> {
-                Glide.with(holder.itemView.context)
-                    .load(item)
-                    .into(holder.imageView)
+            is ImageItem.ResourceId -> {
+                Glide.with(holder.itemView.context).load(item.resourceId).into(holder.imageView)
             }
         }
-    }
-
-    fun getImageItems(): List<Any> {
-        return currentList
     }
 
     class ImageViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val imageView: ImageView = view.findViewById(R.id.item_image)
     }
 
-    class ImageDiffCallback : DiffUtil.ItemCallback<Any>() {
-        override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
-            return oldItem == newItem
+    class ImageDiffCallback : DiffUtil.ItemCallback<ImageItem>() {
+        override fun areItemsTheSame(oldItem: ImageItem, newItem: ImageItem): Boolean {
+            return when {
+                oldItem is ImageItem.Url && newItem is ImageItem.Url -> oldItem.url == newItem.url
+                oldItem is ImageItem.ResourceId && newItem is ImageItem.ResourceId -> oldItem.resourceId == newItem.resourceId
+                else -> false
+            }
         }
 
-        override fun areContentsTheSame(oldItem: Any, newItem: Any): Boolean {
+        override fun areContentsTheSame(oldItem: ImageItem, newItem: ImageItem): Boolean {
             return oldItem == newItem
         }
     }

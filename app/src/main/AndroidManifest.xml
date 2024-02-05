@@ -41,9 +41,8 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="detail"
-                    android:pathPrefix="/gajwa-station"
-                    android:scheme="treasurehunt" />
+                    android:host="treasurehuntsesac.page.link"
+                    android:scheme="https" />
             </intent-filter>
         </activity>
     </application>

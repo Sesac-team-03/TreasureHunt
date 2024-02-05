@@ -31,6 +31,10 @@
     <string name="savelog_sb_upload_success">사진 업로드 (%1$d/%2$d)</string>
     <string name="savelog_sb_upload_failure">사진 업로드 실패</string>
 
+    <!-- 기록 상세 화면 -->
+    <string name="Logdetail_content">Check out Treasure Hunt: %s</string>
+    <string name="Logdetail_chooser_title">내용 공유하기</string>
+
     <!-- 프로필 화면-->
     <string name="profile_tv_nickname">닉네임</string>
     <string name="profile_tv_account">abc@naver.com</string>
