@@ -16,7 +16,7 @@ import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
 import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentDetailBinding
 
-class DetailFragment : BottomSheetDialogFragment() {
+class LogDetailFragment : BottomSheetDialogFragment() {
 
     private var _binding: FragmentDetailBinding? = null
     private val binding get() = _binding!!
@@ -60,30 +60,34 @@ class DetailFragment : BottomSheetDialogFragment() {
         binding.dotsIndicator.setViewPager2(binding.viewPager)
     }
 
-    //테스트용 데이터
     private fun setBottomSheet() {
-        dialog?.setOnShowListener {
+        dialog?.setOnShowListener { dialogSheet ->
             val bottomSheet =
-                (it as BottomSheetDialog).findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
-            bottomSheet?.let {
-                val behavior = BottomSheetBehavior.from(it)
+                (dialogSheet as BottomSheetDialog).findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+            bottomSheet?.let { view ->
+                val behavior = BottomSheetBehavior.from(view)
                 val dpValue = 580
                 val pixels = (dpValue * Resources.getSystem().displayMetrics.density).toInt()
-                it.layoutParams.height = pixels
+                view.layoutParams.height = pixels
                 behavior.peekHeight = pixels
                 behavior.state = BottomSheetBehavior.STATE_EXPANDED
             }
         }
 
         binding.btnShareContent.setOnClickListener {
-            createDynamicLinkAndShare()
+            shareContent(getDynamicLink())
         }
     }
 
-    private fun createDynamicLinkAndShare() {
+    companion object {
+        const val LINK_URL = "https://treasurehuntsesac.page.link/KPo2"
+        const val DOMAIN_URI_PREFIX = "https://treasurehuntsesac.page.link"
+    }
+
+    private fun getDynamicLink(): String {
         val dynamicLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
-            .setLink(Uri.parse("https://treasurehuntsesac.page.link/KPo2"))
-            .setDomainUriPrefix("https://treasurehuntsesac.page.link")
+            .setLink(Uri.parse(LINK_URL))
+            .setDomainUriPrefix(DOMAIN_URI_PREFIX)
             .setAndroidParameters(
                 DynamicLink.AndroidParameters.Builder()
                     .setMinimumVersion(1)
@@ -91,17 +95,17 @@ class DetailFragment : BottomSheetDialogFragment() {
             )
             .buildDynamicLink()
 
-        val dynamicLinkUri = dynamicLink.uri
-        shareContent(dynamicLinkUri.toString())
+        return dynamicLink.uri.toString()
     }
 
     private fun shareContent(link: String) {
+        val shareText = getString(R.string.Logdetail_content, link)
         val intent = Intent().apply {
             action = Intent.ACTION_SEND
-            putExtra(Intent.EXTRA_TEXT, "Check out Treasure Hunt: $link")
+            putExtra(Intent.EXTRA_TEXT, shareText)
             type = "text/plain"
         }
-        startActivity(Intent.createChooser(intent, "내용 공유하기"))
+        startActivity(Intent.createChooser(intent, getString(R.string.Logdetail_chooser_title)))
     }
 
     private fun setEditButton() {
