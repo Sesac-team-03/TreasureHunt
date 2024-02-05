@@ -74,7 +74,7 @@
 
     <dialog
         android:id="@+id/detailFragment"
-        android:name="com.treasurehunt.ui.detail.DetailFragment"
+        android:name="com.treasurehunt.ui.detail.LogDetailFragment"
         android:label="detailFragment">
         <action
             android:id="@+id/action_detailFragment_to_saveLogFragment"
