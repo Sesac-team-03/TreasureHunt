@@ -9,6 +9,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization")
     id("androidx.navigation.safeargs.kotlin")
     id("kotlin-parcelize")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -33,6 +34,7 @@ android {
         buildConfigField("String", "APP_NAME", getApiKey("APP_NAME"))
         buildConfigField("String", "BASE_URL", getApiKey("BASE_URL"))
     }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -42,13 +44,16 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
     buildFeatures {
         viewBinding = true
         dataBinding = true
@@ -101,4 +106,11 @@ dependencies {
     implementation("androidx.viewpager2:viewpager2:1.0.0")
 
     implementation("com.tbuonomo:dotsindicator:4.2")
+
+    implementation("com.google.dagger:hilt-android:2.48")
+    ksp("com.google.dagger:hilt-android-compiler:2.48")
+}
+
+kapt {
+    correctErrorTypes = true
 }
