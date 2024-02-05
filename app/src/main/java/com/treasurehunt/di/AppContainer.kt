@@ -10,7 +10,6 @@ import com.treasurehunt.data.local.TreasureHuntDatabase
 import com.treasurehunt.data.remote.Client
 import com.treasurehunt.data.remote.LogRemoteDataSource
 import com.treasurehunt.data.remote.LogService
-import com.treasurehunt.data.remote.PlaceRemoteDataSource
 import com.treasurehunt.data.remote.PlaceService
 import com.treasurehunt.data.remote.UserRemoteDataSource
 import com.treasurehunt.data.remote.UserService
