@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+
 import com.google.firebase.Firebase
 import com.google.firebase.storage.storage
 import com.treasurehunt.TreasureHuntApplication

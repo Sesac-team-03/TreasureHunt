@@ -7,11 +7,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.treasurehunt.TreasureHuntApplication
 import com.treasurehunt.data.UserRepository
 import com.treasurehunt.data.remote.model.UserDTO
+import com.treasurehunt.ui.login.LoginViewModel
 import kotlinx.coroutines.launch
 
 class ProfileViewModel(
@@ -20,7 +23,7 @@ class ProfileViewModel(
     private val _userData: MutableLiveData<UserDTO> = MutableLiveData<UserDTO>()
     val userData: LiveData<UserDTO> = _userData
     private val _imageUri: MutableLiveData<String> = MutableLiveData<String>()
-    val imageUri:LiveData<String> = _imageUri
+    val imageUri: LiveData<String> = _imageUri
     private val _profileUri: MutableLiveData<String> = MutableLiveData<String>()
     val profileUri: LiveData<String> = _profileUri
 
@@ -56,14 +59,11 @@ class ProfileViewModel(
     }
 
     companion object {
-        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(
-                modelClass: Class<T>,
-                extras: CreationExtras
-            ): T {
-                return ProfileViewModel(
+        val Factory: ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                ProfileViewModel(
                     TreasureHuntApplication.userRepo,
-                ) as T
+                )
             }
         }
     }
