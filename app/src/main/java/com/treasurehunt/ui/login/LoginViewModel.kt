@@ -20,30 +20,29 @@ import kotlinx.coroutines.delay
 const val USER_UPDATE_DELAY = 1000L
 
 class LoginViewModel(
-    private val userRepository: UserRepository,
-    private val logRepository: LogRepository,
-    private val placeRepository: PlaceRepository
+    private val userRepo: UserRepository,
+    private val logRepo: LogRepository,
+    private val placeRepo: PlaceRepository
 ) : ViewModel() {
 
     suspend fun insertNaverUser(user: User) {
         updateProfile(user)
         delay(USER_UPDATE_DELAY)
         val currentUser = Firebase.auth.currentUser!!
-        // 테스트 샘플
         val userDTO = UserDTO(
             email = currentUser.email,
             nickname = currentUser.displayName,
-            profileImage = currentUser.photoUrl.toString()
+            profileImage = currentUser.photoUrl?.toString()
         )
-        userRepository.insert(currentUser.uid, userDTO)
+        userRepo.insert(currentUser.uid, userDTO)
     }
 
     suspend fun insertGuestUser() {
         val currentUser = Firebase.auth.currentUser!!
         val userDTO = UserDTO(
-            email = currentUser.email ?: ""
+            email = ""
         )
-        userRepository.insert(currentUser.uid, userDTO)
+        userRepo.insert(currentUser.uid, userDTO)
     }
 
     private fun updateProfile(user: User) {
@@ -56,24 +55,24 @@ class LoginViewModel(
 
     suspend fun initLocalData() {
         val curUserUid = Firebase.auth.currentUser!!.uid
-        val userDTO = userRepository.getRemoteUser(curUserUid)
+        val userDTO = userRepo.getRemoteUser(curUserUid)
         initLocalLogs(userDTO)
-//            castingRemotePlaces(userDTO)
+        initLocalPlaces(userDTO)
     }
 
     private suspend fun initLocalLogs(userDTO: UserDTO) {
-        logRepository.deleteAll()
+        logRepo.deleteAll()
         userDTO.logs.map {
-            val log = logRepository.getRemoteLog(it.key)
-            logRepository.insert(log.toLogEntity(it.key))
+            val log = logRepo.getRemoteLog(it.key)
+            logRepo.insert(log.toLogEntity(it.key))
         }
     }
 
     private suspend fun initLocalPlaces(userDTO: UserDTO) {
-        placeRepository.deleteAll()
+        placeRepo.deleteAll()
         userDTO.places.map {
-            val place = placeRepository.getRemotePlace(it.key)
-            placeRepository.insert(place.toPlaceEntity(it.key))
+            val place = placeRepo.getRemotePlace(it.key)
+            placeRepo.insert(place.toPlaceEntity(it.key))
         }
     }
 
