@@ -3,7 +3,7 @@ package com.treasurehunt.data
 import com.treasurehunt.data.local.LogDao
 import com.treasurehunt.data.local.model.LogEntity
 import com.treasurehunt.data.remote.model.LogDTO
-import com.treasurehunt.data.remote.model.LogRemoteDataSource
+import com.treasurehunt.data.remote.LogRemoteDataSource
 import kotlinx.coroutines.flow.Flow
 
 class LogRepositoryImpl(

@@ -16,7 +16,7 @@ fun PlaceModel.asPlaceEntity(remoteId: String? = null, localId: Long = 0): Place
     return PlaceEntity(lat, lng, plan, caption, log, remoteId, localId)
 }
 
-fun PlaceModel.asPlaceDTO(remoteId: String? = null, localId: Long = 0): PlaceDTO {
+fun PlaceModel.asPlaceDTO(localId: Long = 0): PlaceDTO {
     val (lat, lng, plan, caption, log) = this
-    return PlaceDTO(lat, lng, plan, caption, log, remoteId, localId)
+    return PlaceDTO(lat, lng, plan, caption, log, localId)
 }

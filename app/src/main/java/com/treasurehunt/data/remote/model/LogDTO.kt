@@ -10,9 +10,10 @@ data class LogDTO(
     val text: String,
     val theme: String,
     val createdDate: Long,
+    val localId: Long = 0
 )
 
 fun LogDTO.toLogEntity(remoteId: String): LogEntity {
-    val (place, images, text, theme, createdDate) = this
-    return LogEntity(place, images.keys.toList(), text, theme, createdDate, remoteId)
+    val (place, images, text, theme, createdDate, localId) = this
+    return LogEntity(place, images.keys.toList(), text, theme, createdDate, remoteId, localId)
 }

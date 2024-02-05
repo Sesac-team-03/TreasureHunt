@@ -1,7 +1,6 @@
 package com.treasurehunt.ui
 
 import android.widget.ImageView
-import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -14,7 +13,6 @@ fun bindDataset(view: RecyclerView, itemList: List<Any>?) {
         (view.adapter as ListAdapter<Any, *>).submitList(itemList)
     }
 }
-
 
 @BindingAdapter("imageUrl")
 fun bindImageUrl(view: ImageView, url: String?) {
@@ -29,6 +27,5 @@ fun bindImageUrl(view: ImageView, url: String?) {
                 .into(this)
             scaleType = ImageView.ScaleType.CENTER_CROP
         }
-
     }
 }

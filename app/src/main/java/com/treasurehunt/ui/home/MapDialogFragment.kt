@@ -80,11 +80,13 @@ class MapDialogFragment : BottomSheetDialogFragment() {
             viewLifecycleOwner.lifecycleScope.launch {
                 val user = viewModel.getRemoteUser(uid)
                 val localPlanId = viewModel.addPlace(planEntity)
-                val remotePlanId = viewModel.addPlace(planDTO.copy(id = localPlanId))
-                viewModel.updatePlace(planEntity.copy(id = localPlanId, remoteId = remotePlanId))
+                val remotePlanId = viewModel.addPlace(planDTO.copy(localId = localPlanId))
+                viewModel.updatePlace(
+                    planEntity.copy(id = localPlanId, remoteId = remotePlanId)
+                )
                 viewModel.updatePlace(
                     remotePlanId,
-                    planDTO.copy(id = localPlanId, remoteId = remotePlanId)
+                    planDTO.copy(localId = localPlanId)
                 )
                 viewModel.updateUser(uid, user.copy(plans = user.plans + (remotePlanId to true)))
 
