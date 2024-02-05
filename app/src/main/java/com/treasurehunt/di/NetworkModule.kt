@@ -2,6 +2,7 @@ package com.treasurehunt.di
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.treasurehunt.BuildConfig
+import com.treasurehunt.data.remote.ImageService
 import com.treasurehunt.data.remote.LogService
 import com.treasurehunt.data.remote.PlaceService
 import com.treasurehunt.data.remote.UserService
@@ -59,5 +60,9 @@ object NetworkModule {
     @Provides
     fun providePlaceService(remoteBuilder:Retrofit): PlaceService =
         remoteBuilder.create(PlaceService::class.java)
+
+    @Provides
+    fun provideImageService(remoteBuilder:Retrofit): ImageService =
+        remoteBuilder.create(ImageService::class.java)
 
 }

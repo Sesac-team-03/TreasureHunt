@@ -32,6 +32,9 @@ object LocalModule {
 
     @Provides
     fun providePlaceDao(database: TreasureHuntDatabase) = database.placeDao()
+
+    @Provides
+    fun provideImageDao(database: TreasureHuntDatabase) = database.imageDao()
 }
 
 

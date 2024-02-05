@@ -1,5 +1,7 @@
 package com.treasurehunt.di
 
+import com.treasurehunt.data.ImageRepository
+import com.treasurehunt.data.ImageRepositoryImpl
 import com.treasurehunt.data.LogRepository
 import com.treasurehunt.data.LogRepositoryImpl
 import com.treasurehunt.data.PlaceRepository
@@ -23,5 +25,8 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindPlaceRepository(placeRepositoryImpl: PlaceRepositoryImpl): PlaceRepository
+
+    @Binds
+    abstract fun bindImageRepository(imageRepositoryImpl: ImageRepositoryImpl): ImageRepository
 
 }
