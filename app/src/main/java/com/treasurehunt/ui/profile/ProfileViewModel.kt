@@ -13,9 +13,12 @@ import com.google.firebase.auth.auth
 import com.treasurehunt.TreasureHuntApplication
 import com.treasurehunt.data.UserRepository
 import com.treasurehunt.data.remote.model.UserDTO
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ProfileViewModel(
+@HiltViewModel
+class ProfileViewModel @Inject constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {
     private val _userData: MutableLiveData<UserDTO> = MutableLiveData<UserDTO>()
@@ -54,16 +57,6 @@ class ProfileViewModel(
             )
         }
         _userData.value = userDTO
-    }
-
-    companion object {
-        val Factory: ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                ProfileViewModel(
-                    TreasureHuntApplication.userRepo,
-                )
-            }
-        }
     }
 }
 

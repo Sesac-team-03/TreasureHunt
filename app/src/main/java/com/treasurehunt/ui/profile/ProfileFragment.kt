@@ -20,13 +20,16 @@ import com.treasurehunt.R
 import com.treasurehunt.data.remote.model.UserDTO
 import com.treasurehunt.databinding.FragmentProfileBinding
 import com.treasurehunt.util.showSnackbar
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
+
+@AndroidEntryPoint
 class ProfileFragment : Fragment() {
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: ProfileViewModel by viewModels { ProfileViewModel.Factory }
+    private val viewModel: ProfileViewModel by viewModels()
     private val imageLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             setImageLauncher(result)

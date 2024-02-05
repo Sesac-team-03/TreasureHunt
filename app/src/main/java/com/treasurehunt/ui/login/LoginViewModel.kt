@@ -1,16 +1,10 @@
 package com.treasurehunt.ui.login
 
-import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.createSavedStateHandle
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.auth.userProfileChangeRequest
 import com.google.firebase.ktx.Firebase
-import com.treasurehunt.TreasureHuntApplication
 import com.treasurehunt.data.LogRepository
 import com.treasurehunt.data.PlaceRepository
 import com.treasurehunt.data.User
@@ -18,12 +12,14 @@ import com.treasurehunt.data.UserRepository
 import com.treasurehunt.data.remote.model.UserDTO
 import com.treasurehunt.data.remote.model.toLogEntity
 import com.treasurehunt.data.remote.model.toPlaceEntity
-import com.treasurehunt.di.AppContainer
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
+import javax.inject.Inject
 
 const val USER_UPDATE_DELAY = 1000L
 
-class LoginViewModel(
+@HiltViewModel
+class LoginViewModel @Inject constructor(
     private val userRepo: UserRepository,
     private val logRepo: LogRepository,
     private val placeRepo: PlaceRepository
@@ -77,18 +73,6 @@ class LoginViewModel(
         userDTO.places.map {
             val place = placeRepo.getRemotePlace(it.key)
             placeRepo.insert(place.toPlaceEntity(it.key))
-        }
-    }
-
-    companion object {
-        val Factory: ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-
-                LoginViewModel(
-                    TreasureHuntApplication.userRepo,
-                    TreasureHuntApplication.logRepo,
-                    TreasureHuntApplication.placeRepo)
-            }
         }
     }
 }

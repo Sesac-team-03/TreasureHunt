@@ -36,13 +36,16 @@ import com.treasurehunt.ui.model.toPlace
 import com.treasurehunt.ui.savelog.adapter.SaveLogAdapter
 import com.treasurehunt.util.getCurrentTime
 import com.treasurehunt.util.showSnackbar
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+
+@AndroidEntryPoint
 class SaveLogFragment : Fragment(), OnMapReadyCallback {
 
     private var _binding: FragmentSavelogBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: SaveLogViewModel by viewModels { SaveLogViewModel.Factory }
+    private val viewModel: SaveLogViewModel by viewModels()
     private val saveLogAdapter = SaveLogAdapter { imageModel -> viewModel.removeImage(imageModel) }
     private val imageLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
