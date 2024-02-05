@@ -32,7 +32,7 @@ class LoginViewModel(
         val userDTO = UserDTO(
             email = currentUser.email,
             nickname = currentUser.displayName,
-            profileImage = currentUser.photoUrl?.path
+            profileImage = currentUser.photoUrl?.toString()
         )
         userRepo.insert(currentUser.uid, userDTO)
     }
@@ -72,7 +72,7 @@ class LoginViewModel(
         placeRepo.deleteAll()
         userDTO.places.map {
             val place = placeRepo.getRemotePlace(it.key)
-            placeRepo.insert(place.toPlaceEntity())
+            placeRepo.insert(place.toPlaceEntity(it.key))
         }
     }
 

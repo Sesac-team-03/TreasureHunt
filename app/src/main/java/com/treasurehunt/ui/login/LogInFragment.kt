@@ -72,7 +72,6 @@ class LogInFragment : Fragment() {
                 }
 
                 override fun onFailure(httpStatus: Int, message: String) {
-
                 }
 
                 override fun onError(errorCode: Int, message: String) {
@@ -94,7 +93,7 @@ class LogInFragment : Fragment() {
                     naverProfile.profileImage
                 )
 
-                createAccount(user)
+                loginAccount(user)
             }
 
             override fun onFailure(httpStatus: Int, message: String) {
@@ -113,7 +112,7 @@ class LogInFragment : Fragment() {
                 if (task.isSuccessful) {
                     lifecycleScope.launch {
                         viewModel.insertNaverUser(user)
-                        loginAccount(user)
+                        findNavController().navigate(R.id.action_logInFragment_to_homeFragment)
                     }
                 } else {
                     binding.root.showSnackbar(R.string.login_create_account_error)
@@ -130,7 +129,7 @@ class LogInFragment : Fragment() {
                         findNavController().navigate(R.id.action_logInFragment_to_homeFragment)
                     }
                 } else {
-                    binding.root.showSnackbar(R.string.login_naver_login_error)
+                    createAccount(user)
                 }
             }
     }
