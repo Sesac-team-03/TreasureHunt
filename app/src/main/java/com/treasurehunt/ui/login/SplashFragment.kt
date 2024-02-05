@@ -36,7 +36,7 @@ class SplashFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         if (isInitialized) {
-            checkLoginAndNavigate()
+            handleAutoLogin()
         }
     }
 
@@ -51,11 +51,11 @@ class SplashFragment : Fragment() {
         lifecycleScope.launch {
             delay(2000)
             isInitialized = true
-            checkLoginAndNavigate()
+            handleAutoLogin()
         }
     }
 
-    private fun checkLoginAndNavigate() {
+    private fun handleAutoLogin() {
         if (Firebase.auth.currentUser == null) {
             findNavController().navigate(R.id.action_splashFragment_to_logInFragment)
         } else {
