@@ -32,14 +32,14 @@ class LogDetailFragment : BottomSheetDialogFragment() {
     }
 
     private fun setImageSlider() {
-        val imageUrls = listOf(
-            "https://firebasestorage.googleapis.com/v0/b/treasurehunt-32565.appspot.com/o/uid%2Fimage%2F52.png?alt=media&token=4323ef4c-8380-46e5-91af-911e51011c41",
-            "https://firebasestorage.googleapis.com/v0/b/treasurehunt-32565.appspot.com/o/uid%2Fimage%2F1000003321.png?alt=media&token=34cae484-ef2e-48a7-bd2f-54daa74a00c8",
-            R.drawable.gajwa, R.drawable.gajwa, R.drawable.gajwa
-        ) as List<Any>
-        imageSliderAdapter = ImageSliderAdapter(imageUrls)
-        imageSliderAdapter.submitList(imageUrls)
-
+        val imageItems = listOf(
+            ImageItem.Url("https://firebasestorage.googleapis.com/v0/b/treasurehunt-32565.appspot.com/o/uid%2Fimage%2F52.png?alt=media&token=4323ef4c-8380-46e5-91af-911e51011c41"),
+            ImageItem.Url("https://firebasestorage.googleapis.com/v0/b/treasurehunt-32565.appspot.com/o/uid%2Fimage%2F1000003321.png?alt=media&token=34cae484-ef2e-48a7-bd2f-54daa74a00c8"),
+            ImageItem.ResourceId(R.drawable.gajwa),
+            ImageItem.ResourceId(R.drawable.gajwa),
+            ImageItem.ResourceId(R.drawable.gajwa)
+        )
+        imageSliderAdapter = ImageSliderAdapter(imageItems)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
