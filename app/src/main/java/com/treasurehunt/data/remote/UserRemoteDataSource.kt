@@ -2,6 +2,7 @@ package com.treasurehunt.data.remote
 
 import com.treasurehunt.data.remote.model.UserDTO
 import javax.inject.Inject
+import kotlinx.serialization.json.Json
 
 class UserRemoteDataSource @Inject constructor(private val userService: UserService) {
 
@@ -13,6 +14,22 @@ class UserRemoteDataSource @Inject constructor(private val userService: UserServ
         userService.update(uid, userDTO)
     }
 
-    suspend fun getUserData(uid: String) = userService.getUser(uid)
+    suspend fun getUserData(id: String) = userService.getUser(id)
 
+    suspend fun search(startAt: String, limit: Int = 10): Map<String, UserDTO> {
+        val result = userService.search(
+            orderBy = "\"email\"",
+            startAt = startAt,
+            limit = limit
+        )
+        return result.entries.associate {
+            it.key to it.value.toString().convertToDataClass()
+        }
+    }
+
+    internal inline fun <reified R : Any> String.convertToDataClass() =
+        Json {
+            ignoreUnknownKeys = true
+            coerceInputValues = true
+        }.decodeFromString<R>(this)
 }

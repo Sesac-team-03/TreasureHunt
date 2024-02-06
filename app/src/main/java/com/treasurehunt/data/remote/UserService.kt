@@ -1,11 +1,13 @@
 package com.treasurehunt.data.remote
 
 import com.treasurehunt.data.remote.model.UserDTO
+import kotlinx.serialization.json.JsonObject
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface UserService {
 
@@ -25,4 +27,11 @@ interface UserService {
         @Path("id") id: String,
         @Body userDTO: UserDTO
     )
+
+    @GET("/users.json")
+    suspend fun search(
+        @Query("orderBy") orderBy: String,
+        @Query("startAt") startAt: String,
+        @Query("limitToFirst") limit: Int
+    ): JsonObject
 }

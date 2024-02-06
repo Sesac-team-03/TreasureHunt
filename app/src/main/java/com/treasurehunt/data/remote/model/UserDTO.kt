@@ -1,5 +1,6 @@
 package com.treasurehunt.data.remote.model
 
+import com.treasurehunt.ui.model.UserModel
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -14,3 +15,7 @@ data class UserDTO(
     val plans: Map<String, Boolean> = emptyMap(),
     val localId: Long = 0
 )
+
+fun UserDTO.toUserModel(remoteId: String): UserModel {
+    return UserModel(email, nickname, profileImage, friends, logs, places, plans, remoteId)
+}
