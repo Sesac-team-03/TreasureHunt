@@ -26,7 +26,7 @@ fun View.showSnackbar(string: String) {
     ).show()
 }
 
-internal inline fun <reified R : Any> String.convertToDataClass() = json.decodeFromString<R>(this)
+internal inline fun <reified R> String.convertToDataClass() = json.decodeFromString<R>(this)
 
 fun View.show() {
     visibility = View.VISIBLE
