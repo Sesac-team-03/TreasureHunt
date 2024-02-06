@@ -1,8 +1,8 @@
 package com.treasurehunt.data.remote
 
 import com.treasurehunt.data.remote.model.UserDTO
+import com.treasurehunt.util.convertToDataClass
 import javax.inject.Inject
-import kotlinx.serialization.json.Json
 
 class UserRemoteDataSource @Inject constructor(private val userService: UserService) {
 
@@ -26,10 +26,4 @@ class UserRemoteDataSource @Inject constructor(private val userService: UserServ
             it.key to it.value.toString().convertToDataClass()
         }
     }
-
-    internal inline fun <reified R : Any> String.convertToDataClass() =
-        Json {
-            ignoreUnknownKeys = true
-            coerceInputValues = true
-        }.decodeFromString<R>(this)
 }

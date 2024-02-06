@@ -13,7 +13,8 @@ data class UserDTO(
     val logs: Map<String, Boolean> = emptyMap(),
     val places: Map<String, Boolean> = emptyMap(),
     val plans: Map<String, Boolean> = emptyMap(),
-    val localId: Long = 0
+    val localId: Long = 0,
+    val remoteId: String? = null
 )
 
 fun UserDTO.toUserModel(remoteId: String): UserModel {

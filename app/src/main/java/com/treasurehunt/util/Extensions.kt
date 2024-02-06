@@ -2,6 +2,13 @@ package com.treasurehunt.util
 
 import android.view.View
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.serialization.json.Json
+
+private val json = Json {
+    isLenient = true
+    ignoreUnknownKeys = true
+    coerceInputValues = true
+}
 
 fun View.showSnackbar(resId: Int) {
     Snackbar.make(
@@ -18,3 +25,5 @@ fun View.showSnackbar(string: String) {
         Snackbar.LENGTH_SHORT
     ).show()
 }
+
+internal inline fun <reified R : Any> String.convertToDataClass() = json.decodeFromString<R>(this)
