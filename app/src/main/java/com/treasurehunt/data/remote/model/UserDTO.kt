@@ -17,6 +17,6 @@ data class UserDTO(
     val remoteId: String? = null
 )
 
-fun UserDTO.toUserModel(remoteId: String): UserModel {
+fun UserDTO.toUserModel(remoteId: String? = null): UserModel {
     return UserModel(email, nickname, profileImage, friends, logs, places, plans, remoteId)
 }

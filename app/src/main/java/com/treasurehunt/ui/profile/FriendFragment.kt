@@ -140,10 +140,14 @@ class FriendFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             val uid = validateRegisteredUser() ?: return@launch
             viewModel.addFriend(uid, friend.remoteId!!)
-            (binding.rvSearchResult.adapter as SearchFriendAdapter).submitList(emptyList())
+            searchFriendAdapter.submitList(null)
 
             val message = getString(R.string.profile_friend_added, friend.nickName)
             binding.root.showSnackbar(message)
+
+            binding.btnHideSearchResult.hide()
+            binding.groupNoSearchResult.hide()
+            binding.rvFriendList.show()
         }
     }
 
@@ -157,8 +161,7 @@ class FriendFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { uiState ->
-                    val friends = uiState.friends.map { it.toUserModel(it.remoteId ?: "") } // check
-                    friendAdapter.submitList(friends)
+                    friendAdapter.submitList(uiState.friends)
                 }
             }
         }

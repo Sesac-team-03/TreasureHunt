@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import com.google.firebase.FirebaseException
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -15,13 +16,23 @@ import com.treasurehunt.data.LogRepository
 import com.treasurehunt.data.PlaceRepository
 import com.treasurehunt.data.UserRepository
 import com.treasurehunt.data.remote.model.UserDTO
+import com.treasurehunt.data.remote.model.toUserModel
 import com.treasurehunt.ui.model.FriendUiState
 import com.treasurehunt.util.ConnectivityRepository
 import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.channels.trySendBlocking
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+
+private const val firebaseUrl =
+    "https://treasurehunt-32565-default-rtdb.asia-southeast1.firebasedatabase.app"
 
 class FriendViewModel(
     private val logRepo: LogRepository,
@@ -32,15 +43,39 @@ class FriendViewModel(
 
     private val _uiState = MutableStateFlow(FriendUiState(false))
     val uiState: StateFlow<FriendUiState> = _uiState
-    val db =
-        FirebaseDatabase.getInstance("https://treasurehunt-32565-default-rtdb.asia-southeast1.firebasedatabase.app")
-    private val _allUsers = MutableStateFlow(emptyList<UserDTO>())
+    private val db = FirebaseDatabase.getInstance(firebaseUrl)
+    private val friendIds: Flow<List<String>> = getFriendIdsFlow()
 
     init {
         initCurrentUser()
-        initAllUsers()
         initFriends()
+    }
 
+    private fun getFriendIdsFlow(): Flow<List<String>> = callbackFlow {
+        val uid = Firebase.auth.currentUser!!.uid
+        val friendsRef = db.reference.child("users").child(uid).child("friends")
+        val callback = object : ValueEventListener {
+            @Suppress("UNCHECKED_CAST")
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val friendIds = (snapshot.value as? Map<String, Boolean>
+                    ?: emptyMap()).filter { it.value }.keys.toList()
+
+                trySendBlocking(friendIds)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+            }
+        }
+
+        try {
+            friendsRef.addValueEventListener(callback)
+        } catch (e: FirebaseException) {
+            trySendBlocking(emptyList())
+            channel.close()
+        }
+        awaitClose {
+            friendsRef.removeEventListener(callback)
+        }
     }
 
     private fun initCurrentUser() {
@@ -51,65 +86,25 @@ class FriendViewModel(
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
-                    signedInAsRegisteredUser = signedInAsRegisteredUser,
-                    uid = uid
+                    signedInAsRegisteredUser = signedInAsRegisteredUser, uid = uid
                 )
             }
         }
     }
 
-    private fun initAllUsers() {
-        val usersRef = db.reference.child("users")
-        usersRef.addValueEventListener(object : ValueEventListener {
-            @Suppress("UNCHECKED_CAST")
-            override fun onDataChange(snapshot: DataSnapshot) {
-                _allUsers.update {
-                    snapshot.children.map {
-                        UserDTO(
-                            email = it.child("email").value as? String?,
-                            nickname = it.child("nickname").value as? String?,
-                            profileImage = it.child("profileImage").value as? String?,
-                            public = it.child("public").value as? Boolean ?: false,
-                            friends = it.child("friends").value as? Map<String, Boolean>
-                                ?: emptyMap(),
-                            logs = it.child("logs").value as? Map<String, Boolean>
-                                ?: emptyMap(),
-                            places = it.child("places").value as? Map<String, Boolean>
-                                ?: emptyMap(),
-                            plans = it.child("plans").value as? Map<String, Boolean>
-                                ?: emptyMap(),
-                            localId = it.child("localId").value as? Long ?: 0,
-                            remoteId = it.key
-                        )
-                    }
-                }
-            }
-
-            override fun onCancelled(error: DatabaseError) {}
-        })
-    }
-
     private fun initFriends() {
         viewModelScope.launch {
-            _allUsers.collect { users ->
-                val uid = uiState.value.uid ?: return@collect
-                val currentUser = getRemoteUser(uid)
-                val friendIds = currentUser.friends.filter { friendEntry ->
-                    friendEntry.value
-                }.keys
-                val friends = users.filter { user ->
-                    friendIds.contains(user.remoteId)
+            friendIds.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+                .collect { friendIds ->
+                    val friends = friendIds.map { friendId ->
+                        userRepo.getRemoteUser(friendId).toUserModel(remoteId = friendId)
+                    }
+                    _uiState.update {
+                        it.copy(friends = friends)
+                    }
                 }
-                _uiState.update {
-                    it.copy(friends = friends)
-                }
-            }
         }
     }
-
-    suspend fun getRemoteUser(uid: String) = viewModelScope.async {
-        return@async userRepo.getRemoteUser(uid)
-    }.await()
 
     suspend fun search(startAt: String): List<UserDTO> {
         return viewModelScope.async {
@@ -126,29 +121,26 @@ class FriendViewModel(
         viewModelScope.launch {
             val user = userRepo.getRemoteUser(uid)
             userRepo.update(
-                uid,
-                user.copy(friends = user.friends + (friendId to true))
+                uid, user.copy(friends = user.friends + (friendId to true))
             )
 
-            _uiState.update {
-                val friend = getRemoteUser(friendId)
-                it.copy(friends = it.friends + friend)
+            _uiState.update { uiState ->
+                val friend = userRepo.getRemoteUser(friendId).toUserModel(friendId)
+                uiState.copy(friends = uiState.friends + friend)
             }
         }
     }
 
     suspend fun removeFriend(uid: String, friendId: String) {
-        viewModelScope.launch {
-            val user = userRepo.getRemoteUser(uid)
-            userRepo.update(
-                uid,
-                user.copy(friends = user.friends + (friendId to false))
-            )
+        val user = userRepo.getRemoteUser(uid)
 
-            _uiState.update {
-                val friend = getRemoteUser(friendId)
-                it.copy(friends = it.friends - friend)
-            }
+        userRepo.update(
+            uid, user.copy(friends = user.friends + (friendId to false))
+        )
+
+        _uiState.update {
+            val friend = userRepo.getRemoteUser(friendId).toUserModel(friendId)
+            it.copy(friends = it.friends - friend)
         }
     }
 
@@ -156,8 +148,7 @@ class FriendViewModel(
         val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(
-                modelClass: Class<T>,
-                extras: CreationExtras
+                modelClass: Class<T>, extras: CreationExtras
             ): T {
                 val application =
                     checkNotNull(extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY])
