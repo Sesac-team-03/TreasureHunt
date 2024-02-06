@@ -8,11 +8,11 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.treasurehunt.R
-import com.treasurehunt.databinding.ItemSearchFriendBinding
+import com.treasurehunt.databinding.ItemFriendBinding
 import com.treasurehunt.ui.model.UserModel
 
-class SearchFriendAdapter(private val friendClickListener: FriendClickListener) :
-    ListAdapter<UserModel, SearchFriendAdapter.ViewHolder>(diffUtil) {
+class FriendAdapter(private val friendClickListener: FriendClickListener) :
+    ListAdapter<UserModel, FriendAdapter.ViewHolder>(diffUtil) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder.from(parent)
@@ -23,7 +23,7 @@ class SearchFriendAdapter(private val friendClickListener: FriendClickListener) 
     }
 
     class ViewHolder(
-        private val binding: ItemSearchFriendBinding
+        private val binding: ItemFriendBinding
     ) :
         RecyclerView.ViewHolder(binding.root) {
 
@@ -31,7 +31,7 @@ class SearchFriendAdapter(private val friendClickListener: FriendClickListener) 
             bindImage(binding.ivProfileImage, friend.profileImage)
             binding.tvNickname.text = friend.nickName
             binding.tvEmail.text = friend.email.toString().substringBefore('@')
-            binding.ibAdd.setOnClickListener {
+            binding.ibRemove.setOnClickListener {
                 friendClickListener.onClick(friend)
             }
         }
@@ -52,7 +52,7 @@ class SearchFriendAdapter(private val friendClickListener: FriendClickListener) 
         companion object {
             fun from(parent: ViewGroup): ViewHolder {
                 return ViewHolder(
-                    ItemSearchFriendBinding.inflate(
+                    ItemFriendBinding.inflate(
                         LayoutInflater.from(parent.context), parent, false
                     )
                 )
