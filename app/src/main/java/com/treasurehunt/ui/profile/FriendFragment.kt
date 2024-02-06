@@ -18,6 +18,8 @@ import com.treasurehunt.data.remote.model.UserDTO
 import com.treasurehunt.data.remote.model.toUserModel
 import com.treasurehunt.databinding.FragmentFriendBinding
 import com.treasurehunt.ui.model.UserModel
+import com.treasurehunt.util.hide
+import com.treasurehunt.util.show
 import com.treasurehunt.util.showSnackbar
 import kotlinx.coroutines.launch
 
@@ -42,9 +44,9 @@ class FriendFragment : Fragment() {
 
         initSearchFriendAdapter()
         setSearchFriend(searchFriendAdapter)
+        setBtnHideSearchResult()
 
         initFriendAdapter()
-
         showFriendList()
     }
 
@@ -79,6 +81,11 @@ class FriendFragment : Fragment() {
         binding.tietSearchFriend.clearFocus()
         adapter.submitList(searchResult)
         hideKeyboard()
+
+        binding.btnHideSearchResult.show()
+        binding.rvSearchResult.show()
+        handleNoSearchResult(searchResult)
+        binding.rvFriendList.hide()
     }
 
     private suspend fun search(uid: String, startAt: String): List<UserModel> {
@@ -108,6 +115,25 @@ class FriendFragment : Fragment() {
         val keyboard =
             requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         keyboard.hideSoftInputFromWindow(binding.root.windowToken, 0)
+    }
+
+    private fun setBtnHideSearchResult() {
+        binding.btnHideSearchResult.setOnClickListener {
+            binding.btnHideSearchResult.hide()
+            binding.rvSearchResult.hide()
+            binding.groupNoSearchResult.hide()
+            binding.rvFriendList.show()
+        }
+    }
+
+    private fun handleNoSearchResult(searchResult: List<UserModel>) {
+        with(binding.groupNoSearchResult) {
+            if (searchResult.isEmpty()) {
+                show()
+            } else {
+                hide()
+            }
+        }
     }
 
     private fun getAddFriendClickListener() = FriendClickListener { friend ->

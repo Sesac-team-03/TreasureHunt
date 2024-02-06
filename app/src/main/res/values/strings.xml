@@ -49,6 +49,8 @@
     <string name="profile_check_url">https://</string>
 
     <!-- 프로필 화면 - 친구 -->
+    <string name="profile_friend_btn_hide_search_result">검색 끝</string>
+    <string name="profile_friend_tv_no_search_result">해당 문자열로 시작되는\n이메일 계정이 없습니다</string>
     <string name="profile_friend_added">%1$s님을 친구로 추가했습니다</string>
     <string name="profile_friend_removed">%1$s님을 친구에서 삭제했습니다</string>
 </resources>
