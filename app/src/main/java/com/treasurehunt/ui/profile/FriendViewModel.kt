@@ -1,9 +1,7 @@
 package com.treasurehunt.ui.profile
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.CreationExtras
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
@@ -11,7 +9,6 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
-import com.treasurehunt.TreasureHuntApplication
 import com.treasurehunt.data.LogRepository
 import com.treasurehunt.data.PlaceRepository
 import com.treasurehunt.data.UserRepository
@@ -19,6 +16,7 @@ import com.treasurehunt.data.remote.model.UserDTO
 import com.treasurehunt.data.remote.model.toUserModel
 import com.treasurehunt.ui.model.FriendUiState
 import com.treasurehunt.util.ConnectivityRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking
@@ -30,11 +28,13 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 private const val FIREBASE_URL =
     "https://treasurehunt-32565-default-rtdb.asia-southeast1.firebasedatabase.app"
 
-class FriendViewModel(
+@HiltViewModel
+class FriendViewModel @Inject constructor(
     private val logRepo: LogRepository,
     private val placeRepo: PlaceRepository,
     private val userRepo: UserRepository,
@@ -140,24 +140,6 @@ class FriendViewModel(
         _uiState.update {
             val friend = userRepo.getRemoteUser(friendId).toUserModel(friendId)
             it.copy(friends = it.friends - friend)
-        }
-    }
-
-    companion object {
-        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(
-                modelClass: Class<T>, extras: CreationExtras
-            ): T {
-                val application =
-                    checkNotNull(extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY])
-                return FriendViewModel(
-                    TreasureHuntApplication.logRepo,
-                    TreasureHuntApplication.placeRepo,
-                    TreasureHuntApplication.userRepo,
-                    ConnectivityRepository(application.applicationContext)
-                ) as T
-            }
         }
     }
 }

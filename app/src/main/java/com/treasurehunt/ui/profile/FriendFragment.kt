@@ -19,13 +19,15 @@ import com.treasurehunt.ui.model.UserModel
 import com.treasurehunt.util.hide
 import com.treasurehunt.util.show
 import com.treasurehunt.util.showSnackbar
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class FriendFragment : Fragment() {
 
     private var _binding: FragmentFriendBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: FriendViewModel by viewModels { FriendViewModel.Factory }
+    private val viewModel: FriendViewModel by viewModels()
     private lateinit var searchFriendAdapter: SearchFriendAdapter
     private lateinit var friendAdapter: FriendAdapter
 
