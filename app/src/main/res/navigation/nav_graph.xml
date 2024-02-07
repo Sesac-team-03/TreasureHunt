@@ -50,7 +50,9 @@
             app:destination="@id/detailFragment" />
         <action
             android:id="@+id/action_homeFragment_to_feedFragment"
-            app:destination="@id/feedFragment" />
+            app:destination="@id/feedFragment"
+            app:popUpTo="@id/homeFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
@@ -125,6 +127,8 @@
             app:destination="@id/detailFragment" />
         <action
             android:id="@+id/action_feedFragment_to_homeFragment"
-            app:destination="@id/homeFragment" />
+            app:destination="@id/homeFragment"
+            app:popUpTo="@id/feedFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 </navigation>
