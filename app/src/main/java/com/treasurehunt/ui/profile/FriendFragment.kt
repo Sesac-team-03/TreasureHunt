@@ -11,8 +11,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import com.treasurehunt.R
 import com.treasurehunt.data.remote.model.UserDTO
 import com.treasurehunt.data.remote.model.toUserModel
@@ -47,13 +45,12 @@ class FriendFragment : Fragment() {
         setBtnHideSearchResult()
 
         initFriendAdapter()
-        showFriendList()
+        updateFriendList()
     }
 
     private fun initSearchFriendAdapter() {
-        searchFriendAdapter = SearchFriendAdapter(getAddFriendClickListener()).apply {
-            binding.rvSearchResult.adapter = this
-        }
+        searchFriendAdapter = SearchFriendAdapter(getAddFriendClickListener(), true)
+        binding.rvSearchResult.adapter = searchFriendAdapter
     }
 
     private fun setSearchFriend(adapter: SearchFriendAdapter) {
@@ -91,7 +88,7 @@ class FriendFragment : Fragment() {
     private suspend fun search(uid: String, startAt: String): List<UserModel> {
         if (startAt == "") return emptyList()
 
-        val friendIds = viewModel.uiState.value.friends.map { it.remoteId!! }
+        val friendIds = viewModel.uiState.value.friends.keys.map { it.remoteId!! }
         return viewModel.search(startAt)
             .filterNotFriend(friendIds, uid)
             .sortedByEmail()
@@ -119,61 +116,60 @@ class FriendFragment : Fragment() {
 
     private fun setBtnHideSearchResult() {
         binding.btnHideSearchResult.setOnClickListener {
-            binding.btnHideSearchResult.hide()
-            binding.rvSearchResult.hide()
-            binding.groupNoSearchResult.hide()
-            binding.rvFriendList.show()
+            showFriendList()
         }
     }
 
     private fun handleNoSearchResult(searchResult: List<UserModel>) {
         with(binding.groupNoSearchResult) {
-            if (searchResult.isEmpty()) {
-                show()
-            } else {
-                hide()
-            }
+            if (searchResult.isEmpty()) show() else hide()
         }
     }
 
     private fun getAddFriendClickListener() = FriendClickListener { friend ->
+        val uid = validateRegisteredUser() ?: return@FriendClickListener
+
         viewLifecycleOwner.lifecycleScope.launch {
-            val uid = validateRegisteredUser() ?: return@launch
             viewModel.addFriend(uid, friend.remoteId!!)
-            searchFriendAdapter.submitList(null)
 
-            val message = getString(R.string.profile_friend_added, friend.nickName)
-            binding.root.showSnackbar(message)
+            binding.root.showSnackbar(getString(R.string.profile_friend_added, friend.nickName))
 
-            binding.btnHideSearchResult.hide()
-            binding.groupNoSearchResult.hide()
-            binding.rvFriendList.show()
-        }
-    }
-
-    private fun initFriendAdapter() {
-        friendAdapter = FriendAdapter(getRemoveFriendClickListener()).apply {
-            binding.rvFriendList.adapter = this
+            showFriendList()
         }
     }
 
     private fun showFriendList() {
+        searchFriendAdapter.submitList(null)
+
+        binding.tietSearchFriend.text = null
+        binding.btnHideSearchResult.hide()
+        binding.groupNoSearchResult.hide()
+        binding.rvFriendList.show()
+    }
+
+    private fun initFriendAdapter() {
+        friendAdapter = FriendAdapter(getRemoveFriendClickListener(), true)
+        binding.rvFriendList.adapter = friendAdapter
+    }
+
+    private fun updateFriendList() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collect { uiState ->
-                    friendAdapter.submitList(uiState.friends)
-                }
+                viewModel.uiState
+                    .collect { uiState ->
+                        friendAdapter.submitList(uiState.friends.keys.toList())
+                    }
             }
         }
     }
 
     private fun getRemoveFriendClickListener() = FriendClickListener { friend ->
+        val uid = validateRegisteredUser() ?: return@FriendClickListener
+
         viewLifecycleOwner.lifecycleScope.launch {
-            val uid = Firebase.auth.currentUser?.uid ?: return@launch
             viewModel.removeFriend(uid, friend.remoteId!!)
 
-            val message = getString(R.string.profile_friend_removed, friend.nickName)
-            binding.root.showSnackbar(message)
+            binding.root.showSnackbar(getString(R.string.profile_friend_removed, friend.nickName))
         }
     }
 }

@@ -31,7 +31,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-private const val firebaseUrl =
+private const val FIREBASE_URL =
     "https://treasurehunt-32565-default-rtdb.asia-southeast1.firebasedatabase.app"
 
 class FriendViewModel(
@@ -43,12 +43,14 @@ class FriendViewModel(
 
     private val _uiState = MutableStateFlow(FriendUiState(false))
     val uiState: StateFlow<FriendUiState> = _uiState
-    private val db = FirebaseDatabase.getInstance(firebaseUrl)
+    private val db = FirebaseDatabase.getInstance(FIREBASE_URL)
     private val friendIds: Flow<List<String>> = getFriendIdsFlow()
 
     init {
-        initCurrentUser()
-        initFriends()
+        viewModelScope.launch {
+            initCurrentUser()
+            initFriends()
+        }
     }
 
     private fun getFriendIdsFlow(): Flow<List<String>> = callbackFlow {
@@ -83,27 +85,23 @@ class FriendViewModel(
         val signedInAsRegisteredUser = currentFirebaseUser?.isAnonymous == false
         val uid = currentFirebaseUser?.uid
 
-        viewModelScope.launch {
-            _uiState.update {
-                it.copy(
-                    signedInAsRegisteredUser = signedInAsRegisteredUser, uid = uid
-                )
-            }
+        _uiState.update {
+            it.copy(
+                signedInAsRegisteredUser = signedInAsRegisteredUser, uid = uid
+            )
         }
     }
 
-    private fun initFriends() {
-        viewModelScope.launch {
-            friendIds.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
-                .collect { friendIds ->
-                    val friends = friendIds.map { friendId ->
-                        userRepo.getRemoteUser(friendId).toUserModel(remoteId = friendId)
-                    }
-                    _uiState.update {
-                        it.copy(friends = friends)
-                    }
+    private suspend fun initFriends() {
+        friendIds.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+            .collect { friendIds ->
+                val friends = friendIds.map { friendId ->
+                    userRepo.getRemoteUser(friendId).toUserModel(remoteId = friendId)
                 }
-        }
+                _uiState.update {
+                    it.copy(friends = friends.associateWith { true })
+                }
+            }
     }
 
     suspend fun search(startAt: String): List<UserDTO> {
@@ -118,21 +116,22 @@ class FriendViewModel(
     }
 
     suspend fun addFriend(uid: String, friendId: String) {
-        viewModelScope.launch {
-            val user = userRepo.getRemoteUser(uid)
-            userRepo.update(
-                uid, user.copy(friends = user.friends + (friendId to true))
-            )
+        val user = userRepo.getRemoteUser(uid)
+        if (user.friends[friendId] == true) return
 
-            _uiState.update { uiState ->
-                val friend = userRepo.getRemoteUser(friendId).toUserModel(friendId)
-                uiState.copy(friends = uiState.friends + friend)
-            }
+        userRepo.update(
+            uid, user.copy(friends = user.friends + (friendId to true))
+        )
+
+        _uiState.update { uiState ->
+            val friend = userRepo.getRemoteUser(friendId).toUserModel(friendId)
+            uiState.copy(friends = uiState.friends + (friend to true))
         }
     }
 
     suspend fun removeFriend(uid: String, friendId: String) {
         val user = userRepo.getRemoteUser(uid)
+        if (user.friends[friendId] != true) return
 
         userRepo.update(
             uid, user.copy(friends = user.friends + (friendId to false))
