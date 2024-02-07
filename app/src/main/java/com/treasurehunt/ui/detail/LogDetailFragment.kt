@@ -3,7 +3,6 @@ package com.treasurehunt.ui.detail
 import android.content.Intent
 import android.content.res.Resources
 import android.net.Uri
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +10,7 @@ import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.dynamiclinks.DynamicLink
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
 import com.treasurehunt.R

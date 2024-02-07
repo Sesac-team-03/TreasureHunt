@@ -2,11 +2,12 @@ package com.treasurehunt.data
 
 import com.treasurehunt.data.local.UserDao
 import com.treasurehunt.data.local.model.UserEntity
-import com.treasurehunt.data.remote.model.UserDTO
 import com.treasurehunt.data.remote.UserRemoteDataSource
+import com.treasurehunt.data.remote.model.UserDTO
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
-class UserRepositoryImpl(
+class UserRepositoryImpl @Inject constructor(
     private val userDao: UserDao,
     private val userRemoteDataSource: UserRemoteDataSource
 ) : UserRepository {

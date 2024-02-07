@@ -1,7 +1,6 @@
 package com.treasurehunt.data.remote.model
 
 import com.treasurehunt.data.local.model.ImageEntity
-import com.treasurehunt.data.local.model.toImageDTO
 import kotlinx.serialization.Serializable
 
 @Serializable

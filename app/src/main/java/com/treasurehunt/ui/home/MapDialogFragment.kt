@@ -13,13 +13,15 @@ import com.treasurehunt.R
 import com.treasurehunt.data.local.model.PlaceEntity
 import com.treasurehunt.data.remote.model.PlaceDTO
 import com.treasurehunt.databinding.FragmentMapDialogBinding
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class MapDialogFragment : BottomSheetDialogFragment() {
 
     private var _binding: FragmentMapDialogBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: HomeViewModel by viewModels { HomeViewModel.Factory } // share?
+    private val viewModel: HomeViewModel by viewModels()
     private val args: MapDialogFragmentArgs by navArgs()
 
     override fun onCreateView(

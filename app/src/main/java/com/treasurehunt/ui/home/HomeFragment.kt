@@ -25,13 +25,15 @@ import com.naver.maps.map.util.FusedLocationSource
 import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentHomeBinding
 import com.treasurehunt.ui.model.MapSymbol
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class HomeFragment : Fragment(), OnMapReadyCallback {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: HomeViewModel by viewModels { HomeViewModel.Factory }
+    private val viewModel: HomeViewModel by viewModels()
     private lateinit var map: NaverMap
     private val source: FusedLocationSource =
         FusedLocationSource(this, LOCATION_PERMISSION_REQUEST_CODE)

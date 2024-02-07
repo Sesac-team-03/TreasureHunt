@@ -12,14 +12,18 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentSplashBinding
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+
+@AndroidEntryPoint
 class SplashFragment : Fragment() {
     private var _binding: FragmentSplashBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: LoginViewModel by viewModels { LoginViewModel.Factory }
     private var isInitialized = false
+    private val viewModel: LoginViewModel by viewModels()
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

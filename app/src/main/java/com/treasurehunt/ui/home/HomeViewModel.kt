@@ -1,19 +1,13 @@
 package com.treasurehunt.ui.home
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.CreationExtras
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
 import com.treasurehunt.R
-import com.treasurehunt.TreasureHuntApplication.Companion.logRepo
-import com.treasurehunt.TreasureHuntApplication.Companion.placeRepo
-import com.treasurehunt.TreasureHuntApplication.Companion.userRepo
 import com.treasurehunt.data.LogRepository
 import com.treasurehunt.data.PlaceRepository
 import com.treasurehunt.data.UserRepository
@@ -22,6 +16,7 @@ import com.treasurehunt.data.remote.model.PlaceDTO
 import com.treasurehunt.data.remote.model.UserDTO
 import com.treasurehunt.ui.model.MapUiState
 import com.treasurehunt.util.ConnectivityRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,8 +27,10 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.IOException
+import javax.inject.Inject
 
-class HomeViewModel(
+@HiltViewModel
+class HomeViewModel @Inject constructor(
     private val logRepo: LogRepository,
     private val placeRepo: PlaceRepository,
     private val userRepo: UserRepository,
@@ -158,23 +155,5 @@ class HomeViewModel(
         this.icon = icon
         this.width = width
         this.height = height
-    }
-
-    companion object {
-        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(
-                modelClass: Class<T>,
-                extras: CreationExtras
-            ): T {
-                val application = checkNotNull(extras[APPLICATION_KEY])
-                return HomeViewModel(
-                    logRepo,
-                    placeRepo,
-                    userRepo,
-                    ConnectivityRepository(application.applicationContext)
-                ) as T
-            }
-        }
     }
 }

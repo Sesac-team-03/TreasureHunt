@@ -21,17 +21,19 @@ import com.treasurehunt.R
 import com.treasurehunt.data.User
 import com.treasurehunt.databinding.FragmentLoginBinding
 import com.treasurehunt.util.showSnackbar
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 private const val NAVER_LOGIN_CLIENT_ID = BuildConfig.NAVER_LOGIN_CLIENT_ID
 private const val NAVER_LOGIN_CLIENT_SECRET = BuildConfig.NAVER_LOGIN_CLIENT_SECRET
 private const val APP_NAME = BuildConfig.APP_NAME
 
+@AndroidEntryPoint
 class LogInFragment : Fragment() {
 
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: LoginViewModel by viewModels { LoginViewModel.Factory }
+    private val viewModel: LoginViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

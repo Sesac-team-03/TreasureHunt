@@ -4,12 +4,9 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.MediaStore
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.CreationExtras
 import com.google.firebase.Firebase
 import com.google.firebase.storage.storage
-import com.treasurehunt.TreasureHuntApplication
 import com.treasurehunt.data.ImageRepository
 import com.treasurehunt.data.LogRepository
 import com.treasurehunt.data.PlaceRepository
@@ -20,12 +17,15 @@ import com.treasurehunt.data.remote.model.ImageDTO
 import com.treasurehunt.data.remote.model.LogDTO
 import com.treasurehunt.data.remote.model.PlaceDTO
 import com.treasurehunt.data.remote.model.UserDTO
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
 
-class SaveLogViewModel(
+@HiltViewModel
+class SaveLogViewModel @Inject constructor(
     private val logRepo: LogRepository,
     private val placeRepo: PlaceRepository,
     private val userRepo: UserRepository,
@@ -80,6 +80,7 @@ class SaveLogViewModel(
 
     suspend fun insertLog(logDTO: LogDTO) = logRepo.insert(logDTO)
 
+
     fun removeImage(image: ImageModel) {
         _images.value -= image
         setButtonState()
@@ -128,20 +129,4 @@ class SaveLogViewModel(
     }
 
     suspend fun insertImage(image: ImageDTO) = imageRepo.insertImage(image)
-
-    companion object {
-        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(
-                modelClass: Class<T>,
-                extras: CreationExtras
-            ): T {
-                return SaveLogViewModel(
-                    TreasureHuntApplication.logRepo,
-                    TreasureHuntApplication.placeRepo,
-                    TreasureHuntApplication.userRepo,
-                    TreasureHuntApplication.imageRepo
-                ) as T
-            }
-        }
-    }
 }
