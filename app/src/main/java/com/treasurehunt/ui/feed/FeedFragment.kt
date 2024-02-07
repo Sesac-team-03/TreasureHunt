@@ -11,7 +11,6 @@ import androidx.navigation.fragment.findNavController
 import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentFeedBinding
 import com.treasurehunt.ui.feed.adapter.FeedAdapter
-import com.treasurehunt.ui.model.LogImageModel
 import com.treasurehunt.ui.model.LogModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

@@ -170,7 +170,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         val remotePlaceId = tag.toString()
 
         setOnClickListener {
-            val action = HomeFragmentDirections.actionHomeFragmentToDetailFragment(null,remotePlaceId)
+            val action =
+                HomeFragmentDirections.actionHomeFragmentToDetailFragment(null, remotePlaceId)
             findNavController().navigate(action)
             true
         }

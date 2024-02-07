@@ -1,18 +1,13 @@
 package com.treasurehunt.ui.feed.adapter
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.ktx.storage
 import com.treasurehunt.databinding.ItemFeedBinding
 import com.treasurehunt.ui.feed.LogClickListener
-import com.treasurehunt.ui.model.LogImageModel
 import com.treasurehunt.ui.model.LogModel
 
 class FeedAdapter(

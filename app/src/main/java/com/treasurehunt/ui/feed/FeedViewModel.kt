@@ -1,13 +1,10 @@
 package com.treasurehunt.ui.feed
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.treasurehunt.data.ImageRepository
 import com.treasurehunt.data.LogRepository
 import com.treasurehunt.data.local.model.toLogModel
-import com.treasurehunt.data.remote.model.toImageModel
-import com.treasurehunt.ui.model.LogImageModel
 import com.treasurehunt.ui.model.LogModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
