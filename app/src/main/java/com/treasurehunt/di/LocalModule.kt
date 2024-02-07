@@ -16,7 +16,7 @@ object LocalModule {
 
     @Singleton
     @Provides
-    fun provideDataBase(@ApplicationContext context: Context): TreasureHuntDatabase {
+    fun provideDatabase(@ApplicationContext context: Context): TreasureHuntDatabase {
         return Room.databaseBuilder(
             context,
             TreasureHuntDatabase::class.java,

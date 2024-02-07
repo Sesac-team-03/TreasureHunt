@@ -4,13 +4,9 @@ import android.content.Intent
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
-import com.treasurehunt.TreasureHuntApplication
 import com.treasurehunt.data.UserRepository
 import com.treasurehunt.data.remote.model.UserDTO
 import dagger.hilt.android.lifecycle.HiltViewModel

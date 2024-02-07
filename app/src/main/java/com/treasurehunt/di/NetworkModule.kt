@@ -16,7 +16,6 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import javax.inject.Singleton
 
-
 private const val HEADER_USER_AGENT = "User-Agent"
 private const val APP_NAME = "TreasureHunt"
 private const val BASE_URL = BuildConfig.BASE_URL
@@ -49,20 +48,20 @@ object NetworkModule {
 
 
     @Provides
-    fun provideUserService(remoteBuilder:Retrofit): UserService =
+    fun provideUserService(remoteBuilder: Retrofit): UserService =
         remoteBuilder.create(UserService::class.java)
 
 
     @Provides
-    fun provideLogService(remoteBuilder:Retrofit): LogService =
+    fun provideLogService(remoteBuilder: Retrofit): LogService =
         remoteBuilder.create(LogService::class.java)
 
     @Provides
-    fun providePlaceService(remoteBuilder:Retrofit): PlaceService =
+    fun providePlaceService(remoteBuilder: Retrofit): PlaceService =
         remoteBuilder.create(PlaceService::class.java)
 
     @Provides
-    fun provideImageService(remoteBuilder:Retrofit): ImageService =
+    fun provideImageService(remoteBuilder: Retrofit): ImageService =
         remoteBuilder.create(ImageService::class.java)
 
 }
