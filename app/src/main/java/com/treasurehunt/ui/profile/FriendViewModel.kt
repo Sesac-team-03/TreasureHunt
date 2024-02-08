@@ -82,12 +82,13 @@ class FriendViewModel @Inject constructor(
 
     private fun initCurrentUser() {
         val currentFirebaseUser = Firebase.auth.currentUser
-        val signedInAsRegisteredUser = currentFirebaseUser?.isAnonymous == false
+        val signedInAsMember = currentFirebaseUser?.isAnonymous == false
         val uid = currentFirebaseUser?.uid
 
         _uiState.update {
             it.copy(
-                signedInAsRegisteredUser = signedInAsRegisteredUser, uid = uid
+                isSignedInAsMember = signedInAsMember,
+                uid = uid
             )
         }
     }

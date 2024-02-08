@@ -42,12 +42,22 @@ class FriendFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        initSearchFriendAdapter()
-        setSearchFriend(searchFriendAdapter)
-        setBtnHideSearchResult()
+        if (viewModel.uiState.value.isSignedInAsMember) {
+            showSearchBar()
 
-        initFriendAdapter()
-        updateFriendList()
+            initSearchFriendAdapter()
+            setSearchFriend(searchFriendAdapter)
+            setBtnHideSearchResult()
+
+            initFriendAdapter()
+            updateFriendList()
+        } else {
+            showAlertGuest()
+        }
+    }
+
+    private fun showSearchBar() {
+        binding.groupSearch.show()
     }
 
     private fun initSearchFriendAdapter() {
@@ -58,7 +68,7 @@ class FriendFragment : Fragment() {
     private fun setSearchFriend(adapter: SearchFriendAdapter) {
         binding.tietSearchFriend.setOnEditorActionListener { _, _, _ ->
             viewLifecycleOwner.lifecycleScope.launch {
-                val uid = validateRegisteredUser() ?: return@launch
+                val uid = validateMember() ?: return@launch
 
                 showSearchResult(uid, adapter)
             }
@@ -66,8 +76,8 @@ class FriendFragment : Fragment() {
         }
     }
 
-    private fun validateRegisteredUser(): String? {
-        val isSignedInAsUser = viewModel.uiState.value.signedInAsRegisteredUser
+    private fun validateMember(): String? {
+        val isSignedInAsUser = viewModel.uiState.value.isSignedInAsMember
         val uid = viewModel.uiState.value.uid
 
         return if (isSignedInAsUser) uid else null
@@ -129,7 +139,7 @@ class FriendFragment : Fragment() {
     }
 
     private fun getAddFriendClickListener() = FriendClickListener { friend ->
-        val uid = validateRegisteredUser() ?: return@FriendClickListener
+        val uid = validateMember() ?: return@FriendClickListener
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.addFriend(uid, friend.remoteId!!)
@@ -166,12 +176,16 @@ class FriendFragment : Fragment() {
     }
 
     private fun getRemoveFriendClickListener() = FriendClickListener { friend ->
-        val uid = validateRegisteredUser() ?: return@FriendClickListener
+        val uid = validateMember() ?: return@FriendClickListener
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.removeFriend(uid, friend.remoteId!!)
 
             binding.root.showSnackbar(getString(R.string.profile_friend_removed, friend.nickName))
         }
+    }
+
+    private fun showAlertGuest() {
+        binding.tvAlertGuest.show()
     }
 }
