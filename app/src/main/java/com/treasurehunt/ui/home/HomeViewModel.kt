@@ -3,6 +3,7 @@ package com.treasurehunt.ui.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.ktx.Firebase
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.overlay.Marker
@@ -14,6 +15,7 @@ import com.treasurehunt.data.UserRepository
 import com.treasurehunt.data.local.model.PlaceEntity
 import com.treasurehunt.data.remote.model.PlaceDTO
 import com.treasurehunt.data.remote.model.UserDTO
+import com.treasurehunt.ui.model.LogModel
 import com.treasurehunt.ui.model.MapUiState
 import com.treasurehunt.util.ConnectivityRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,10 +24,12 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import java.io.IOException
 import javax.inject.Inject
 
@@ -34,13 +38,37 @@ class HomeViewModel @Inject constructor(
     private val logRepo: LogRepository,
     private val placeRepo: PlaceRepository,
     private val userRepo: UserRepository,
-    private val connectivityRepo: ConnectivityRepository
+    private val connectivityRepo: ConnectivityRepository,
+    private val database: DatabaseReference
 ) :
     ViewModel() {
 
     private val _uiState = MutableStateFlow(MapUiState())
     val uiState: StateFlow<MapUiState> = _uiState
     private var fetchJob: Job? = null
+
+    private val _logModel = MutableStateFlow<LogModel?>(null)
+    val logModel: StateFlow<LogModel?> = _logModel.asStateFlow()
+
+    fun getLogDataFromFirebase(logId: String) {
+        viewModelScope.launch {
+            val reference = database.child("logs").child(logId)
+            val dataSnapshot = reference.get().await()
+            if (dataSnapshot.exists()) {
+                val createdDate =
+                    dataSnapshot.child("createdDate").getValue(Long::class.java)?.toString() ?: ""
+                val images = dataSnapshot.child("images").children.map {
+                    it.getValue(String::class.java) ?: ""
+                }
+                val place = dataSnapshot.child("place").getValue(String::class.java) ?: ""
+                val text = dataSnapshot.child("text").getValue(String::class.java) ?: ""
+                val theme = dataSnapshot.child("theme").getValue(String::class.java)?.toLong() ?: 0L
+                _logModel.value = LogModel(createdDate, images, place, text, theme)
+            } else {
+                _logModel.value = null
+            }
+        }
+    }
 
     init {
         initUser()
