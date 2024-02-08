@@ -80,8 +80,12 @@
             android:id="@+id/action_detailFragment_to_saveLogFragment"
             app:destination="@id/saveLogFragment" />
         <argument
-            android:name="remotePlaceId"
+            android:name="LogId"
+            android:defaultValue=""
             app:argType="string" />
+        <argument
+            android:name="LogModel"
+            app:argType="com.treasurehunt.ui.model.LogModel" />
     </dialog>
 
     <fragment
