@@ -167,8 +167,23 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         val remotePlaceId = tag.toString()
 
         setOnClickListener {
-            val action = HomeFragmentDirections.actionHomeFragmentToDetailFragment(remotePlaceId)
-            findNavController().navigate(action)
+            if (!viewModel.uiState.value.isOnline || viewModel.uiState.value.uid.isNullOrEmpty()) {
+                return@setOnClickListener false
+            }
+            viewModel.getLogDataFromFirebase(remotePlaceId)
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewModel.logModel.collect { logModel ->
+                    logModel?.let {
+                        val action = HomeFragmentDirections.actionHomeFragmentToDetailFragment(
+                            it,
+                            remotePlaceId
+                        )
+                        findNavController().navigate(action)
+                    }
+                }
+            }
+
             true
         }
     }
