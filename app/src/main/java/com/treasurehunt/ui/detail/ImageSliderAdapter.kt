@@ -12,11 +12,16 @@ import com.treasurehunt.R
 import com.treasurehunt.databinding.ItemImageBinding
 
 class ImageSliderAdapter(
-    imageItems: List<ImageItem>
+    private var imageItems: List<ImageItem>
 ) : ListAdapter<ImageItem, ImageSliderAdapter.ImageViewHolder>(ImageDiffCallback()) {
 
     init {
         submitList(imageItems)
+    }
+
+    fun updateData(newImageItems: List<ImageItem>) {
+        imageItems = newImageItems
+        submitList(newImageItems)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
