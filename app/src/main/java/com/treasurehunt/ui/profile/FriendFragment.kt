@@ -91,7 +91,7 @@ class FriendFragment : Fragment() {
         if (startAt == "") return emptyList()
 
         val friendIds = viewModel.uiState.value.friends.keys.map { it.remoteId!! }
-        return viewModel.search(startAt)
+        return viewModel.searchUser(startAt)
             .filterNotFriend(friendIds, uid)
             .sortedByEmail()
     }

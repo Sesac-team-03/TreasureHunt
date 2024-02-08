@@ -9,6 +9,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
+import com.treasurehunt.BuildConfig
 import com.treasurehunt.data.LogRepository
 import com.treasurehunt.data.PlaceRepository
 import com.treasurehunt.data.UserRepository
@@ -30,8 +31,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-private const val FIREBASE_URL =
-    "https://treasurehunt-32565-default-rtdb.asia-southeast1.firebasedatabase.app"
+private const val BASE_URL = BuildConfig.BASE_URL
 
 @HiltViewModel
 class FriendViewModel @Inject constructor(
@@ -43,7 +43,7 @@ class FriendViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(FriendUiState(false))
     val uiState: StateFlow<FriendUiState> = _uiState
-    private val db = FirebaseDatabase.getInstance(FIREBASE_URL)
+    private val db = FirebaseDatabase.getInstance(BASE_URL)
     private val friendIds: Flow<List<String>> = getFriendIdsFlow()
 
     init {
@@ -104,7 +104,7 @@ class FriendViewModel @Inject constructor(
             }
     }
 
-    suspend fun search(startAt: String): List<UserDTO> {
+    suspend fun searchUser(startAt: String): List<UserDTO> {
         return viewModelScope.async {
             val searchResult = userRepo.search("\"$startAt\"")
             return@async searchResult.map { remoteUserEntry ->
