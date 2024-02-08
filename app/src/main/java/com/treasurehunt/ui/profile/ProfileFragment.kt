@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import com.google.android.material.tabs.TabLayoutMediator
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.storage.storage
@@ -23,7 +24,6 @@ import com.treasurehunt.util.showSnackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-
 
 @AndroidEntryPoint
 class ProfileFragment : Fragment() {
@@ -55,6 +55,7 @@ class ProfileFragment : Fragment() {
         syncProfile()
         setAlbumPermission()
         setEditButton()
+        initTabLayout()
     }
 
     override fun onDestroyView() {
@@ -190,6 +191,17 @@ class ProfileFragment : Fragment() {
             val storageRef =
                 Firebase.storage.getReferenceFromUrl(userDTO.profileImage.toString())
             Glide.with(requireContext()).load(storageRef).into(binding.ivProfileImage)
+        }
+    }
+
+    private fun initTabLayout() {
+        val tabLayout = binding.tlNotification
+        val viewPager = binding.vpNotification
+
+        viewPager.adapter = ProfileViewPagerAdapter(this@ProfileFragment)
+
+        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
+            tab.text = getString(ProfileViewPagerAdapter.Tab.entries[position].restId)
         }
     }
 }

@@ -46,11 +46,9 @@ object NetworkModule {
             .build()
     }
 
-
     @Provides
     fun provideUserService(remoteBuilder: Retrofit): UserService =
         remoteBuilder.create(UserService::class.java)
-
 
     @Provides
     fun provideLogService(remoteBuilder: Retrofit): LogService =
@@ -63,5 +61,4 @@ object NetworkModule {
     @Provides
     fun provideImageService(remoteBuilder: Retrofit): ImageService =
         remoteBuilder.create(ImageService::class.java)
-
 }

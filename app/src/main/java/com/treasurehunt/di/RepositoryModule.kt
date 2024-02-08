@@ -28,5 +28,4 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindImageRepository(imageRepositoryImpl: ImageRepositoryImpl): ImageRepository
-
 }

@@ -56,10 +56,8 @@ class HomeViewModel @Inject constructor(
     private fun initUser() {
         val uid = Firebase.auth.currentUser?.uid
 
-        viewModelScope.launch {
-            _uiState.update {
-                it.copy(uid = uid)
-            }
+        _uiState.update {
+            it.copy(uid = uid)
         }
     }
 
