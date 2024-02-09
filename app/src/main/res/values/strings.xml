@@ -58,4 +58,7 @@
 
     <!-- 피드 화면 -->
     <string name="no_treasure">아직 보물이 없어요</string>
-</resources>
+
+    <!-- 알림 -->
+    <string name="notification_channel">Upload</string>
+    <string name="notification_description">데이터 업로드가 완료될 때, 알림을 보냅니다</string>

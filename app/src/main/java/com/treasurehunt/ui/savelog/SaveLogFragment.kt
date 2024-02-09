@@ -1,5 +1,7 @@
 package com.treasurehunt.ui.savelog
 
+import android.app.NotificationManager
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -8,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
@@ -37,6 +40,7 @@ import com.treasurehunt.ui.model.asPlaceDTO
 import com.treasurehunt.ui.model.asPlaceEntity
 import com.treasurehunt.ui.model.toPlace
 import com.treasurehunt.ui.savelog.adapter.SaveLogAdapter
+import com.treasurehunt.util.NOTIFICATION_ID_STRING
 import com.treasurehunt.util.getCurrentTime
 import com.treasurehunt.util.showSnackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -154,9 +158,24 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
 
                 updatePlaceWithLog(remotePlaceId, remoteLogId)
                 updateUser(remotePlaceId, remoteLogId)
-                
+
+                sendUploadNotification()
             }
             findNavController().navigate(R.id.action_saveLogFragment_to_homeFragment)
+        }
+    }
+
+    private fun sendUploadNotification() {
+        val notificationManager =
+            requireContext().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        if (notificationManager.areNotificationsEnabled()) {
+            var builder = NotificationCompat.Builder(requireContext(), NOTIFICATION_ID_STRING)
+                .setSmallIcon(R.drawable.ic_chest_open)
+                .setContentTitle("My notification")
+                .setContentText("Upload successful")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            val notification = builder.build()
+            notificationManager.notify(0, notification)
         }
     }
 
