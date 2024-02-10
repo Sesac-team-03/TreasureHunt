@@ -1,7 +1,5 @@
 package com.treasurehunt.ui.savelog
 
-import android.app.NotificationManager
-import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -10,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
@@ -19,8 +16,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.work.Data
+import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.naver.maps.map.LocationTrackingMode
@@ -40,7 +40,6 @@ import com.treasurehunt.ui.model.asPlaceDTO
 import com.treasurehunt.ui.model.asPlaceEntity
 import com.treasurehunt.ui.model.toPlace
 import com.treasurehunt.ui.savelog.adapter.SaveLogAdapter
-import com.treasurehunt.util.NOTIFICATION_ID_STRING
 import com.treasurehunt.util.getCurrentTime
 import com.treasurehunt.util.showSnackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -69,10 +68,10 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         }
     private val args: SaveLogFragmentArgs by navArgs()
 
+    private var isNotificationPermitted = false
+
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = FragmentSavelogBinding.inflate(inflater, container, false)
         return binding.root
@@ -149,58 +148,81 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         binding.btnSave.setOnClickListener {
             viewLifecycleOwner.lifecycleScope.launch {
 //                uploadImages()
-                // 사진 업로드 백그라운드 구현 테스트
-                uploadImage1()
+//
+//                val remotePlaceId = getRemotePlaceId()
+//                val log = getLogFor(remotePlaceId)
+//                val remoteLogId = insertLog(log)
+//
+//                updatePlaceWithLog(remotePlaceId, remoteLogId)
+//                updateUser(remotePlaceId, remoteLogId)
+//
+//                sendUploadNotification()
 
-                val remotePlaceId = getRemotePlaceId()
-                val log = getLogFor(remotePlaceId)
-                val remoteLogId = insertLog(log)
-
-                updatePlaceWithLog(remotePlaceId, remoteLogId)
-                updateUser(remotePlaceId, remoteLogId)
-
-                sendUploadNotification()
+                scheduleUploadWork()
             }
             findNavController().navigate(R.id.action_saveLogFragment_to_homeFragment)
         }
     }
 
-    private fun sendUploadNotification() {
-        val notificationManager =
-            requireContext().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        if (notificationManager.areNotificationsEnabled()) {
-            var builder = NotificationCompat.Builder(requireContext(), NOTIFICATION_ID_STRING)
-                .setSmallIcon(R.drawable.ic_chest_open)
-                .setContentTitle("My notification")
-                .setContentText("Upload successful")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            val notification = builder.build()
-            notificationManager.notify(0, notification)
+    private fun scheduleUploadWork() {
+        handleNotificationPermission()
+
+        val data = workDataOf(
+            "IMAGE_URI" to "http://test", "IS_NOTIFICATION_PERMITTED" to isNotificationPermitted
+        )
+        val uploadWork =
+            OneTimeWorkRequestBuilder<CoroutineUploadWorker>().setInputData(data).build()
+
+        WorkManager.getInstance(requireContext())
+            .enqueueUniqueWork("upload", ExistingWorkPolicy.KEEP, uploadWork)
+    }
+
+    private fun handleNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            when (ContextCompat.checkSelfPermission(
+                requireContext(), android.Manifest.permission.POST_NOTIFICATIONS
+            )) {
+                PackageManager.PERMISSION_GRANTED -> {
+                    isNotificationPermitted = true
+                }
+
+                PackageManager.PERMISSION_DENIED -> {
+                    requestNotificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                }
+            }
+
+            requestNotificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            isNotificationPermitted = true
         }
     }
+
+    private val requestNotificationPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (isGranted) {
+                isNotificationPermitted = true
+            }
+        }
 
     private suspend fun uploadImages() {
         val uid = Firebase.auth.currentUser!!.uid
 
         for (i in 0 until viewModel.images.value.size) {
             val result = viewModel.uploadImage(
-                i + 1,
-                viewModel.images.value.size,
-                uid,
-                viewModel.images.value[i].url.toUri()
+                i + 1, viewModel.images.value.size, uid, viewModel.images.value[i].url.toUri()
             )
 
-            if (result) {
-                binding.root.showSnackbar(
-                    getString(
-                        R.string.savelog_sb_upload_success,
-                        i + 1,
-                        viewModel.images.value.size
-                    )
-                )
-            } else {
-                binding.root.showSnackbar(R.string.savelog_sb_upload_failure)
-            }
+//            if (result) {
+//                binding.root.showSnackbar(
+//                    getString(
+//                        R.string.savelog_sb_upload_success,
+//                        i + 1,
+//                        viewModel.images.value.size
+//                    )
+//                )
+//            } else {
+//                binding.root.showSnackbar(R.string.savelog_sb_upload_failure)
+//            }
         }
     }
 
@@ -210,14 +232,10 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         val images = viewModel.images.value
         val uploadRequests = mutableListOf<OneTimeWorkRequest>()
         for (i in images.indices) {
-            val data = Data.Builder()
-                .putString("uid", uid)
-                .putString("uri", images[i].url)
-                .build()
+            val data = Data.Builder().putString("uid", uid).putString("uri", images[i].url).build()
 
-            val uploadRequest = OneTimeWorkRequestBuilder<ImageUploadWorker>()
-                .setInputData(data)
-                .build()
+            val uploadRequest =
+                OneTimeWorkRequestBuilder<ImageUploadWorker>().setInputData(data).build()
 
             uploadRequests.add(uploadRequest)
         }
@@ -242,8 +260,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
             place.asPlaceEntity(remotePlaceId, localPlaceId)
         )
         viewModel.updatePlace(
-            remotePlaceId,
-            place.asPlaceDTO(localPlaceId)
+            remotePlaceId, place.asPlaceDTO(localPlaceId)
         )
 
         return remotePlaceId
@@ -253,8 +270,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         val placeDTO = viewModel.getRemotePlaceById(remotePlaceId)
 
         viewModel.updatePlace(
-            placeDTO.toPlaceEntity(remotePlaceId)
-                .copy(plan = false)
+            placeDTO.toPlaceEntity(remotePlaceId).copy(plan = false)
         )
         viewModel.updatePlace(
             remotePlaceId, placeDTO.copy(plan = false)
@@ -296,16 +312,14 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
 
         if (!args.mapSymbol.remoteId.isNullOrEmpty()) {
             viewModel.updateUser(
-                uid,
-                userDTO.copy(
+                uid, userDTO.copy(
                     plans = userDTO.plans.minus(remotePlaceId)
                 )
             )
         }
 
         viewModel.updateUser(
-            uid,
-            userDTO.copy(
+            uid, userDTO.copy(
                 places = userDTO.places.plus(remotePlaceId to true),
                 logs = userDTO.logs.plus(remoteLogId to true)
             )
@@ -313,12 +327,11 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun setLocationTrackingMode(isGranted: Boolean) {
-        map.locationTrackingMode =
-            if (isGranted) {
-                LocationTrackingMode.Follow
-            } else {
-                LocationTrackingMode.None
-            }
+        map.locationTrackingMode = if (isGranted) {
+            LocationTrackingMode.Follow
+        } else {
+            LocationTrackingMode.None
+        }
     }
 
     private fun initMap(naverMap: NaverMap) {
@@ -336,8 +349,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
     private fun handleLocationAccessPermission() {
         when (PackageManager.PERMISSION_GRANTED) {
             ContextCompat.checkSelfPermission(
-                requireContext(),
-                android.Manifest.permission.ACCESS_COARSE_LOCATION
+                requireContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION
             ) -> {
                 setLocationTrackingMode(true)
             }
