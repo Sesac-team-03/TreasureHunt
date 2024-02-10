@@ -15,6 +15,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequest
+import androidx.work.OneTimeWorkRequestBuilder
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.naver.maps.map.LocationTrackingMode
@@ -141,7 +144,9 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
     private fun setSaveButton() {
         binding.btnSave.setOnClickListener {
             viewLifecycleOwner.lifecycleScope.launch {
-                uploadImages()
+//                uploadImages()
+                // 사진 업로드 백그라운드 구현 테스트
+                uploadImage1()
 
                 val remotePlaceId = getRemotePlaceId()
                 val log = getLogFor(remotePlaceId)
@@ -149,9 +154,9 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
 
                 updatePlaceWithLog(remotePlaceId, remoteLogId)
                 updateUser(remotePlaceId, remoteLogId)
-
-                findNavController().navigate(R.id.action_saveLogFragment_to_homeFragment)
+                
             }
+            findNavController().navigate(R.id.action_saveLogFragment_to_homeFragment)
         }
     }
 
@@ -177,6 +182,25 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
             } else {
                 binding.root.showSnackbar(R.string.savelog_sb_upload_failure)
             }
+        }
+    }
+
+    // 사진 업로드 백그라운드 구현 테스트
+    private fun uploadImage1() {
+        val uid = Firebase.auth.currentUser!!.uid
+        val images = viewModel.images.value
+        val uploadRequests = mutableListOf<OneTimeWorkRequest>()
+        for (i in images.indices) {
+            val data = Data.Builder()
+                .putString("uid", uid)
+                .putString("uri", images[i].url)
+                .build()
+
+            val uploadRequest = OneTimeWorkRequestBuilder<ImageUploadWorker>()
+                .setInputData(data)
+                .build()
+
+            uploadRequests.add(uploadRequest)
         }
     }
 
