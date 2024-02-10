@@ -147,7 +147,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
                     uiState.visitMarkers.forEach { marker ->
                         marker.show()
-                        marker.setPlaceClick()
+                        marker.setVisitClick()
                     }
 
                     uiState.planMarkers.forEach { marker ->
@@ -163,7 +163,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         map = this@HomeFragment.map
     }
 
-    private fun Marker.setPlaceClick() {
+    private fun Marker.setVisitClick() {
         val remotePlaceId = tag.toString()
 
         setOnClickListener {

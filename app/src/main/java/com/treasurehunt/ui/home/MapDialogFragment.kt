@@ -35,7 +35,7 @@ class MapDialogFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setPrompt()
-        setBtnPlace()
+        setBtnVisit()
         setBtnPlan()
         setBtnCancel()
     }
@@ -44,8 +44,8 @@ class MapDialogFragment : BottomSheetDialogFragment() {
         binding.tvTitle.text = getString(R.string.map_prompt, args.mapSymbol.caption)
     }
 
-    private fun setBtnPlace() {
-        binding.btnPlace.setOnClickListener {
+    private fun setBtnVisit() {
+        binding.btnVisit.setOnClickListener {
             if (viewModel.uiState.value.uid.isNullOrEmpty()) {
                 findNavController().navigateUp()
             }

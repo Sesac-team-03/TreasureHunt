@@ -103,15 +103,15 @@ class HomeViewModel @Inject constructor(
 
         fetchJob = viewModelScope.launch {
             try {
-                combine(placeRepo.getAllVisits(), placeRepo.getAllPlans()) { places, plans ->
-                    places + plans
+                combine(placeRepo.getAllVisits(), placeRepo.getAllPlans()) { visits, plans ->
+                    visits + plans
                 }
                     .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
                     .collect { visitsAndPlans ->
                         _uiState.update { uiState ->
-                            val (places, plans) = visitsAndPlans.partition { !it.plan }
+                            val (visits, plans) = visitsAndPlans.partition { !it.plan }
                             uiState.copy(
-                                visitMarkers = places.mapToMarkers(),
+                                visitMarkers = visits.mapToMarkers(),
                                 planMarkers = plans.mapToMarkers()
                             )
                         }
