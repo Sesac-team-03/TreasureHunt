@@ -18,7 +18,7 @@ class LogDetailViewModel @Inject constructor(
     private val logRepository: LogRepository,
     private val imageRepo: ImageRepository
 ) : ViewModel() {
-    suspend fun GetPlace(placeId: String): LogModel? {
+    suspend fun getPlace(placeId: String): LogModel? {
         val placeDTO: PlaceDTO = placeRepository.getRemotePlace(placeId)
         val logId = placeDTO.log
 
