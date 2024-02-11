@@ -4,20 +4,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.google.firebase.storage.FirebaseStorage
 import com.treasurehunt.R
 import com.treasurehunt.databinding.ItemImageBinding
 
-class ImageSliderAdapter(
-    imageItems: List<ImageItem>
-) : ListAdapter<ImageItem, ImageSliderAdapter.ImageViewHolder>(ImageDiffCallback()) {
-
-    init {
-        submitList(imageItems)
-    }
+class ImageSliderAdapter :
+    ListAdapter<ImageItem.Url, ImageSliderAdapter.ImageViewHolder>(ImageDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -27,31 +23,22 @@ class ImageSliderAdapter(
 
     override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
         val item = getItem(position)
-        when (item) {
-            is ImageItem.Url -> {
-                Glide.with(holder.itemView.context).load(item.url).into(holder.imageView)
-            }
-
-            is ImageItem.ResourceId -> {
-                Glide.with(holder.itemView.context).load(item.resourceId).into(holder.imageView)
-            }
-        }
+        val storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(item.url)
+        Glide.with(holder.imageView)
+            .load(storageReference)
+            .into(holder.imageView)
     }
 
     class ImageViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val imageView: ImageView = view.findViewById(R.id.item_image)
     }
 
-    class ImageDiffCallback : DiffUtil.ItemCallback<ImageItem>() {
-        override fun areItemsTheSame(oldItem: ImageItem, newItem: ImageItem): Boolean {
-            return when {
-                oldItem is ImageItem.Url && newItem is ImageItem.Url -> oldItem.url == newItem.url
-                oldItem is ImageItem.ResourceId && newItem is ImageItem.ResourceId -> oldItem.resourceId == newItem.resourceId
-                else -> false
-            }
+    class ImageDiffCallback : DiffUtil.ItemCallback<ImageItem.Url>() {
+        override fun areItemsTheSame(oldItem: ImageItem.Url, newItem: ImageItem.Url): Boolean {
+            return oldItem.url == newItem.url
         }
 
-        override fun areContentsTheSame(oldItem: ImageItem, newItem: ImageItem): Boolean {
+        override fun areContentsTheSame(oldItem: ImageItem.Url, newItem: ImageItem.Url): Boolean {
             return oldItem == newItem
         }
     }
