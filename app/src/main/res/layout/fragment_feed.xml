@@ -4,13 +4,13 @@
 
     <data>
 
-        <import type="com.treasurehunt.ui.model.LogModel" />
+        <import type="com.treasurehunt.ui.feed.FeedViewModel" />
 
         <import type="java.util.List" />
 
         <variable
-            name="logs"
-            type="List&lt;LogModel>" />
+            name="viewModel"
+            type="FeedViewModel" />
 
     </data>
 
@@ -55,7 +55,7 @@
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_logs"
-                dataset="@{logs}"
+                dataset="@{viewModel.uiState.logs}"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_marginTop="8dp"
@@ -75,7 +75,7 @@
                 android:layout_height="0dp"
                 android:gravity="center"
                 android:text="@string/no_treasure"
-                android:visibility="gone"
+                android:visibility="invisible"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -89,7 +89,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/btn_toggle" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 </layout>
