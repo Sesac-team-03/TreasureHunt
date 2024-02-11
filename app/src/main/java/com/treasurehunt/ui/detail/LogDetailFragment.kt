@@ -7,51 +7,50 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.dynamiclinks.DynamicLink
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
 import com.treasurehunt.R
-import com.treasurehunt.databinding.FragmentDetailBinding
+import com.treasurehunt.databinding.FragmentLogdetailBinding
+import com.treasurehunt.ui.model.LogModel
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class LogDetailFragment : BottomSheetDialogFragment() {
 
-    private var _binding: FragmentDetailBinding? = null
+    private var _binding: FragmentLogdetailBinding? = null
     private val binding get() = _binding!!
-    private var contentId: String? = null
     private lateinit var imageSliderAdapter: ImageSliderAdapter
+    private val viewModel: LogDetailViewModel by viewModels()
+    private val args: LogDetailFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentDetailBinding.inflate(inflater, container, false)
+        _binding = FragmentLogdetailBinding.inflate(inflater, container, false)
 
         return binding.root
-    }
-
-    private fun setImageSlider() {
-        val imageItems = listOf(
-            ImageItem.Url("https://firebasestorage.googleapis.com/v0/b/treasurehunt-32565.appspot.com/o/uid%2Fimage%2F52.png?alt=media&token=4323ef4c-8380-46e5-91af-911e51011c41"),
-            ImageItem.Url("https://firebasestorage.googleapis.com/v0/b/treasurehunt-32565.appspot.com/o/uid%2Fimage%2F1000003321.png?alt=media&token=34cae484-ef2e-48a7-bd2f-54daa74a00c8"),
-            ImageItem.ResourceId(R.drawable.gajwa),
-            ImageItem.ResourceId(R.drawable.gajwa),
-            ImageItem.ResourceId(R.drawable.gajwa)
-        )
-        imageSliderAdapter = ImageSliderAdapter(imageItems)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        contentId = arguments?.getString("content_id")
+        imageSliderAdapter = ImageSliderAdapter()
 
-        setImageSlider()
+        loadData()
+        setBottomSheet()
         setDotsIndicator()
         setCloseButton()
-        setBottomSheet()
         setEditButton()
+        //setDeleteButton()
+
     }
 
     private fun setDotsIndicator() {
@@ -106,6 +105,31 @@ class LogDetailFragment : BottomSheetDialogFragment() {
             type = "text/plain"
         }
         startActivity(Intent.createChooser(intent, getString(R.string.Logdetail_chooser_title)))
+    }
+
+    private fun updateUIWithLogModel(logModel: LogModel) {
+        val imageItems = logModel.imageUrls.map { ImageItem.Url(it) }
+        imageSliderAdapter.submitList(imageItems)
+        binding.viewPager.adapter = imageSliderAdapter
+        binding.dotsIndicator.setViewPager2(binding.viewPager)
+        binding.textView.text = logModel.text
+    }
+
+    private fun loadData() {
+        val placeId = args.placeId
+        val logModel = args.logModel
+        if (placeId.isNotEmpty()) {
+            viewLifecycleOwner.lifecycleScope.launch {
+                val logModel = viewModel.GetPlace(placeId)
+                logModel?.let {
+                    updateUIWithLogModel(it)
+                }
+            }
+        } else {
+            logModel?.let {
+                updateUIWithLogModel(it)
+            }
+        }
     }
 
     private fun setEditButton() {
