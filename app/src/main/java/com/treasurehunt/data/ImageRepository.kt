@@ -10,5 +10,4 @@ interface ImageRepository {
     suspend fun insertImage(imageDTO: ImageDTO): String
 
     suspend fun getRemoteImage(id: String): ImageDTO
-
 }

@@ -16,5 +16,4 @@ interface ImageService {
     suspend fun getImage(
         @Path("id") id: String
     ): ImageDTO
-
 }

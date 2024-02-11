@@ -16,6 +16,10 @@ class ImageRepositoryImpl @Inject constructor(
     override suspend fun insertImage(imageDTO: ImageDTO): String =
         imageRemoteDataSource.insert(imageDTO)
 
+<<<<<<< HEAD
     override suspend fun getRemoteImage(id: String): ImageDTO =
+=======
+    override suspend fun getImage(id: String): ImageDTO =
+>>>>>>> 53c7952 (feat: 이미지 조회 getImage 함수 추가 및 imageModel로 변환)
         imageRemoteDataSource.getImage(id)
 }
