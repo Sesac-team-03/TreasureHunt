@@ -116,8 +116,8 @@ class LogDetailFragment : BottomSheetDialogFragment() {
     }
 
     private fun loadData() {
-        val placeId = args.placeId
-        val logModel = args.logModel
+        val placeId = args.remotePlaceId
+        val logModel = args.log
         if (placeId.isNotEmpty()) {
             viewLifecycleOwner.lifecycleScope.launch {
                 val logModel = viewModel.GetPlace(placeId)
