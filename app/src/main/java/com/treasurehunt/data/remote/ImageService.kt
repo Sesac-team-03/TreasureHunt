@@ -12,7 +12,8 @@ interface ImageService {
     @POST("images.json")
     suspend fun insert(@Body imageDTO: ImageDTO): RemoteIdWrapper
 
-    @GET("images/{id}.json")
+    @GET("images{id}.json")
+
     suspend fun getImage(
         @Path("id") id: String
     ): ImageDTO
