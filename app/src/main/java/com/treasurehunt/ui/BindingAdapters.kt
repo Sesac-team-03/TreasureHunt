@@ -1,5 +1,6 @@
 package com.treasurehunt.ui
 
+import android.accounts.NetworkErrorException
 import android.graphics.Color
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
@@ -9,6 +10,8 @@ import com.bumptech.glide.Glide
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.treasurehunt.R
+import java.lang.Exception
+import java.lang.NullPointerException
 
 private val storage = Firebase.storage
 

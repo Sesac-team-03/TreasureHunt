@@ -16,6 +16,7 @@ import com.treasurehunt.ui.feed.adapter.FeedAdapter
 import com.treasurehunt.ui.model.FeedUiState
 import com.treasurehunt.ui.model.LogModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -47,6 +48,7 @@ class FeedFragment : Fragment() {
         _binding = null
     }
 
+    <<<<<<< HEAD
     private fun bindLogs() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.uiState
