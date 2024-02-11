@@ -16,6 +16,6 @@ class ImageRepositoryImpl @Inject constructor(
     override suspend fun insertImage(imageDTO: ImageDTO): String =
         imageRemoteDataSource.insert(imageDTO)
 
-    override suspend fun getImage(id: String): ImageDTO =
+    override suspend fun getRemoteImage(id: String): ImageDTO =
         imageRemoteDataSource.getImage(id)
 }

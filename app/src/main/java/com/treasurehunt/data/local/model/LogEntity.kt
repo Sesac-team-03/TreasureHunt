@@ -26,10 +26,9 @@ fun LogEntity.toLogDTO(): LogDTO {
     return LogDTO(place, images.associateWith { true }, text, theme, createdDate, localId)
 }
 
-suspend fun LogEntity.toLogModel(
-    imageRepo: ImageRepository
+fun LogEntity.toLogModel(
+    imagesUrls: List<String>
 ): LogModel {
     val (place, imageIds, text, theme, createdDate, _, _) = this
-    val imagesUrls = imageIds.map { id -> imageRepo.getImage(id).url }
     return LogModel(place, imageIds, imagesUrls, text, theme, createdDate)
 }

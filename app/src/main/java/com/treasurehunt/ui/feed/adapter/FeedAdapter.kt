@@ -32,7 +32,7 @@ class FeedAdapter(
 
         fun bind(log: LogModel, logClickListener: LogClickListener) {
             val images = log.imageUrls
-            if (images.size == 1) binding.btnImagesIcon.visibility = View.GONE
+            if (images.size > 1) binding.ivAlbum.visibility = View.VISIBLE
             binding.log = log
             binding.logClickListener = logClickListener
         }

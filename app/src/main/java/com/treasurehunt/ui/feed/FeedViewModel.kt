@@ -1,10 +1,12 @@
 package com.treasurehunt.ui.feed
 
+import android.adservices.adid.AdId
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.treasurehunt.data.ImageRepository
 import com.treasurehunt.data.LogRepository
 import com.treasurehunt.data.local.model.toLogModel
+import com.treasurehunt.ui.model.FeedUiState
 import com.treasurehunt.ui.model.LogModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,11 +16,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
-data class FeedUiState(
-    val logs: List<LogModel> = emptyList(),
-)
-
 @HiltViewModel
 class FeedViewModel @Inject constructor(
     private val logRepo: LogRepository,
@@ -26,7 +23,7 @@ class FeedViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FeedUiState())
-    val uiState get() = _uiState.asStateFlow()
+    val uiState = _uiState.asStateFlow()
 
     init {
         getAllLogs()
@@ -34,12 +31,26 @@ class FeedViewModel @Inject constructor(
 
     private fun getAllLogs() {
         viewModelScope.launch {
-            logRepo.getAllLogs().catch {
-            }.collect { allLogs ->
+
+            logRepo.getAllLogs().collect { allLogs ->
                 _uiState.update {
-                    FeedUiState(allLogs.map { it.toLogModel(imageRepo) })
+                    FeedUiState(
+                        allLogs.map { logEntity ->
+                            logEntity.toLogModel(
+                                getImageUrls(
+                                    logEntity.imageIds
+                                )
+                            )
+                        }, allLogs.isNotEmpty()
+                    )
                 }
             }
+        }
+    }
+
+    private suspend fun getImageUrls(imageIds: List<String>): List<String> {
+        return imageIds.map { id ->
+            imageRepo.getRemoteImage(id).url
         }
     }
 

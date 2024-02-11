@@ -19,24 +19,25 @@
         android:onClickListener="@{()-> logClickListener.onClick(log)}">
 
         <ImageView
-            android:id="@+id/btn_image"
+            android:id="@+id/iv_image"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:padding="4dp"
             android:scaleType="centerCrop"
+            app:imageStorageUrl="@{log.imageUrls.get(0)}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:storageUrl="@{log.imageUrls.get(0)}" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
-            android:id="@+id/btn_images_icon"
+            android:id="@+id/iv_album"
             android:layout_width="22dp"
             android:layout_height="22dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:src="@drawable/ic_images_icon"
+            android:visibility="invisible"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

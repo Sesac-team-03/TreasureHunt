@@ -13,6 +13,7 @@ import com.treasurehunt.databinding.FragmentFeedBinding
 import com.treasurehunt.ui.feed.adapter.FeedAdapter
 import com.treasurehunt.ui.model.LogModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -21,13 +22,13 @@ class FeedFragment : Fragment() {
     private var _binding: FragmentFeedBinding? = null
     private val binding get() = _binding!!
     private val viewModel: FeedViewModel by viewModels()
-    private val feedAdapter = FeedAdapter { moveDetail(it) }
+    private val feedAdapter = FeedAdapter { moveToDetail(it) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentFeedBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -36,6 +37,7 @@ class FeedFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initAdapter()
         initSegmentedButton()
+        setLogs()
     }
 
     override fun onDestroyView() {
@@ -43,13 +45,23 @@ class FeedFragment : Fragment() {
         _binding = null
     }
 
-    private fun initAdapter() {
-        binding.rvLogs.adapter = feedAdapter
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.uiState.collect {
-                binding.logs = it.logs
+    private fun setLogs() {
+        lifecycleScope.launch {
+            viewModel.uiState.collectLatest { uiState ->
+                if (uiState.logs.isEmpty()) {
+                    binding.tvNoTreasure.visibility = View.GONE
+                    updateAdapter()
+                }
             }
         }
+    }
+
+    private fun initAdapter() {
+        binding.rvLogs.adapter = feedAdapter
+    }
+
+    private fun updateAdapter() {
+        binding.viewModel = viewModel
     }
 
     private fun initSegmentedButton() {
@@ -59,7 +71,7 @@ class FeedFragment : Fragment() {
         }
     }
 
-    private fun moveDetail(log: LogModel) {
+    private fun moveToDetail(log: LogModel) {
         val action = FeedFragmentDirections.actionFeedFragmentToDetailFragment(log, null)
         findNavController().navigate(action)
     }
