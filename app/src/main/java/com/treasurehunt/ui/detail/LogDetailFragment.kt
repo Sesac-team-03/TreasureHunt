@@ -120,7 +120,7 @@ class LogDetailFragment : BottomSheetDialogFragment() {
         val logModel = args.logModel
         if (placeId.isNotEmpty()) {
             viewLifecycleOwner.lifecycleScope.launch {
-                val logModel = viewModel.GetPlace(placeId)
+                val logModel = viewModel.getPlace(placeId)
                 logModel?.let {
                     updateUIWithLogModel(it)
                 }
