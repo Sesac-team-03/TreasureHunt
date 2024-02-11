@@ -93,7 +93,6 @@
             android:name="remotePlaceId"
             android:defaultValue=""
             app:argType="string" />
-
     </dialog>
 
     <fragment
