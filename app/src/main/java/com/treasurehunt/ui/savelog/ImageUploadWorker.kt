@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.net.Uri
 import androidx.core.app.NotificationCompat
+import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.google.android.gms.tasks.Tasks
@@ -16,14 +17,21 @@ import com.treasurehunt.BuildConfig
 import com.treasurehunt.R
 import com.treasurehunt.util.NOTIFICATION_ID
 import com.treasurehunt.util.NOTIFICATION_ID_STRING
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.tasks.await
 
-class ImageUploadWorker(private val context: Context, params: WorkerParameters) :
-    CoroutineWorker(context, params) {
+@HiltWorker
+class ImageUploadWorker @AssistedInject constructor(
+    @Assisted private val context: Context,
+    @Assisted params: WorkerParameters
+) : CoroutineWorker(context, params) {
 
     private val notificationManager =
         context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     private lateinit var builder: NotificationCompat.Builder
+
+    //TODO: handle notification permission
 
     override suspend fun doWork(): Result {
         val uid = inputData.getString("uid") ?: return Result.failure()
@@ -32,7 +40,8 @@ class ImageUploadWorker(private val context: Context, params: WorkerParameters) 
         val result = uploadImages(uid, uris)
 
         return if (result) {
-            builder.setContentText("업로드 성공")
+            builder.setProgress(100, 100, false)
+                .setContentText("업로드 성공")
             notificationManager.notify(NOTIFICATION_ID, builder.build())
             Result.success()
         } else {
