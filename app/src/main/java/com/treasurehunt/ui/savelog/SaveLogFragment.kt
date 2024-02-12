@@ -17,7 +17,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.work.Data
 import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
@@ -147,6 +146,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
     private fun setSaveButton() {
         binding.btnSave.setOnClickListener {
             viewLifecycleOwner.lifecycleScope.launch {
+                requestImageUpload()
 //                uploadImages()
 //
 //                val remotePlaceId = getRemotePlaceId()
@@ -226,19 +226,21 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    // 사진 업로드 백그라운드 구현 테스트
-    private fun uploadImage1() {
+    private fun requestImageUpload() {
         val uid = Firebase.auth.currentUser!!.uid
         val images = viewModel.images.value
-        val uploadRequests = mutableListOf<OneTimeWorkRequest>()
-        for (i in images.indices) {
-            val data = Data.Builder().putString("uid", uid).putString("uri", images[i].url).build()
+        val urls = images.indices.map { i ->
+            images[i].url
+        }.toTypedArray()
+        val data = Data.Builder()
+            .putString("uid", uid)
+            .putStringArray("urls", urls)
+            .build()
+        val uploadRequest = OneTimeWorkRequestBuilder<ImageUploadWorker>()
+            .setInputData(data)
+            .build()
 
-            val uploadRequest =
-                OneTimeWorkRequestBuilder<ImageUploadWorker>().setInputData(data).build()
-
-            uploadRequests.add(uploadRequest)
-        }
+        WorkManager.getInstance(requireContext()).enqueue(uploadRequest)
     }
 
     private suspend fun getRemotePlaceId(): String {
