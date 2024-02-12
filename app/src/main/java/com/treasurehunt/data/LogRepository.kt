@@ -1,5 +1,6 @@
 package com.treasurehunt.data
 
+import androidx.paging.PagingSource
 import com.treasurehunt.data.local.model.LogEntity
 import com.treasurehunt.data.remote.model.LogDTO
 import kotlinx.coroutines.flow.Flow
@@ -17,6 +18,9 @@ interface LogRepository {
     fun getLogById(id: String): Flow<LogEntity>
 
     fun getAllLogs(): Flow<List<LogEntity>>
+
+    fun getPagingLogs(): PagingSource<Int, LogEntity>
+
 
     fun update(log: LogEntity): Int
 
