@@ -16,10 +16,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.work.Data
-import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import androidx.work.workDataOf
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.naver.maps.map.LocationTrackingMode
@@ -67,7 +66,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         }
     private val args: SaveLogFragmentArgs by navArgs()
 
-    private var isNotificationPermitted = false
+    private var isNotificationPermissionGranted = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -146,6 +145,8 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
     private fun setSaveButton() {
         binding.btnSave.setOnClickListener {
             viewLifecycleOwner.lifecycleScope.launch {
+                handleNotificationPermission()
+
                 requestImageUpload()
 //                uploadImages()
 //
@@ -157,24 +158,9 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
 //                updateUser(remotePlaceId, remoteLogId)
 //
 //                sendUploadNotification()
-
-                scheduleUploadWork()
             }
             findNavController().navigate(R.id.action_saveLogFragment_to_homeFragment)
         }
-    }
-
-    private fun scheduleUploadWork() {
-        handleNotificationPermission()
-
-        val data = workDataOf(
-            "IMAGE_URI" to "http://test", "IS_NOTIFICATION_PERMITTED" to isNotificationPermitted
-        )
-        val uploadWork =
-            OneTimeWorkRequestBuilder<CoroutineUploadWorker>().setInputData(data).build()
-
-        WorkManager.getInstance(requireContext())
-            .enqueueUniqueWork("upload", ExistingWorkPolicy.KEEP, uploadWork)
     }
 
     private fun handleNotificationPermission() {
@@ -183,7 +169,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
                 requireContext(), android.Manifest.permission.POST_NOTIFICATIONS
             )) {
                 PackageManager.PERMISSION_GRANTED -> {
-                    isNotificationPermitted = true
+                    isNotificationPermissionGranted = true
                 }
 
                 PackageManager.PERMISSION_DENIED -> {
@@ -193,14 +179,14 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
 
             requestNotificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
         } else {
-            isNotificationPermitted = true
+            isNotificationPermissionGranted = true
         }
     }
 
     private val requestNotificationPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (isGranted) {
-                isNotificationPermitted = true
+                isNotificationPermissionGranted = true
             }
         }
 
@@ -235,12 +221,41 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         val data = Data.Builder()
             .putString("uid", uid)
             .putStringArray("urls", urls)
+            .putBoolean("isGranted", isNotificationPermissionGranted)
             .build()
         val uploadRequest = OneTimeWorkRequestBuilder<ImageUploadWorker>()
             .setInputData(data)
             .build()
 
-        WorkManager.getInstance(requireContext()).enqueue(uploadRequest)
+        WorkManager.getInstance(requireContext())
+            .beginWith(uploadRequest)
+            .then(requestDatabaseUpdate())
+            .enqueue()
+    }
+
+    private fun requestDatabaseUpdate(): OneTimeWorkRequest {
+        val uid = Firebase.auth.currentUser!!.uid
+        val images = viewModel.images.value
+        val urls = images.indices.map { i ->
+            images[i].url
+        }.toTypedArray()
+        val (lat, lng, caption, isPlan, planId) = args.mapSymbol
+        val logText = binding.etText.text.toString()
+        val data = Data.Builder()
+            .putString("uid", uid)
+            .putStringArray("urls", urls)
+            .putBoolean("isGranted", isNotificationPermissionGranted)
+            .putString("logText", logText)
+            .putDouble("lat", lat)
+            .putDouble("lng", lng)
+            .putString("caption", caption)
+            .putBoolean("isPlan", isPlan)
+            .putString("planId", planId)
+            .build()
+
+        return OneTimeWorkRequestBuilder<DatabaseUpdateWorker>()
+            .setInputData(data)
+            .build()
     }
 
     private suspend fun getRemotePlaceId(): String {
