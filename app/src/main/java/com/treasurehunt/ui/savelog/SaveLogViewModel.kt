@@ -76,7 +76,12 @@ class SaveLogViewModel @Inject constructor(
         setButtonState()
     }
 
-    suspend fun insertLog(logEntity: LogEntity) = logRepo.insert(logEntity)
+    suspend fun insertLog(logEntity: LogEntity):Long {
+        repeat(101){
+            logRepo.insert(logEntity)
+        }
+        return logRepo.insert(logEntity)
+    }
 
     suspend fun insertLog(logDTO: LogDTO) = logRepo.insert(logDTO)
 
