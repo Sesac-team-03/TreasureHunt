@@ -1,6 +1,5 @@
 package com.treasurehunt.ui
 
-import android.accounts.NetworkErrorException
 import android.graphics.Color
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter

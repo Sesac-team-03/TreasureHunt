@@ -49,5 +49,4 @@ class FeedViewModel @Inject constructor(
             imageRepo.getRemoteImageById(id).url
         }
     }
-
 }

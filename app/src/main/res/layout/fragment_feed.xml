@@ -4,13 +4,13 @@
 
     <data>
 
-        <import type="com.treasurehunt.ui.feed.FeedViewModel" />
+        <import type="com.treasurehunt.ui.model.LogModel" />
 
         <import type="java.util.List" />
 
         <variable
-            name="viewModel"
-            type="FeedViewModel" />
+            name="logs"
+            type="List&lt;LogModel>" />
 
     </data>
 
