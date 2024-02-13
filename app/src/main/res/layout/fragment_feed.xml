@@ -4,13 +4,13 @@
 
     <data>
 
-        <import type="com.treasurehunt.ui.feed.FeedViewModel" />
+        <import type="com.treasurehunt.ui.model.LogModel" />
 
         <import type="java.util.List" />
 
         <variable
-            name="viewModel"
-            type="FeedViewModel" />
+            name="logs"
+            type="List&lt;LogModel>" />
 
     </data>
 
@@ -55,7 +55,7 @@
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_logs"
-                dataset="@{viewModel.uiState.logs}"
+                dataset="@{logs}"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_marginTop="8dp"

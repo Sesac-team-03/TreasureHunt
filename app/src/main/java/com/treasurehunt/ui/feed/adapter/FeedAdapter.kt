@@ -45,10 +45,7 @@ class FeedAdapter(
                 return oldItem == newItem
             }
 
-            override fun areContentsTheSame(
-                oldItem: LogModel,
-                newItem: LogModel
-            ): Boolean {
+            override fun areContentsTheSame(oldItem: LogModel, newItem: LogModel): Boolean {
                 return oldItem.createdDate == newItem.createdDate
             }
         }

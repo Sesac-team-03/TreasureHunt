@@ -6,14 +6,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentFeedBinding
 import com.treasurehunt.ui.feed.adapter.FeedAdapter
+import com.treasurehunt.ui.model.FeedUiState
 import com.treasurehunt.ui.model.LogModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -22,7 +24,7 @@ class FeedFragment : Fragment() {
     private var _binding: FragmentFeedBinding? = null
     private val binding get() = _binding!!
     private val viewModel: FeedViewModel by viewModels()
-    private val feedAdapter = FeedAdapter { moveToDetail(it) }
+    private val feedAdapter = FeedAdapter { log -> moveToDetail(log) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -37,7 +39,7 @@ class FeedFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initAdapter()
         initSegmentedButton()
-        setLogs()
+        bindLogs()
     }
 
     override fun onDestroyView() {
@@ -45,28 +47,30 @@ class FeedFragment : Fragment() {
         _binding = null
     }
 
-    private fun setLogs() {
-        lifecycleScope.launch {
-            viewModel.uiState.collect { uiState ->
-                if (uiState.isLogUpdate){
-                    binding.cpiLoading.visibility = View.GONE
-                    if (uiState.logs.isNotEmpty()) {
-                        updateAdapter()
-                    }
-                    else{
-                        binding.tvNoTreasure.visibility = View.VISIBLE
+    private fun bindLogs() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.uiState
+                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+                .collect { uiState ->
+                    uiState?.let {
+                        binding.logs = uiState.logs
+                        showFeed(it)
                     }
                 }
+        }
+    }
+
+    private fun showFeed(uiState: FeedUiState) {
+        if (uiState.isLogUpdated) {
+            binding.cpiLoading.visibility = View.GONE
+            if (uiState.logs.isEmpty()) {
+                binding.tvNoTreasure.visibility = View.VISIBLE
             }
         }
     }
 
     private fun initAdapter() {
         binding.rvLogs.adapter = feedAdapter
-    }
-
-    private fun updateAdapter() {
-        binding.viewModel = viewModel
     }
 
     private fun initSegmentedButton() {

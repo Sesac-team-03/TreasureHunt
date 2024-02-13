@@ -1,9 +1,6 @@
 package com.treasurehunt.ui
 
-import android.accounts.NetworkErrorException
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.Icon
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.ListAdapter
@@ -12,8 +9,6 @@ import com.bumptech.glide.Glide
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.treasurehunt.R
-import java.lang.Exception
-import java.lang.NullPointerException
 
 private val storage = Firebase.storage
 
@@ -55,12 +50,7 @@ fun bindImageStorageUrl(view: ImageView, url: String?) {
                 .into(this)
             scaleType = ImageView.ScaleType.CENTER_CROP
         }
-    } catch (e: NullPointerException) {
-        view.run {
-            setBackgroundColor(Color.GRAY)
-            scaleType = android.widget.ImageView.ScaleType.CENTER_INSIDE
-        }
-    } catch (e: NetworkErrorException) {
+    } catch (e: Exception) {
         view.run {
             setBackgroundColor(Color.GRAY)
             scaleType = android.widget.ImageView.ScaleType.CENTER_INSIDE

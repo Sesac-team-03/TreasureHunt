@@ -29,6 +29,6 @@ fun LogEntity.toLogDTO(): LogDTO {
 fun LogEntity.toLogModel(
     imagesUrls: List<String>
 ): LogModel {
-    val (place, imageIds, text, theme, createdDate, _, _) = this
-    return LogModel(place, imageIds, imagesUrls, text, theme, createdDate)
+    val (place, imageIds, text, theme, createdDate, _, id) = this
+    return LogModel(place, text, theme, createdDate, imageIds, imagesUrls)
 }
