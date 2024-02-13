@@ -31,7 +31,6 @@ class FeedViewModel @Inject constructor(
 
     private fun getAllLogs() {
         viewModelScope.launch {
-
             logRepo.getAllLogs().collect { allLogs ->
                 _uiState.update {
                     FeedUiState(
@@ -41,7 +40,7 @@ class FeedViewModel @Inject constructor(
                                     logEntity.imageIds
                                 )
                             )
-                        }, allLogs.isNotEmpty()
+                        }, true
                     )
                 }
             }

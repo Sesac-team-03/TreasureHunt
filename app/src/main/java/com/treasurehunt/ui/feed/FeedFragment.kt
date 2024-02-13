@@ -47,10 +47,15 @@ class FeedFragment : Fragment() {
 
     private fun setLogs() {
         lifecycleScope.launch {
-            viewModel.uiState.collectLatest { uiState ->
-                if (uiState.logs.isEmpty()) {
-                    binding.tvNoTreasure.visibility = View.GONE
-                    updateAdapter()
+            viewModel.uiState.collect { uiState ->
+                if (uiState.isLogUpdate){
+                    binding.cpiLoading.visibility = View.GONE
+                    if (uiState.logs.isNotEmpty()) {
+                        updateAdapter()
+                    }
+                    else{
+                        binding.tvNoTreasure.visibility = View.VISIBLE
+                    }
                 }
             }
         }
