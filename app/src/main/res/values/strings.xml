@@ -34,6 +34,12 @@
     <string name="savelog_sb_upload_success">사진 업로드 (%1$d/%2$d)</string>
     <string name="savelog_sb_upload_failure">사진 업로드 실패</string>
 
+    <!-- 기록 저장 화면 - 백그라운드 -->
+    <string name="savelog_image_upload_notification_title">업로드 알리미</string>
+    <string name="savelog_image_upload_notification_progress">업로드 진행 중</string>
+    <string name="savelog_image_upload_notification_success">업로드 성공</string>
+    <string name="savelog_image_upload_notification_fail">업로드 실패</string>
+
     <!-- 기록 상세 화면 -->
     <string name="Logdetail_content">Check out Treasure Hunt: %s</string>
     <string name="Logdetail_chooser_title">내용 공유하기</string>

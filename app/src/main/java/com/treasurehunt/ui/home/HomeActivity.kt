@@ -13,7 +13,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.treasurehunt.R
 import com.treasurehunt.databinding.ActivityHomeBinding
-import com.treasurehunt.util.NOTIFICATION_ID_STRING
+import com.treasurehunt.util.UPLOAD_NOTIFICATION_ID_STRING
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -61,7 +61,7 @@ class HomeActivity : AppCompatActivity() {
             val name = getString(R.string.notification_channel)
             val descriptionText = getString(R.string.notification_description)
             val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(NOTIFICATION_ID_STRING, name, importance).apply {
+            val channel = NotificationChannel(UPLOAD_NOTIFICATION_ID_STRING, name, importance).apply {
                 description = descriptionText
             }
             val notificationManager =

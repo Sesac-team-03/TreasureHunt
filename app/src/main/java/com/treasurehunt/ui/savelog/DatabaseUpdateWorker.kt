@@ -1,14 +1,9 @@
 package com.treasurehunt.ui.savelog
 
-import android.app.NotificationManager
 import android.content.Context
-import android.net.Uri
-import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
 import com.treasurehunt.data.ImageRepository
 import com.treasurehunt.data.LogRepository
 import com.treasurehunt.data.PlaceRepository
@@ -41,32 +36,26 @@ class DatabaseUpdateWorker @AssistedInject constructor(
     private val imageRepo: ImageRepository
 ) : CoroutineWorker(context, params) {
 
+    private lateinit var uid: String
     private lateinit var mapSymbol: MapSymbol
 
-    private val notificationManager =
-        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-    private lateinit var builder: NotificationCompat.Builder
-
-    // -- worker --
     override suspend fun doWork(): Result {
-        val uid = inputData.getString("uid") ?: return Result.failure()
-        val urls = inputData.getStringArray("urls")?.asList() ?: return Result.failure()
-        val text = inputData.getString("logText") ?: return Result.failure()
-        val uris = urls.map { Uri.parse(it) }
+        return try {
+            uid = inputData.getString(WORK_DATA_UID) ?: return Result.failure()
+            val urls = inputData.getStringArray(WORK_DATA_URLS)?.asList() ?: return Result.failure()
+            val text = inputData.getString(WORK_DATA_LOG_TEXT) ?: return Result.failure()
+            val lat = inputData.getDouble(WORK_DATA_LAT, 0.0)
+            val lng = inputData.getDouble(WORK_DATA_LNG, 0.0)
+            val caption = inputData.getString(WORK_DATA_CAPTION) ?: ""
+            val isPlan = inputData.getBoolean(WORK_DATA_IS_PLAN, false)
+            val planId = inputData.getString(WORK_DATA_PLAN_ID)
 
-        val lat = inputData.getDouble("lat", 0.0)
-        val lng = inputData.getDouble("lng", 0.0)
-        val caption = inputData.getString("caption") ?: ""
-        val isPlan = inputData.getBoolean("isPlan", false)
-        val planId = inputData.getString("planID")
-        mapSymbol = MapSymbol(lat, lng, caption, isPlan, planId)
+            mapSymbol = MapSymbol(lat, lng, caption, isPlan, planId)
 
-        init(urls, text)
+            init(urls, text)
 
-        val result = true
-        return if (result) {
             Result.success()
-        } else {
+        } catch (e: Exception) {
             Result.failure()
         }
     }
@@ -80,40 +69,32 @@ class DatabaseUpdateWorker @AssistedInject constructor(
         updateUser(remotePlaceId, remoteLogId)
     }
 
-    // -- viewmodel --
-    suspend fun insertLog(logEntity: LogEntity) = logRepo.insert(logEntity)
+    // -- 기존 Viewmodel --
+    private suspend fun insertLog(logEntity: LogEntity) = logRepo.insert(logEntity)
 
-    suspend fun insertLog(logDTO: LogDTO) = logRepo.insert(logDTO)
+    private suspend fun insertLog(logDTO: LogDTO) = logRepo.insert(logDTO)
 
-    suspend fun insertPlace(placeEntity: PlaceEntity): Long {
-        return placeRepo.insert(placeEntity)
-    }
+    private suspend fun insertPlace(placeEntity: PlaceEntity) = placeRepo.insert(placeEntity)
 
-    suspend fun insertPlace(placeDTO: PlaceDTO): String {
-        return placeRepo.insert(placeDTO)
-    }
+    private suspend fun insertPlace(placeDTO: PlaceDTO) = placeRepo.insert(placeDTO)
 
-    suspend fun getRemotePlaceById(id: String): PlaceDTO {
-        return placeRepo.getRemotePlace(id)
-    }
+    private suspend fun getRemotePlaceById(id: String) = placeRepo.getRemotePlace(id)
 
-    suspend fun updatePlace(place: PlaceEntity) {
-        placeRepo.update(place)
-    }
+    private suspend fun updatePlace(place: PlaceEntity) = placeRepo.update(place)
 
-    suspend fun updatePlace(id: String, place: PlaceDTO) {
+    private suspend fun updatePlace(id: String, place: PlaceDTO) {
         placeRepo.update(id, place)
     }
 
-    suspend fun getUserById(uid: String) = userRepo.getRemoteUser(uid)
+    private suspend fun getUserById(uid: String) = userRepo.getRemoteUser(uid)
 
-    suspend fun updateUser(uid: String, user: UserDTO) {
+    private suspend fun updateUser(uid: String, user: UserDTO) {
         userRepo.update(uid, user)
     }
 
-    suspend fun insertImage(image: ImageDTO) = imageRepo.insertImage(image)
+    private suspend fun insertImage(image: ImageDTO) = imageRepo.insertImage(image)
 
-    // -- fragment --
+    // -- 기존 Fragment --
     private suspend fun getRemotePlaceId(): String {
         val planId = mapSymbol.remoteId
         return if (planId.isNullOrEmpty()) {
@@ -186,7 +167,7 @@ class DatabaseUpdateWorker @AssistedInject constructor(
     }
 
     private suspend fun updateUser(remotePlaceId: String, remoteLogId: String) {
-        val uid = Firebase.auth.currentUser!!.uid
+
         val userDTO = getUserById(uid)
 
         if (!mapSymbol.remoteId.isNullOrEmpty()) {

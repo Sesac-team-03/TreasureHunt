@@ -15,8 +15,8 @@ import com.google.firebase.storage.UploadTask
 import com.google.firebase.storage.storage
 import com.treasurehunt.BuildConfig
 import com.treasurehunt.R
-import com.treasurehunt.util.NOTIFICATION_ID
-import com.treasurehunt.util.NOTIFICATION_ID_STRING
+import com.treasurehunt.util.UPLOAD_NOTIFICATION_ID
+import com.treasurehunt.util.UPLOAD_NOTIFICATION_ID_STRING
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.tasks.await
@@ -31,42 +31,47 @@ class ImageUploadWorker @AssistedInject constructor(
         context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     private lateinit var builder: NotificationCompat.Builder
 
-    //TODO: handle notification permission
-
     override suspend fun doWork(): Result {
-        val uid = inputData.getString("uid") ?: return Result.failure()
-        val urls = inputData.getStringArray("urls")?.asList() ?: return Result.failure()
+        val uid = inputData.getString(WORK_DATA_UID) ?: return Result.failure()
+        val urls = inputData.getStringArray(WORK_DATA_URLS)?.asList() ?: return Result.failure()
         val uris = urls.map { Uri.parse(it) }
         val result = uploadImages(uid, uris)
 
         return if (result) {
-            builder.setProgress(100, 100, false)
-                .setContentText("업로드 성공")
-            notificationManager.notify(NOTIFICATION_ID, builder.build())
+            notificationManager.updateNotification(
+                builder,
+                context.getString(R.string.savelog_image_upload_notification_success),
+                Triple(100, 100, false)
+            )
             Result.success()
         } else {
-            builder.setContentText("업로드 실패")
-            notificationManager.notify(NOTIFICATION_ID, builder.build())
+            notificationManager.updateNotification(
+                builder,
+                context.getString(R.string.savelog_image_upload_notification_fail)
+            )
             Result.failure()
         }
     }
 
     private suspend fun uploadImages(uid: String, uris: List<Uri>): Boolean {
-        val storageRef = Firebase.storage.getReference("${uid}/log_images")
-        val fileNames = uris.map {
-            it.toString().replace("[^0-9]".toRegex(), "")
-        }
-        val refs = fileNames.map {
-            storageRef.child("$it.png")
-        }
-
         return try {
-            sendNotification()
+            val refs = getStorageReferences(uid, uris)
+            builder = notificationManager.sendNotification()
             Tasks.whenAll(execUploadTasks(uris, refs)).await()
             true
         } catch (e: Exception) {
             e.printStackTrace()
             false
+        }
+    }
+
+    private fun getStorageReferences(uid: String, uris: List<Uri>): List<StorageReference> {
+        val storageRef = Firebase.storage.getReference("${uid}/log_images")
+        val fileNames = uris.map {
+            it.toString().replace("[^0-9]".toRegex(), "")
+        }
+        return fileNames.map {
+            storageRef.child("$it.png")
         }
     }
 
@@ -84,25 +89,50 @@ class ImageUploadWorker @AssistedInject constructor(
                         (bytesTransferred * 100 / totalByteCount).toInt(),
                         false
                     )
-                    notificationManager.notify(NOTIFICATION_ID, builder.build())
+                    notificationManager.notify(UPLOAD_NOTIFICATION_ID, builder.build())
                 }
             }
         }
     }
 
-    private fun sendNotification() {
+    private fun NotificationManager.sendNotification(): NotificationCompat.Builder {
+        if (!areNotificationsEnabled()) {
+            return NotificationCompat.Builder(context, UPLOAD_NOTIFICATION_ID_STRING)
+        }
+
         val launchIntent =
             context.packageManager.getLaunchIntentForPackage(BuildConfig.APPLICATION_ID)
         val pendingIntent =
             PendingIntent.getActivity(context, 0, launchIntent, PendingIntent.FLAG_IMMUTABLE)
-
-        builder = NotificationCompat.Builder(context, NOTIFICATION_ID_STRING)
+        val builder = NotificationCompat.Builder(context, UPLOAD_NOTIFICATION_ID_STRING)
             .setSmallIcon(R.drawable.ic_chest_open)
-            .setContentTitle("업로드 알리미")
-            .setContentText("업로드 진행 중")
+            .setContentTitle(context.getString(R.string.savelog_image_upload_notification_title))
+            .setContentText(context.getString(R.string.savelog_image_upload_notification_progress))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
-        notificationManager.notify(NOTIFICATION_ID, builder.build())
+
+        notificationManager.notify(UPLOAD_NOTIFICATION_ID, builder.build())
+
+        return builder
+    }
+
+    private fun NotificationManager.updateNotification(
+        builder: NotificationCompat.Builder,
+        text: String? = null,
+        progress: Triple<Int, Int, Boolean>? = null
+    ) {
+        if (!areNotificationsEnabled()) return
+
+        text?.run {
+            builder.setContentText(text)
+        }
+
+        progress?.run {
+            val (max, current, indeterminate) = progress
+            builder.setProgress(max, current, indeterminate)
+        }
+
+        notificationManager.notify(UPLOAD_NOTIFICATION_ID, builder.build())
     }
 }
