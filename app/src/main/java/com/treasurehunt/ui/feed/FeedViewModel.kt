@@ -20,6 +20,9 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
+private const val PAGE_SIZE = 9
+private const val INITIAL_PAGE_SIZE = 16
+
 @HiltViewModel
 class FeedViewModel @Inject constructor(
     private val logRepo: LogRepository,
@@ -39,8 +42,8 @@ class FeedViewModel @Inject constructor(
     private fun getLogs(): Flow<PagingData<LogModel>> {
         return Pager(
             config = PagingConfig(
-                9,
-                initialLoadSize = 15,
+                PAGE_SIZE,
+                initialLoadSize = 16,
                 enablePlaceholders = false,
             )
         ) { logRepo.getPagingLogs() }
