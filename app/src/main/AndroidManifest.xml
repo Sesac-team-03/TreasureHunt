@@ -24,7 +24,11 @@
             android:name="androidx.startup.InitializationProvider"
             android:authorities="com.treasurehunt.androidx-startup"
             android:exported="false"
-            tools:node="remove">
+            tools:node="merge">
+            <meta-data
+                android:name="androidx.work.impl.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
         </provider>
 
         <meta-data
