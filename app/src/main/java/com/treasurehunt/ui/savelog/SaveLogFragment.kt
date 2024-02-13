@@ -111,7 +111,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
 
     private fun setAddImage(isGranted: Boolean) {
         if (isGranted) {
-            imageLauncher.launch(viewModel.getImage())
+            imageLauncher.launch(viewModel.getImagePick())
         }
     }
 
