@@ -81,7 +81,7 @@ class ImageUploadWorker @AssistedInject constructor(
 
         return uris.mapIndexed { i, uri ->
             refs[i].putFile(uri).apply {
-                totalByteCount += snapshot.totalByteCount * 2
+                totalByteCount += snapshot.totalByteCount
                 addOnProgressListener {
                     bytesTransferred += it.bytesTransferred
                     builder.setProgress(
