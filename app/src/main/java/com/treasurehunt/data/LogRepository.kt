@@ -23,4 +23,6 @@ interface LogRepository {
     suspend fun delete(vararg logs: LogEntity): Int
 
     suspend fun deleteAll()
+
+    suspend fun deleteLog(logId: String)
 }

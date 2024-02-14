@@ -31,4 +31,7 @@ class LogRepositoryImpl @Inject constructor(
     override suspend fun deleteAll() {
         logDao.deleteAllLogs()
     }
+    override suspend fun deleteLog(logId: String) {
+        logDao.deleteLog(logId)
+    }
 }
