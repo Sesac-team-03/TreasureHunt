@@ -21,6 +21,6 @@ fun LogDTO.toLogEntity(remoteId: String): LogEntity {
 }
 
 suspend fun LogDTO.toLogModel(imageRepo: ImageRepository): LogModel {
-    val imageUrls = images.keys.map { imageId -> imageRepo.getImage(imageId).url }
-    return LogModel(place, images.keys.toList(), imageUrls, text, theme, createdDate)
+    val imageUrls = images.keys.map { imageId -> imageRepo.getRemoteImage(imageId).url }
+    return LogModel(place, text, theme, createdDate, images.keys.toList(), imageUrls)
 }
