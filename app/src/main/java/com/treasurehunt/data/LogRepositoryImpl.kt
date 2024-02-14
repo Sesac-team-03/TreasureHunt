@@ -34,4 +34,7 @@ class LogRepositoryImpl @Inject constructor(
     override suspend fun delete(id: String) {
         logRemoteDataSource.delete(id)
     }
+    override suspend fun deleteLog(logId: String) {
+        logDao.deleteLog(logId)
+    }
 }
