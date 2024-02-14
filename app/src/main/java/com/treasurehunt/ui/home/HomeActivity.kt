@@ -20,12 +20,10 @@ class HomeActivity : AppCompatActivity() {
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
         initNavigation()
-        //handleDeepLink(intent)
     }
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        //handleDeepLink(intent)
     }
 
     private fun initNavigation() {
@@ -48,29 +46,4 @@ class HomeActivity : AppCompatActivity() {
             }
         }
     }
-
-
-    //TODO
-//    val SCHEME_TREASUREHUNT = "treasurehunt"
-//    val HOST_DETAIL = "detail"
-//    private fun handleDeepLink(intent: Intent?) {
-//        intent?.data?.let { uri ->
-//            if (uri.scheme == "SCHEME_TREASUREHUNT" && uri.host == "HOST_DETAIL") {
-//                val identifier = uri.lastPathSegment
-//                navigateToDetailFragmentWithIdentifier(identifier)
-//            }
-//        }
-//    }
-//
-//
-//    private fun navigateToDetailFragmentWithIdentifier(identifier: String?) {
-//        identifier?.let {
-//            val bundle = Bundle().apply {
-//                putString("contentId", it)
-//            }
-//            val navHostFragment =
-//                supportFragmentManager.findFragmentById(R.id.fcv_home) as NavHostFragment
-//            val navController = navHostFragment.navController
-//        }
-//    }
 }
