@@ -54,7 +54,7 @@ class FeedFragment : Fragment() {
                 .collect { uiState ->
                     uiState?.let {
                         binding.logs = uiState.logs
-                        showFeed(it)
+                        showFeed(uiState)
                     }
                 }
         }
