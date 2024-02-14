@@ -32,4 +32,7 @@ interface PlaceDao {
 
     @Query("DELETE FROM places")
     suspend fun deleteAllPlaces()
+
+    @Query("DELETE FROM places WHERE id = :placeId")
+    suspend fun deletePlace(placeId: String)
 }
