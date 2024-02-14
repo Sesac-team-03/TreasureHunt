@@ -94,11 +94,6 @@ class LogDetailFragment : BottomSheetDialogFragment() {
         }
     }
 
-    companion object {
-        const val LINK_URL = "https://treasurehuntsesac.page.link/KPo2"
-        const val DOMAIN_URI_PREFIX = "https://treasurehuntsesac.page.link"
-    }
-
     private fun getDynamicLink(): String {
         val dynamicLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
             .setLink(Uri.parse(LINK_URL))
@@ -221,5 +216,10 @@ class LogDetailFragment : BottomSheetDialogFragment() {
         binding.btnClose.setOnClickListener {
             dismiss()
         }
+    }
+
+    companion object {
+        const val LINK_URL = "https://treasurehuntsesac.page.link/KPo2"
+        const val DOMAIN_URI_PREFIX = "https://treasurehuntsesac.page.link"
     }
 }
