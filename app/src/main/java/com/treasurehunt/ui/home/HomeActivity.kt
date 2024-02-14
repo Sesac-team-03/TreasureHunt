@@ -32,7 +32,6 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        //handleDeepLink(intent)
     }
 
     private fun initNavigation() {
@@ -61,9 +60,10 @@ class HomeActivity : AppCompatActivity() {
             val name = getString(R.string.notification_channel)
             val descriptionText = getString(R.string.notification_description)
             val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(UPLOAD_NOTIFICATION_ID_STRING, name, importance).apply {
-                description = descriptionText
-            }
+            val channel =
+                NotificationChannel(UPLOAD_NOTIFICATION_ID_STRING, name, importance).apply {
+                    description = descriptionText
+                }
             val notificationManager =
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
