@@ -56,7 +56,7 @@ class ImageUploadWorker @AssistedInject constructor(
     private suspend fun uploadImages(uid: String, uris: List<Uri>): Boolean {
         return try {
             val refs = getStorageReferences(uid, uris)
-            builder = notificationManager.sendNotification()
+            builder = buildNotification()
             Tasks.whenAll(execUploadTasks(uris, refs)).await()
             true
         } catch (e: Exception) {
@@ -89,32 +89,31 @@ class ImageUploadWorker @AssistedInject constructor(
                         (bytesTransferred * 100 / totalByteCount).toInt(),
                         false
                     )
-                    notificationManager.notify(UPLOAD_NOTIFICATION_ID, builder.build())
+                    notificationManager.sendNotification()
                 }
             }
         }
     }
 
-    private fun NotificationManager.sendNotification(): NotificationCompat.Builder {
-        if (!areNotificationsEnabled()) {
-            return NotificationCompat.Builder(context, UPLOAD_NOTIFICATION_ID_STRING)
-        }
-
+    private fun buildNotification(): NotificationCompat.Builder {
         val launchIntent =
             context.packageManager.getLaunchIntentForPackage(BuildConfig.APPLICATION_ID)
         val pendingIntent =
             PendingIntent.getActivity(context, 0, launchIntent, PendingIntent.FLAG_IMMUTABLE)
-        val builder = NotificationCompat.Builder(context, UPLOAD_NOTIFICATION_ID_STRING)
+
+        return NotificationCompat.Builder(context, UPLOAD_NOTIFICATION_ID_STRING)
             .setSmallIcon(R.drawable.ic_chest_open)
             .setContentTitle(context.getString(R.string.savelog_image_upload_notification_title))
             .setContentText(context.getString(R.string.savelog_image_upload_notification_progress))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
+    }
+
+    private fun NotificationManager.sendNotification() {
+        if (!areNotificationsEnabled()) return
 
         notificationManager.notify(UPLOAD_NOTIFICATION_ID, builder.build())
-
-        return builder
     }
 
     private fun NotificationManager.updateNotification(
@@ -133,6 +132,6 @@ class ImageUploadWorker @AssistedInject constructor(
             builder.setProgress(max, current, indeterminate)
         }
 
-        notificationManager.notify(UPLOAD_NOTIFICATION_ID, builder.build())
+        sendNotification()
     }
 }
