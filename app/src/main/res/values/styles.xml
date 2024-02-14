@@ -85,6 +85,12 @@
         <item name="android:textSize">@dimen/small</item>
     </style>
 
+    <!-- 피드 화면 -->
+    <style name="Font.NoTreasureText">
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">@dimen/xxLarge</item>
+    </style>
+
     <style name="ProfileImage">
         <item name="cornerSize">24dp</item>
     </style>

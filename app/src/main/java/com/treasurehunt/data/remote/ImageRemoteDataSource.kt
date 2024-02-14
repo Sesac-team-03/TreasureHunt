@@ -6,4 +6,6 @@ import javax.inject.Inject
 class ImageRemoteDataSource @Inject constructor(private val imageService: ImageService) {
 
     suspend fun insert(imageDTO: ImageDTO) = imageService.insert(imageDTO).name
+
+    suspend fun getImage(id: String) = imageService.getImage(id)
 }

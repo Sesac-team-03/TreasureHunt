@@ -55,4 +55,7 @@
     <string name="profile_friend_added">%1$s님을 친구로 추가했습니다</string>
     <string name="profile_friend_removed">%1$s님을 친구에서 삭제했습니다</string>
     <string name="profile_friend_tv_alert_guest">회원으로 로그인하면,\n친구들과 함께할 수 있어요!</string>
+
+    <!-- 피드 화면 -->
+    <string name="no_treasure">아직 보물이 없어요</string>
 </resources>

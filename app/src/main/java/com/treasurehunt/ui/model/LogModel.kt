@@ -1,22 +1,26 @@
 package com.treasurehunt.ui.model
 
+import android.os.Parcelable
 import com.treasurehunt.data.local.model.LogEntity
 import com.treasurehunt.data.remote.model.LogDTO
+import kotlinx.android.parcel.Parcelize
 
+@Parcelize
 data class LogModel(
     val place: String,
-    val images: List<String>,
     val text: String,
     val theme: String,
-    val createdDate: Long
-)
+    val createdDate: Long,
+    val imageIds: List<String>,
+    val imageUrls: List<String> = emptyList(),
+) : Parcelable
 
 fun LogModel.asLogEntity(remoteId: String? = null, localId: Long = 0): LogEntity {
-    val (place, images, text, theme, createdDate) = this
-    return LogEntity(place, images, text, theme, createdDate, remoteId, localId)
+    val (place, text, theme, createdDate, imageIds) = this
+    return LogEntity(place, imageIds, text, theme, createdDate, remoteId, localId)
 }
 
 fun LogModel.asLogDTO(localId: Long = 0): LogDTO {
-    val (place, images, text, theme, createdDate) = this
-    return LogDTO(place, images.associateWith { true }, text, theme, createdDate, localId)
+    val (place, text, theme, createdDate,imageIds) = this
+    return LogDTO(place, imageIds.associateWith { true }, text, theme, createdDate, localId)
 }

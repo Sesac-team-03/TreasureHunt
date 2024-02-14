@@ -71,6 +71,9 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
     private fun initSegmentedButton() {
         binding.btnMap.isSelected = true
+        binding.btnFeed.setOnClickListener {
+            findNavController().navigate(R.id.action_homeFragment_to_feedFragment)
+        }
     }
 
     private fun loadMap() {
@@ -167,7 +170,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         val remotePlaceId = tag.toString()
 
         setOnClickListener {
-            val action = HomeFragmentDirections.actionHomeFragmentToDetailFragment(remotePlaceId)
+            val action =
+                HomeFragmentDirections.actionHomeFragmentToDetailFragment(null, remotePlaceId)
             findNavController().navigate(action)
             true
         }

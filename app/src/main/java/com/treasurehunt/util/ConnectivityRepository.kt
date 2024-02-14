@@ -3,12 +3,10 @@ package com.treasurehunt.util
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
-import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
-import javax.inject.Singleton
 
 class ConnectivityRepository @Inject constructor(@ApplicationContext context: Context) {
     private val _isConnected = MutableStateFlow(false)

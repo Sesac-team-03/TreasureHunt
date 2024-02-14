@@ -2,8 +2,8 @@ package com.treasurehunt.data
 
 import com.treasurehunt.data.local.ImageDao
 import com.treasurehunt.data.local.model.ImageEntity
-import com.treasurehunt.data.remote.model.ImageDTO
 import com.treasurehunt.data.remote.ImageRemoteDataSource
+import com.treasurehunt.data.remote.model.ImageDTO
 import javax.inject.Inject
 
 class ImageRepositoryImpl @Inject constructor(
@@ -15,4 +15,7 @@ class ImageRepositoryImpl @Inject constructor(
 
     override suspend fun insertImage(imageDTO: ImageDTO): String =
         imageRemoteDataSource.insert(imageDTO)
+
+    override suspend fun getRemoteImage(id: String): ImageDTO =
+        imageRemoteDataSource.getImage(id)
 }
