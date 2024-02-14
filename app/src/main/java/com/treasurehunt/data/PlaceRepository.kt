@@ -25,4 +25,8 @@ interface PlaceRepository {
     suspend fun delete(vararg places: PlaceEntity): Int
 
     suspend fun deleteAll()
+
+    suspend fun deletePlace(placeId: String)
+
+
 }
