@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class LogDTO(
     val place: String,
-    val images: Map<String,Boolean>,
+    val images: Map<String, Boolean>,
     val text: String,
     val theme: String,
     val createdDate: Long,
@@ -22,5 +22,5 @@ fun LogDTO.toLogEntity(remoteId: String): LogEntity {
 
 suspend fun LogDTO.toLogModel(imageRepo: ImageRepository): LogModel {
     val imageUrls = images.keys.map { imageId -> imageRepo.getImage(imageId).url }
-    return LogModel(place, images.keys.toList(), imageUrls, text, theme, createdDate)
+    return LogModel(place, text, theme, createdDate, images.keys.toList(), imageUrls)
 }

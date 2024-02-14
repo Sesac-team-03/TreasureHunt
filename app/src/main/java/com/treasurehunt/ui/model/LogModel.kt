@@ -8,19 +8,19 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 data class LogModel(
     val place: String,
-    val imageIds: List<String>,
-    val imageUrls: List<String> = emptyList(),
     val text: String,
     val theme: String,
-    val createdDate: Long
-):Parcelable
+    val createdDate: Long,
+    val imageIds: List<String>,
+    val imageUrls: List<String> = emptyList(),
+) : Parcelable
 
 fun LogModel.asLogEntity(remoteId: String? = null, localId: Long = 0): LogEntity {
-    val (place, imageIds, _, text, theme, createdDate) = this
+    val (place, text, theme, createdDate, imageIds) = this
     return LogEntity(place, imageIds, text, theme, createdDate, remoteId, localId)
 }
 
 fun LogModel.asLogDTO(localId: Long = 0): LogDTO {
-    val (place, imageIds, _, text, theme, createdDate) = this
+    val (place, text, theme, createdDate,imageIds) = this
     return LogDTO(place, imageIds.associateWith { true }, text, theme, createdDate, localId)
 }
