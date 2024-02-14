@@ -230,10 +230,10 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
 
         return LogModel(
             remotePlaceId,
-            imageIds,
-            text = text,
-            theme = theme,
-            createdDate = createdDate
+            text,
+            theme,
+            createdDate,
+            imageIds
         )
     }
 
