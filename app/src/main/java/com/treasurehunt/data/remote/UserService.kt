@@ -34,9 +34,6 @@ interface UserService {
     @DELETE("/users/{id}.json")
     suspend fun deleteUser(@Path("id") id: String) : Response<Unit>
 
-//    @PATCH("/users/{id}.json")
-//    suspend fun deleteUser2(@Path("id") id: String, @Body updates: Map<String, Any?>): Response<Unit>
-
     @Serializable
     data class UserUpdates(
         val places: String? = null,

@@ -14,19 +14,10 @@ import com.treasurehunt.data.remote.PlaceService
 import com.treasurehunt.data.remote.UserService
 import com.treasurehunt.data.remote.model.LogDTO
 import com.treasurehunt.data.remote.model.PlaceDTO
+import com.treasurehunt.data.remote.model.toLogEntity
 import com.treasurehunt.data.remote.model.toLogModel
 import com.treasurehunt.ui.model.LogModel
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -35,8 +26,6 @@ class LogDetailViewModel @Inject constructor(
     private val logRepository: LogRepository,
     private val userRepository: UserRepository,
     private val imageRepo: ImageRepository,
-    private val shareViewModel: ShareViewModel,
-    private val dispatcher: CoroutineDispatcher,
     private val placeService: PlaceService,
     private val logService: LogService,
     private val userService: UserService
@@ -61,46 +50,6 @@ class LogDetailViewModel @Inject constructor(
         return placeRepository.getRemotePlace(placeId)
     }
 
-//
-
-//    fun deletePost(placeId: String, userId: String, logId: String) {
-//        // Place 삭제
-//        viewModelScope.launch {
-//            try {
-//                val deletePlaceResponse = placeService.deletePlace(placeId)
-//                if (!deletePlaceResponse.isSuccessful) {
-//                    Log.e("DeletePost", "Failed to delete place: ${deletePlaceResponse.errorBody()?.string()}")
-//                }
-//            } catch (e: Exception) {
-//                Log.e("DeletePost", "Exception while deleting place: ${e.message}")
-//            }
-//        }
-//
-//        // Log 삭제
-//        viewModelScope.launch {
-//            try {
-//                val deleteLogResponse = logService.deleteLog(logId)
-//                if (!deleteLogResponse.isSuccessful) {
-//                    Log.e("DeletePost", "Failed to delete log: ${deleteLogResponse.errorBody()?.string()}")
-//                }
-//            } catch (e: Exception) {
-//                Log.e("DeletePost", "Exception while deleting log: ${e.message}")
-//            }
-//        }
-//
-//        // User 삭제
-//        viewModelScope.launch {
-//            try {
-//                val deleteUserResponse = userService.deleteUser(userId)
-//                if (!deleteUserResponse.isSuccessful) {
-//                    Log.e("DeletePost", "Failed to delete user: ${deleteUserResponse.errorBody()?.string()}")
-//                }
-//            } catch (e: Exception) {
-//                Log.e("DeletePost", "Exception while deleting user: ${e.message}")
-//            }
-//        }
-//    }
-
 //    fun deletePost(placeId: String, userId: String, logId: String) {
 //        viewModelScope.launch {
 //            try {
@@ -117,46 +66,78 @@ class LogDetailViewModel @Inject constructor(
 //        }
 //    }
 
-    fun deletePost(placeId: String, userId: String, logId: String) {
-        viewModelScope.launch {
+    suspend fun deletePost(placeId: String, userId: String, logId: String) {
 
-            val deleteLogJob = async {
-                val deleteLogResponse = logService.deleteLog(logId)
-                if (!deleteLogResponse.isSuccessful) {
-                    Log.e(
-                        "DeletePost",
-                        "Failed to delete log: ${deleteLogResponse.errorBody()?.string()}"
-                    )
-                }
-                logRepository.deleteAll()
-                delay(1000)
-            }
+        val remoteLog = logRepository.getRemoteLog(logId).toLogEntity(logId)
+        logRepository.delete(remoteLog)
 
-            val deleteUserJob = async {
-                val deleteUserResponse = userService.deleteUser(userId)
-                if (!deleteUserResponse.isSuccessful) {
-                    Log.e(
-                        "DeletePost",
-                        "Failed to delete user: ${deleteUserResponse.errorBody()?.string()}"
-                    )
-                }
-            }
-
-            val deletePlaceJob = async {
-                val deletePlaceResponse = placeService.deletePlace(placeId)
-                if (!deletePlaceResponse.isSuccessful) {
-                    Log.e(
-                        "DeletePost",
-                        "Failed to delete place: ${deletePlaceResponse.errorBody()?.string()}"
-                    )
-                }
-                placeRepository.deleteAll()
-            }
-            deleteLogJob.await()
-            deletePlaceJob.await()
-            deleteUserJob.await()
+        val deleteLogResponse = logService.deleteLog(logId)
+        if (!deleteLogResponse.isSuccessful) {
+            Log.e(
+                "DeletePost",
+                "Failed to delete log: ${deleteLogResponse.errorBody()?.string()}"
+            )
         }
+
+        val deleteUserResponse = userService.deleteUser(userId)
+        if (!deleteUserResponse.isSuccessful) {
+            Log.e(
+                "DeletePost",
+                "Failed to delete user: ${deleteUserResponse.errorBody()?.string()}"
+            )
+        }
+
+        val deletePlaceResponse = placeService.deletePlace(placeId)
+        if (!deletePlaceResponse.isSuccessful) {
+            Log.e(
+                "DeletePost",
+                "Failed to delete place: ${deletePlaceResponse.errorBody()?.string()}"
+            )
+        }
+        placeRepository.deleteAll()
+
     }
+
+//    fun deletePost(placeId: String, userId: String, logId: String) {
+//        viewModelScope.launch {
+//            // User's places and logs deletion
+//            val updates = UserService.UserUpdates(
+//                places = null,
+//                logs = null
+//            )
+//            userService.deleteUser2(userId, updates)
+//
+//            val deletePlaceJob = async {
+//                val deletePlaceResponse = placeService.deletePlace(placeId)
+//                if (!deletePlaceResponse.isSuccessful) {
+//                    Log.e(
+//                        "DeletePost",
+//                        "Failed to delete place: ${deletePlaceResponse.errorBody()?.string()}"
+//                    )
+//                }
+//                // 로컬 데이터베이스에서 place 삭제
+//                placeRepository.deletePlace(placeId)
+//                delay(1000)
+//            }
+//
+//            val deleteLogJob = async {
+//                val deleteLogResponse = logService.deleteLog(logId)
+//                if (!deleteLogResponse.isSuccessful) {
+//                    Log.e(
+//                        "DeletePost",
+//                        "Failed to delete log: ${deleteLogResponse.errorBody()?.string()}"
+//                    )
+//                }
+//                // 로컬 데이터베이스에서 log 삭제
+//                logRepository.deleteLog(logId)
+//                delay(1000)
+//            }
+//
+//            // 모든 작업이 완료될 때까지 기다립니다.
+//            deletePlaceJob.await()
+//            deleteLogJob.await()
+//        }
+//    }
 
 //    fun deletePost(placeId: String, userId: String, logId: String) {
 //        viewModelScope.launch {
