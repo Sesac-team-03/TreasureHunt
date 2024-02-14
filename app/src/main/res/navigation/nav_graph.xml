@@ -91,9 +91,8 @@
             app:nullable="true" />
         <argument
             android:name="remotePlaceId"
-            android:defaultValue="@null"
-            app:argType="string"
-            app:nullable="true" />
+            android:defaultValue=""
+            app:argType="string" />
 
     </dialog>
 
