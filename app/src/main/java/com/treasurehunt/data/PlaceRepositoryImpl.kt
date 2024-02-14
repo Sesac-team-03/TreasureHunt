@@ -32,18 +32,6 @@ class PlaceRepositoryImpl @Inject constructor(
 
     override suspend fun delete(vararg places: PlaceEntity) = placeDao.delete(*places)
 
-    // PlaceRepository.kt
-//    override suspend fun deleteLocalPlace(placeId: String) {
-//        val placeEntity = placeDao.getPlaceById(placeId).firstOrNull()
-//        if (placeEntity != null) {
-//            placeDao.delete(placeEntity)
-//        }
-//    }
-
-//    override suspend fun deletePlace(placeId: String) {
-//        placeRemoteDataSource.deletePlace(placeId)
-//    }
-
     override suspend fun deleteAll() {
         placeDao.deleteAllPlaces()
     }

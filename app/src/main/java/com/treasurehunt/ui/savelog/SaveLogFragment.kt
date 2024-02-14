@@ -238,8 +238,9 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
     }
 
     private suspend fun insertLog(log: LogModel): String {
-        viewModel.insertLog(log.asLogEntity())
-        return viewModel.insertLog(log.asLogDTO())
+        val localLogId = viewModel.insertLog(log.asLogEntity())
+        val remoteLogId = viewModel.insertLog(log.asLogDTO(localLogId))
+        return remoteLogId
     }
 
     private suspend fun updatePlaceWithLog(remotePlaceId: String, remoteLogId: String) {

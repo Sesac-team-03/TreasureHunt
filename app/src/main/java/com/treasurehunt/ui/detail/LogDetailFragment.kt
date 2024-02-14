@@ -65,9 +65,9 @@ class LogDetailFragment : BottomSheetDialogFragment() {
         setCloseButton()
         //setEditButton()
         setDeleteButton()
-        binding.btnEdit.setOnClickListener {
-            //setPopupMenu(it)
-        }
+//        binding.btnEdit.setOnClickListener {
+//            //setPopupMenu(it)
+//        }
     }
 
     private fun setDotsIndicator() {
@@ -161,7 +161,7 @@ class LogDetailFragment : BottomSheetDialogFragment() {
             val userId = Firebase.auth.currentUser?.uid
 
             if (placeId.isNotEmpty() && userId != null) {
-                viewModel.viewModelScope.launch {
+                viewLifecycleOwner.lifecycleScope.launch {
                     val placeDTO = viewModel.getRemotePlace(placeId)
                     placeDTO.log?.let { logId ->
                         viewModel.deletePost(placeId, userId, logId)
