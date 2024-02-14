@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bottom_sheet_background"
@@ -11,7 +10,7 @@
     android:paddingBottom="16dp">
 
     <ImageButton
-        android:id="@+id/btnClose"
+        android:id="@+id/btn_Close"
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_marginTop="22dp"
@@ -21,37 +20,48 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+
     <ImageButton
         android:id="@+id/btn_edit"
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_marginStart="22dp"
         android:layout_marginTop="22dp"
-        android:background="@drawable/ic_edit"
+        android:background="@drawable/ic_popupwhite"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageButton
+        android:id="@+id/btn_delete"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="22dp"
+        android:layout_marginTop="22dp"
+        android:background="@drawable/ic_popupwhite"
+        app:layout_constraintStart_toEndOf="@+id/btn_edit"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <ImageView
-        android:id="@+id/barImageView"
+        android:id="@+id/iv_bar"
         android:layout_width="40dp"
         android:layout_height="4dp"
         android:layout_marginBottom="56dp"
         android:src="@drawable/ic_dialogtop"
-        app:layout_constraintBottom_toTopOf="@+id/viewPager"
+        app:layout_constraintBottom_toTopOf="@+id/vp_photo"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/viewPager"
+        android:id="@+id/vp_photo"
         android:layout_width="0dp"
         android:layout_height="260dp"
         android:layout_marginTop="70dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/barImageView" />
+        app:layout_constraintTop_toBottomOf="@+id/iv_bar" />
 
     <com.tbuonomo.viewpagerdotsindicator.DotsIndicator
-        android:id="@+id/dotsIndicator"
+        android:id="@+id/di_text"
         android:layout_width="wrap_content"
         android:layout_height="30dp"
         android:layout_gravity="center"
@@ -62,40 +72,40 @@
         app:dotsSize="8dp"
         app:dotsSpacing="8dp"
         app:dotsWidthFactor="1.0"
-        app:layout_constraintBottom_toTopOf="@+id/textView"
+        app:layout_constraintBottom_toTopOf="@+id/tv_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/viewPager"
+        app:layout_constraintTop_toBottomOf="@+id/vp_photo"
         app:selectedDotColor="@color/black" />
 
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/tv_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="50dp"
         android:padding="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/viewPager" />
+        app:layout_constraintTop_toBottomOf="@+id/vp_photo" />
 
     <ImageButton
-        android:id="@+id/btnShareContent"
+        android:id="@+id/btn_share"
         android:layout_width="18dp"
         android:layout_height="20dp"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="16dp"
         android:background="@drawable/ic_share"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/viewPager" />
+        app:layout_constraintTop_toBottomOf="@+id/vp_photo" />
 
     <ImageButton
-        android:id="@+id/btnMessageContent"
+        android:id="@+id/btn_message"
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="28dp"
         android:background="@drawable/ic_message"
-        app:layout_constraintEnd_toStartOf="@+id/btnShareContent"
-        app:layout_constraintTop_toBottomOf="@+id/viewPager" />
+        app:layout_constraintEnd_toStartOf="@+id/btn_share"
+        app:layout_constraintTop_toBottomOf="@+id/vp_photo" />
 </androidx.constraintlayout.widget.ConstraintLayout>
