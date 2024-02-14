@@ -1,8 +1,6 @@
 package com.treasurehunt.data.remote.model
 
-import com.treasurehunt.data.ImageRepository
 import com.treasurehunt.data.local.model.LogEntity
-import com.treasurehunt.ui.model.LogModel
 import kotlinx.serialization.Serializable
 
 @Serializable
