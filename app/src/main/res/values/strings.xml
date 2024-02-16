@@ -11,7 +11,7 @@
 
     <!-- 지도 다이얼로그 -->
     <string name="map_prompt">%1$s를 보물상자로 지정할까요?</string>
-    <string name="map_answer_place">네, 가봤어요</string>
+    <string name="map_answer_visit">네, 가봤어요</string>
     <string name="map_answer_plan">네, 가볼래요</string>
     <string name="map_answer_no">아니요</string>
 

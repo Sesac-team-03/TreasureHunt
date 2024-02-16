@@ -23,17 +23,17 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
         android:orientation="vertical"
-        app:constraint_referenced_ids="btn_place,btn_plan,btn_cancel"
+        app:constraint_referenced_ids="btn_visit,btn_plan,btn_cancel"
         app:flow_verticalGap="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_title" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_place"
+        android:id="@+id/btn_visit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/map_answer_place" />
+        android:text="@string/map_answer_visit" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_plan"
