@@ -149,10 +149,10 @@ class DatabaseUpdateWorker @AssistedInject constructor(
 
         return LogModel(
             remotePlaceId,
-            imageIds,
             text,
             theme,
-            createdDate
+            createdDate,
+            imageIds,
         )
     }
 
