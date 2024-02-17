@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -16,13 +17,10 @@ import androidx.paging.PagingData
 import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentFeedBinding
 import com.treasurehunt.ui.feed.adapter.FeedAdapter
-import com.treasurehunt.ui.model.FeedUiState
 import com.treasurehunt.ui.model.LogModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlin.system.measureTimeMillis
 
 @AndroidEntryPoint
 class FeedFragment : Fragment() {
@@ -46,36 +44,13 @@ class FeedFragment : Fragment() {
         initAdapter()
         initSegmentedButton()
         bindLogs()
+        showFeed()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
-
-    private fun bindLogs() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.pagingLogs
-                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-                .collect { pagingLogs ->
-                    showFeed(pagingLogs, viewModel.isLogsUpdated.value)
-                }
-        }
-    }
-
-    private suspend fun showFeed(pagingLogs: PagingData<LogModel>, isLogUpdated: Boolean) {
-        if (isLogUpdated) {
-            binding.cpiLoading.visibility = View.GONE
-            feedAdapter.submitData(pagingLogs)
-//            feedAdapter.loadStateFlow.collect { loadState ->
-//                val isListEmpty = loadState.refresh is LoadState.NotLoading && feedAdapter.itemCount == 0
-//                if (isListEmpty) {
-//                    binding.tvNoTreasure.visibility = View.VISIBLE
-//                }
-//            }
-        }
-    }
-
 
     private fun initAdapter() {
         binding.rvLogs.adapter = feedAdapter
@@ -91,5 +66,29 @@ class FeedFragment : Fragment() {
     private fun moveToDetail(log: LogModel) {
         val action = FeedFragmentDirections.actionFeedFragmentToLogDetailFragment(log)
         findNavController().navigate(action)
+    }
+
+    private fun bindLogs() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.pagingLogs
+                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+                .collect { pagingLogs ->
+                    if (viewModel.isLogsUpdated.value) {
+                        binding.cpiLoading.visibility = View.GONE
+                        feedAdapter.submitData(pagingLogs)
+                    }
+                }
+        }
+    }
+
+    private fun showFeed() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            feedAdapter.loadStateFlow.collect { loadState ->
+                val isListEmpty =
+                    loadState.refresh is LoadState.NotLoading && feedAdapter.itemCount == 0
+                binding.tvNoTreasure.isVisible = isListEmpty
+                binding.rvLogs.isVisible = !isListEmpty
+            }
+        }
     }
 }

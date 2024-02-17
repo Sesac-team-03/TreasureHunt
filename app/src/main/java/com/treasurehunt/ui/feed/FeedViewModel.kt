@@ -43,14 +43,12 @@ class FeedViewModel @Inject constructor(
         return Pager(
             config = PagingConfig(
                 PAGE_SIZE,
-                initialLoadSize = 16,
+                initialLoadSize = INITIAL_PAGE_SIZE,
                 enablePlaceholders = false,
             )
         ) { logRepo.getPagingLogs() }
             .flow
-            .map { pagingData ->
-                initPagingData(pagingData)
-            }
+            .map { pagingData -> initPagingData(pagingData) }
             .cachedIn(viewModelScope)
     }
 
