@@ -109,10 +109,19 @@ class HomeViewModel @Inject constructor(
                     .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
                     .collect { visitsAndPlans ->
                         _uiState.update { uiState ->
+                            val oldVisitMarkers = uiState.visitMarkers.filterValues { true }
+                            val oldPlanMarkers = uiState.planMarkers.filterValues { true }
                             val (visits, plans) = visitsAndPlans.partition { !it.plan }
+                            val newVisitMarkers = visits.mapToMarkers().associateWith { true }
+                            val newPlanMarkers = plans.mapToMarkers().associateWith { true }
+                            val removedVisitMarkers = oldVisitMarkers.minus(newVisitMarkers.keys)
+                                .mapValues { false }
+                            val removedPlanMarkers = oldPlanMarkers.minus(newPlanMarkers.keys)
+                                .mapValues { false }
+
                             uiState.copy(
-                                visitMarkers = visits.mapToMarkers(),
-                                planMarkers = plans.mapToMarkers()
+                                visitMarkers = newVisitMarkers + removedVisitMarkers,
+                                planMarkers = newPlanMarkers + removedPlanMarkers
                             )
                         }
                     }

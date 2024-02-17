@@ -148,14 +148,22 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                 viewModel.uiState.collect { uiState ->
                     if (uiState.uid == null) return@collect
 
-                    uiState.visitMarkers.forEach { marker ->
-                        marker.show()
-                        marker.setVisitClick()
+                    uiState.visitMarkers.forEach { markerEntry ->
+                        if (markerEntry.value) {
+                            markerEntry.key.show()
+                            markerEntry.key.setVisitClick()
+                        } else {
+                            markerEntry.key.hide()
+                        }
                     }
 
-                    uiState.planMarkers.forEach { marker ->
-                        marker.show()
-                        marker.setPlanClick()
+                    uiState.planMarkers.forEach { markerEntry ->
+                        if (markerEntry.value) {
+                            markerEntry.key.show()
+                            markerEntry.key.setPlanClick()
+                        } else {
+                            markerEntry.key.hide()
+                        }
                     }
                 }
             }
@@ -164,6 +172,10 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
     private fun Marker.show() {
         map = this@HomeFragment.map
+    }
+
+    private fun Marker.hide() {
+        map = null
     }
 
     private fun Marker.setVisitClick() {
