@@ -8,6 +8,7 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.treasurehunt.R
@@ -46,6 +47,7 @@ fun bindImageStorageUrl(view: ImageView, url: String?) {
             Glide.with(view.context)
                 .load(storageRef)
                 .thumbnail(thumbnailRequestBuilder)
+                .diskCacheStrategy(DiskCacheStrategy.DATA)
                 .into(this)
             scaleType = ImageView.ScaleType.CENTER_CROP
         }
