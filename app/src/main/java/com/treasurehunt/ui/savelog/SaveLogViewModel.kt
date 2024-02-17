@@ -3,6 +3,7 @@ package com.treasurehunt.ui.savelog
 import android.content.Intent
 import android.provider.MediaStore
 import androidx.lifecycle.ViewModel
+import com.treasurehunt.ui.model.ImageModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
