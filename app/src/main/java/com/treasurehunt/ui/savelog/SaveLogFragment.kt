@@ -27,6 +27,7 @@ import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.util.FusedLocationSource
 import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentSavelogBinding
+import com.treasurehunt.ui.model.ImageModel
 import com.treasurehunt.ui.savelog.adapter.SaveLogAdapter
 import com.treasurehunt.util.showSnackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -36,13 +37,14 @@ private const val LOCATION_PERMISSION_REQUEST_CODE = 1001
 private const val MAX_COUNT = 5
 
 internal const val WORK_DATA_UID = "uid"
-internal const val WORK_DATA_URLS = "urls"
+internal const val WORK_DATA_URI_STRINGS = "uriStrings"
 internal const val WORK_DATA_LOG_TEXT = "logText"
 internal const val WORK_DATA_LAT = "lat"
 internal const val WORK_DATA_LNG = "lng"
 internal const val WORK_DATA_CAPTION = "caption"
 internal const val WORK_DATA_IS_PLAN = "isPlan"
 internal const val WORK_DATA_PLAN_ID = "planId"
+internal const val WORK_DATA_URL_STRINGS = "urlStrings"
 
 @AndroidEntryPoint
 class SaveLogFragment : Fragment(), OnMapReadyCallback {
@@ -50,7 +52,6 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
     private var _binding: FragmentSavelogBinding? = null
     private val binding get() = _binding!!
     private val viewModel: SaveLogViewModel by viewModels()
-    private val saveLogAdapter = SaveLogAdapter { imageModel -> viewModel.removeImage(imageModel) }
     private val imageLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             setImageLauncher(result)
@@ -141,6 +142,11 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    override fun onMapReady(naverMap: NaverMap) {
+        initMap(naverMap)
+        handleLocationAccessPermission()
+    }
+
     private fun handleLocationAccessPermission() {
         when (PackageManager.PERMISSION_GRANTED) {
             ContextCompat.checkSelfPermission(
@@ -155,18 +161,13 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    override fun onMapReady(naverMap: NaverMap) {
-        initMap(naverMap)
-        handleLocationAccessPermission()
-    }
-
     private fun initViewModel() {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
     }
 
     private fun initAdapter() {
-        binding.rvPhoto.adapter = saveLogAdapter
+        binding.rvPhoto.adapter = SaveLogAdapter { imageModel -> viewModel.removeImage(imageModel) }
     }
 
     private fun setAlbumPermission() {
@@ -230,12 +231,12 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
     private fun getImageUploadRequest(): OneTimeWorkRequest {
         val uid = Firebase.auth.currentUser!!.uid
         val images = viewModel.images.value
-        val urls = images.indices.map { i ->
-            images[i].url
+        val uris = images.indices.map { i ->
+            images[i].uri
         }.toTypedArray()
         val data = Data.Builder()
             .putString(WORK_DATA_UID, uid)
-            .putStringArray(WORK_DATA_URLS, urls)
+            .putStringArray(WORK_DATA_URI_STRINGS, uris)
             .build()
 
         return OneTimeWorkRequestBuilder<ImageUploadWorker>()
@@ -245,15 +246,10 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
 
     private fun getDatabaseUpdateRequest(): OneTimeWorkRequest {
         val uid = Firebase.auth.currentUser!!.uid
-        val images = viewModel.images.value
-        val urls = images.indices.map { i ->
-            images[i].url
-        }.toTypedArray()
         val (lat, lng, caption, isPlan, planId) = args.mapSymbol
         val logText = binding.etText.text.toString()
         val data = Data.Builder()
             .putString(WORK_DATA_UID, uid)
-            .putStringArray(WORK_DATA_URLS, urls)
             .putString(WORK_DATA_LOG_TEXT, logText)
             .putDouble(WORK_DATA_LAT, lat)
             .putDouble(WORK_DATA_LNG, lng)

@@ -5,13 +5,16 @@ import android.app.PendingIntent
 import android.content.Context
 import android.net.Uri
 import androidx.core.app.NotificationCompat
+import androidx.core.net.toUri
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
+import androidx.work.Data
 import androidx.work.WorkerParameters
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.Firebase
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
+import com.google.firebase.storage.UploadTask.TaskSnapshot
 import com.google.firebase.storage.storage
 import com.treasurehunt.BuildConfig
 import com.treasurehunt.R
@@ -27,23 +30,32 @@ class ImageUploadWorker @AssistedInject constructor(
     @Assisted params: WorkerParameters
 ) : CoroutineWorker(context, params) {
 
+    private val urlStrings = mutableListOf<String>()
+    private var totalByteCount = 0L
+    private var bytesTransferred = 0L
     private val notificationManager =
         context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     private lateinit var builder: NotificationCompat.Builder
 
     override suspend fun doWork(): Result {
-        val uid = inputData.getString(WORK_DATA_UID) ?: return Result.failure()
-        val urls = inputData.getStringArray(WORK_DATA_URLS)?.asList() ?: return Result.failure()
-        val uris = urls.map { Uri.parse(it) }
+        val uid = inputData.getString(WORK_DATA_UID)
+            ?: return Result.failure()
+        val uriStrings = inputData.getStringArray(WORK_DATA_URI_STRINGS)?.asList()
+            ?: return Result.failure()
+        val uris = uriStrings.map { it.toUri() }
         val result = uploadImages(uid, uris)
 
         return if (result) {
+            val outputData = Data.Builder()
+                .putStringArray(WORK_DATA_URL_STRINGS, urlStrings.toTypedArray())
+                .build()
+
             notificationManager.updateNotification(
                 builder,
                 context.getString(R.string.savelog_image_upload_notification_success),
                 Triple(100, 100, false)
             )
-            Result.success()
+            Result.success(outputData)
         } else {
             notificationManager.updateNotification(
                 builder,
@@ -58,9 +70,11 @@ class ImageUploadWorker @AssistedInject constructor(
             val refs = getStorageReferences(uid, uris)
             builder = buildNotification()
             Tasks.whenAll(execUploadTasks(uris, refs)).await()
+
             true
         } catch (e: Exception) {
             e.printStackTrace()
+
             false
         }
     }
@@ -70,28 +84,41 @@ class ImageUploadWorker @AssistedInject constructor(
         val fileNames = uris.map {
             it.toString().replace("[^0-9]".toRegex(), "")
         }
+
         return fileNames.map {
             storageRef.child("$it.png")
         }
     }
 
     private fun execUploadTasks(uris: List<Uri>, refs: List<StorageReference>): List<UploadTask> {
-        var totalByteCount = 0L
-        var bytesTransferred = 0L
-
         return uris.mapIndexed { i, uri ->
             refs[i].putFile(uri).apply {
-                totalByteCount += snapshot.totalByteCount
-                addOnProgressListener {
-                    bytesTransferred += it.bytesTransferred
-                    builder.setProgress(
-                        100,
-                        (bytesTransferred * 100 / totalByteCount).toInt(),
-                        false
-                    )
-                    notificationManager.sendNotification()
-                }
+                setUrlStrings(i, snapshot.storage.toString())
+
+                setTotalByteCount(snapshot)
+
+                setProgressNotification()
             }
+        }
+    }
+
+    private fun setUrlStrings(index: Int, urlString: String) {
+        urlStrings.add(index, urlString)
+    }
+
+    private fun setTotalByteCount(snapshot: TaskSnapshot) {
+        totalByteCount += snapshot.totalByteCount
+    }
+
+    private fun UploadTask.setProgressNotification() {
+        addOnProgressListener {
+            bytesTransferred += it.bytesTransferred
+            builder.setProgress(
+                100,
+                (bytesTransferred * 100 / totalByteCount).toInt(),
+                false
+            )
+            notificationManager.sendNotification()
         }
     }
 

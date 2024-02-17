@@ -8,12 +8,7 @@ import com.treasurehunt.data.ImageRepository
 import com.treasurehunt.data.LogRepository
 import com.treasurehunt.data.PlaceRepository
 import com.treasurehunt.data.UserRepository
-import com.treasurehunt.data.local.model.LogEntity
-import com.treasurehunt.data.local.model.PlaceEntity
 import com.treasurehunt.data.remote.model.ImageDTO
-import com.treasurehunt.data.remote.model.LogDTO
-import com.treasurehunt.data.remote.model.PlaceDTO
-import com.treasurehunt.data.remote.model.UserDTO
 import com.treasurehunt.data.remote.model.toPlaceEntity
 import com.treasurehunt.ui.model.LogModel
 import com.treasurehunt.ui.model.MapSymbol
@@ -41,9 +36,12 @@ class DatabaseUpdateWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         return try {
-            uid = inputData.getString(WORK_DATA_UID) ?: return Result.failure()
-            val urls = inputData.getStringArray(WORK_DATA_URLS)?.asList() ?: return Result.failure()
-            val text = inputData.getString(WORK_DATA_LOG_TEXT) ?: return Result.failure()
+            uid = inputData.getString(WORK_DATA_UID)
+                ?: return Result.failure()
+            val urlStrings = inputData.getStringArray(WORK_DATA_URL_STRINGS)?.asList()
+                ?: return Result.failure()
+            val text = inputData.getString(WORK_DATA_LOG_TEXT)
+                ?: return Result.failure()
             val lat = inputData.getDouble(WORK_DATA_LAT, 0.0)
             val lng = inputData.getDouble(WORK_DATA_LNG, 0.0)
             val caption = inputData.getString(WORK_DATA_CAPTION) ?: ""
@@ -52,7 +50,7 @@ class DatabaseUpdateWorker @AssistedInject constructor(
 
             mapSymbol = MapSymbol(lat, lng, caption, isPlan, planId)
 
-            init(urls, text)
+            init(urlStrings, text)
 
             Result.success()
         } catch (e: Exception) {
@@ -69,32 +67,6 @@ class DatabaseUpdateWorker @AssistedInject constructor(
         updateUser(remotePlaceId, remoteLogId)
     }
 
-    // -- 기존 Viewmodel --
-    private suspend fun insertLog(logEntity: LogEntity) = logRepo.insert(logEntity)
-
-    private suspend fun insertLog(logDTO: LogDTO) = logRepo.insert(logDTO)
-
-    private suspend fun insertPlace(placeEntity: PlaceEntity) = placeRepo.insert(placeEntity)
-
-    private suspend fun insertPlace(placeDTO: PlaceDTO) = placeRepo.insert(placeDTO)
-
-    private suspend fun getRemotePlaceById(id: String) = placeRepo.getRemotePlace(id)
-
-    private suspend fun updatePlace(place: PlaceEntity) = placeRepo.update(place)
-
-    private suspend fun updatePlace(id: String, place: PlaceDTO) {
-        placeRepo.update(id, place)
-    }
-
-    private suspend fun getUserById(uid: String) = userRepo.getRemoteUser(uid)
-
-    private suspend fun updateUser(uid: String, user: UserDTO) {
-        userRepo.update(uid, user)
-    }
-
-    private suspend fun insertImage(image: ImageDTO) = imageRepo.insertImage(image)
-
-    // -- 기존 Fragment --
     private suspend fun getRemotePlaceId(): String {
         val planId = mapSymbol.remoteId
         return if (planId.isNullOrEmpty()) {
@@ -107,14 +79,14 @@ class DatabaseUpdateWorker @AssistedInject constructor(
 
     private suspend fun insertPlace(mapSymbol: MapSymbol): String {
         val place = mapSymbol.toPlace()
-        val remotePlaceId = insertPlace(place.asPlaceDTO())
-        val localPlaceId = insertPlace(place.asPlaceEntity())
+        val remotePlaceId = placeRepo.insert(place.asPlaceDTO())
+        val localPlaceId = placeRepo.insert(place.asPlaceEntity())
 
-        updatePlace(
+        placeRepo.update(
             place.asPlaceEntity(remotePlaceId, localPlaceId)
         )
 
-        updatePlace(
+        placeRepo.update(
             remotePlaceId,
             place.asPlaceDTO(localPlaceId)
         )
@@ -123,13 +95,13 @@ class DatabaseUpdateWorker @AssistedInject constructor(
     }
 
     private suspend fun updatePlaceFromPlanToVisit(remotePlaceId: String) {
-        val placeDTO = getRemotePlaceById(remotePlaceId)
+        val placeDTO = placeRepo.getRemotePlace(remotePlaceId)
 
-        updatePlace(
+        placeRepo.update(
             placeDTO.toPlaceEntity(remotePlaceId)
                 .copy(plan = false)
         )
-        updatePlace(
+        placeRepo.update(
             remotePlaceId, placeDTO.copy(plan = false)
         )
     }
@@ -142,7 +114,7 @@ class DatabaseUpdateWorker @AssistedInject constructor(
         val theme = "123"
         val createdDate = getCurrentTime()
         val imageIds = imageUrls.map { imageUrl ->
-            insertImage(
+            imageRepo.insertImage(
                 ImageDTO(url = imageUrl)
             )
         }
@@ -157,28 +129,27 @@ class DatabaseUpdateWorker @AssistedInject constructor(
     }
 
     private suspend fun insertLog(log: LogModel): String {
-        insertLog(log.asLogEntity())
-        return insertLog(log.asLogDTO())
+        logRepo.insert(log.asLogEntity())
+        return logRepo.insert(log.asLogDTO())
     }
 
     private suspend fun updatePlaceWithLog(remotePlaceId: String, remoteLogId: String) {
-        val updatedPlace = getRemotePlaceById(remotePlaceId).copy(log = remoteLogId)
-        updatePlace(remotePlaceId, updatedPlace)
+        val updatedPlace = placeRepo.getRemotePlace(remotePlaceId).copy(log = remoteLogId)
+        placeRepo.update(remotePlaceId, updatedPlace)
     }
 
     private suspend fun updateUser(remotePlaceId: String, remoteLogId: String) {
-
-        val userDTO = getUserById(uid)
+        val userDTO = userRepo.getRemoteUser(uid)
 
         if (!mapSymbol.remoteId.isNullOrEmpty()) {
-            updateUser(
+            userRepo.update(
                 uid, userDTO.copy(
                     plans = userDTO.plans.minus(remotePlaceId)
                 )
             )
         }
 
-        updateUser(
+        userRepo.update(
             uid, userDTO.copy(
                 places = userDTO.places.plus(remotePlaceId to true),
                 logs = userDTO.logs.plus(remoteLogId to true)
