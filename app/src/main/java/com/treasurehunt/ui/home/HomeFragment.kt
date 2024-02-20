@@ -166,8 +166,12 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         val remotePlaceId = tag.toString()
 
         setOnClickListener {
+<<<<<<< HEAD
             val action =
                 HomeFragmentDirections.actionHomeFragmentToDetailFragment(null, remotePlaceId)
+=======
+            val action = HomeFragmentDirections.actionHomeFragmentToLogDetailFragment(remotePlaceId)
+>>>>>>> 2f9545b (refactor: 중복 코드 제거, detail -> logDetail 이름 변경, 불필요한 주석 제거 등)
             findNavController().navigate(action)
             true
         }
