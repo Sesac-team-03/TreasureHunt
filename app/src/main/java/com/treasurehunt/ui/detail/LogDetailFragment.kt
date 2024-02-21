@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.auth.ktx.auth
@@ -93,26 +94,28 @@ class LogDetailFragment : BottomSheetDialogFragment() {
             val placeId = args.remotePlaceId
             val userId = Firebase.auth.currentUser?.uid
 
-            if (placeId.isNotEmpty() && userId != null) {
-                viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycleScope.launch {
+                if (placeId.isNotEmpty() && userId != null) {
                     val placeDTO = viewModel.getRemotePlace(placeId)
                     placeDTO.log?.let { logId ->
-                        viewModel.deletePost(placeId, userId, logId)
+                        viewModel.deletePost(logId, placeId, userId)
                         Toast.makeText(requireContext(), "삭제", Toast.LENGTH_SHORT).show()
                         dismiss()
                     } ?: run {
                         Toast.makeText(requireContext(), "삭제 실패", Toast.LENGTH_SHORT).show()
                     }
+                } else {
+                    Toast.makeText(requireContext(), "삭제 처리 실패", Toast.LENGTH_SHORT).show()
                 }
-            } else {
-                Toast.makeText(requireContext(), "삭제 처리 실패", Toast.LENGTH_SHORT).show()
+                val action = LogDetailFragmentDirections.actionLogDetailFragmentToHomeFragment(args.placeId)
+                findNavController().navigate(action)
             }
         }
     }
 
     private fun setCloseButton() {
         binding.btnClose.setOnClickListener {
-            dismiss()
+            findNavController().navigateUp()
         }
     }
 
