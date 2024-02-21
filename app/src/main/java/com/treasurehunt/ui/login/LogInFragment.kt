@@ -18,7 +18,7 @@ import com.navercorp.nid.profile.NidProfileCallback
 import com.navercorp.nid.profile.data.NidProfileResponse
 import com.treasurehunt.BuildConfig
 import com.treasurehunt.R
-import com.treasurehunt.data.User
+import com.treasurehunt.ui.model.NaverUser
 import com.treasurehunt.databinding.FragmentLoginBinding
 import com.treasurehunt.util.showSnackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -88,14 +88,14 @@ class LogInFragment : Fragment() {
         NidOAuthLogin().callProfileApi(object : NidProfileCallback<NidProfileResponse> {
             override fun onSuccess(result: NidProfileResponse) {
                 val naverProfile = result.profile!!
-                val user = User(
-                    naverProfile.email!!,
+                val naverUser = NaverUser(
                     naverProfile.id!!,
+                    naverProfile.email!!,
                     naverProfile.nickname,
                     naverProfile.profileImage
                 )
 
-                loginAccount(user)
+                loginAccount(naverUser)
             }
 
             override fun onFailure(httpStatus: Int, message: String) {
@@ -108,22 +108,8 @@ class LogInFragment : Fragment() {
         })
     }
 
-    private fun createAccount(user: User) {
-        Firebase.auth.createUserWithEmailAndPassword(user.email!!, user.id)
-            .addOnCompleteListener(requireActivity()) { task ->
-                if (task.isSuccessful) {
-                    lifecycleScope.launch {
-                        viewModel.insertNaverUser(user)
-                        findNavController().navigate(R.id.action_logInFragment_to_homeFragment)
-                    }
-                } else {
-                    binding.root.showSnackbar(R.string.login_create_account_error)
-                }
-            }
-    }
-
-    private fun loginAccount(user: User) {
-        Firebase.auth.signInWithEmailAndPassword(user.email!!, user.id)
+    private fun loginAccount(naverUser: NaverUser) {
+        Firebase.auth.signInWithEmailAndPassword(naverUser.email!!, naverUser.id)
             .addOnCompleteListener(requireActivity()) { task ->
                 if (task.isSuccessful) {
                     lifecycleScope.launch {
@@ -131,7 +117,21 @@ class LogInFragment : Fragment() {
                         findNavController().navigate(R.id.action_logInFragment_to_homeFragment)
                     }
                 } else {
-                    createAccount(user)
+                    createAccount(naverUser)
+                }
+            }
+    }
+
+    private fun createAccount(naverUser: NaverUser) {
+        Firebase.auth.createUserWithEmailAndPassword(naverUser.email!!, naverUser.id)
+            .addOnCompleteListener(requireActivity()) { task ->
+                if (task.isSuccessful) {
+                    lifecycleScope.launch {
+                        viewModel.insertNaverUser(naverUser)
+                        findNavController().navigate(R.id.action_logInFragment_to_homeFragment)
+                    }
+                } else {
+                    binding.root.showSnackbar(R.string.login_create_account_error)
                 }
             }
     }
