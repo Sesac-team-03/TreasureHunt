@@ -68,25 +68,23 @@ class LogDetailFragment : BottomSheetDialogFragment() {
 
     private fun loadLog() {
         val placeId = args.remotePlaceId
-        val logModel = args.log
         if (placeId.isNotEmpty()) {
             viewLifecycleOwner.lifecycleScope.launch {
-                val logModel = viewModel.getLog(placeId)
-                logModel?.let {
-                    updateUIWithLogModel(it)
-                }
+                val log = viewModel.getLogByRemotePlaceId(placeId) ?: return@launch
+                setTextAndImages(log)
             }
-        } else {
-            logModel?.let {
-                updateUIWithLogModel(it)
-            }
+        }
+
+        val log = args.log
+        if (log != null) {
+            setTextAndImages(log)
         }
     }
 
-    private fun updateUIWithLogModel(logModel: LogModel) {
-        val imageItems = logModel.imageUrls.map { ImageItem.Url(it) }
+    private fun setTextAndImages(log: LogModel) {
+        binding.tvText.text = log.text
+        val imageItems = log.imageUrls.map { ImageItem.Url(it) }
         imageSliderAdapter.submitList(imageItems)
-        binding.tvText.text = logModel.text
     }
 
     private fun setDeleteButton() {
@@ -98,7 +96,7 @@ class LogDetailFragment : BottomSheetDialogFragment() {
                 if (placeId.isNotEmpty() && userId != null) {
                     val placeDTO = viewModel.getRemotePlace(placeId)
                     placeDTO.log?.let { logId ->
-                        viewModel.deletePost(logId, placeId, userId)
+                        viewModel.deleteLogAndAssociatedData(logId, placeId, userId)
                         Toast.makeText(requireContext(), "삭제", Toast.LENGTH_SHORT).show()
                         dismiss()
                     } ?: run {
@@ -107,7 +105,8 @@ class LogDetailFragment : BottomSheetDialogFragment() {
                 } else {
                     Toast.makeText(requireContext(), "삭제 처리 실패", Toast.LENGTH_SHORT).show()
                 }
-                val action = LogDetailFragmentDirections.actionLogDetailFragmentToHomeFragment(args.placeId)
+                val action =
+                    LogDetailFragmentDirections.actionLogDetailFragmentToHomeFragment(args.remotePlaceId)
                 findNavController().navigate(action)
             }
         }
