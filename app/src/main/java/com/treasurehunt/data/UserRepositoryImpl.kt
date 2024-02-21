@@ -1,6 +1,5 @@
 package com.treasurehunt.data
 
-import com.google.firebase.database.FirebaseDatabase
 import com.treasurehunt.data.local.UserDao
 import com.treasurehunt.data.local.model.UserEntity
 import com.treasurehunt.data.remote.UserRemoteDataSource
@@ -33,13 +32,4 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun delete(vararg users: UserEntity) = userDao.delete(*users)
 
     override suspend fun search(startAt: String, limit: Int) = userRemoteDataSource.search(startAt, limit)
-
-//    override suspend fun deleteUser(userId: String) {
-//        userRemoteDataSource.deleteUser(userId)
-//    }
-//
-//    override suspend fun deleteUser(userId: String) {
-//        val databaseReference = FirebaseDatabase.getInstance().getReference("users").child(userId)
-//        databaseReference.removeValue()
-//    }
 }
