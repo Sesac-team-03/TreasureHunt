@@ -35,7 +35,6 @@ class SplashFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Firebase.auth.currentUser?.delete()
         initSplashScreen()
     }
 

@@ -53,6 +53,11 @@
             app:destination="@id/feedFragment"
             app:popUpTo="@id/homeFragment"
             app:popUpToInclusive="true" />
+        <argument
+            android:name="remotePlaceId"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
     </fragment>
 
     <fragment
@@ -81,6 +86,9 @@
         android:id="@+id/logDetailFragment"
         android:name="com.treasurehunt.ui.detail.LogDetailFragment"
         android:label="logDetailFragment">
+        <action
+            android:id="@+id/action_logDetailFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
         <action
             android:id="@+id/action_logDetailFragment_to_saveLogFragment"
             app:destination="@id/saveLogFragment" />
