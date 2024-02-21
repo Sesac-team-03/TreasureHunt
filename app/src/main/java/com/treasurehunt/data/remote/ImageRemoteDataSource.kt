@@ -8,4 +8,8 @@ class ImageRemoteDataSource @Inject constructor(private val imageService: ImageS
     suspend fun insert(imageDTO: ImageDTO) = imageService.insert(imageDTO).name
 
     suspend fun getRemoteImage(id: String) = imageService.getRemoteImage(id)
+
+    suspend fun delete(id: String) {
+        imageService.delete(id)
+    }
 }
