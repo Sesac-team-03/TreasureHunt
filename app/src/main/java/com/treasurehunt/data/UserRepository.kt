@@ -7,12 +7,14 @@ import kotlinx.coroutines.flow.Flow
 interface UserRepository {
 
     suspend fun insert(user: UserEntity): Long
+
     suspend fun insert(id: String, data: UserDTO)
-    suspend fun getRemoteUser(id: String): UserDTO
 
     fun getUserById(id: String): Flow<UserEntity>
 
     fun getAllUsers(): Flow<List<UserEntity>>
+
+    suspend fun getRemoteUser(id: String): UserDTO
 
     fun update(user: UserEntity): Int
 
@@ -21,6 +23,4 @@ interface UserRepository {
     suspend fun delete(vararg users: UserEntity): Int
 
     suspend fun search(startAt: String, limit: Int = 10): Map<String, UserDTO>
-
-//    suspend fun deleteUser(userId: String)
 }

@@ -1,6 +1,5 @@
 package com.treasurehunt.data.remote
 
-import android.util.Log
 import com.treasurehunt.data.remote.model.UserDTO
 import com.treasurehunt.util.convertToDataClass
 import javax.inject.Inject
@@ -11,11 +10,11 @@ class UserRemoteDataSource @Inject constructor(private val userService: UserServ
         userService.insert(uid, userDTO)
     }
 
+    suspend fun getRemoteUser(id: String) = userService.getRemoteUser(id)
+
     suspend fun update(uid: String, userDTO: UserDTO) {
         userService.update(uid, userDTO)
     }
-
-    suspend fun getUserData(id: String) = userService.getUser(id)
 
     suspend fun search(startAt: String, limit: Int = 10): Map<String, UserDTO> {
         return try {

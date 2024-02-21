@@ -1,6 +1,5 @@
 package com.treasurehunt.data
 
-import com.google.firebase.database.FirebaseDatabase
 import com.treasurehunt.data.local.UserDao
 import com.treasurehunt.data.local.model.UserEntity
 import com.treasurehunt.data.remote.UserRemoteDataSource
@@ -19,11 +18,11 @@ class UserRepositoryImpl @Inject constructor(
         userRemoteDataSource.insert(id, data)
     }
 
-    override suspend fun getRemoteUser(id: String): UserDTO = userRemoteDataSource.getUserData(id)
-
     override fun getUserById(id: String): Flow<UserEntity> = userDao.getUserById(id)
 
     override fun getAllUsers(): Flow<List<UserEntity>> = userDao.getAllUsers()
+
+    override suspend fun getRemoteUser(id: String): UserDTO = userRemoteDataSource.getRemoteUser(id)
 
     override fun update(user: UserEntity) = userDao.update(user)
 
@@ -34,13 +33,4 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun delete(vararg users: UserEntity) = userDao.delete(*users)
 
     override suspend fun search(startAt: String, limit: Int) = userRemoteDataSource.search(startAt, limit)
-
-//    override suspend fun deleteUser(userId: String) {
-//        userRemoteDataSource.deleteUser(userId)
-//    }
-//
-//    override suspend fun deleteUser(userId: String) {
-//        val databaseReference = FirebaseDatabase.getInstance().getReference("users").child(userId)
-//        databaseReference.removeValue()
-//    }
 }
