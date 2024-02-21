@@ -114,7 +114,7 @@ class DatabaseUpdateWorker @AssistedInject constructor(
         val theme = "123"
         val createdDate = getCurrentTime()
         val imageIds = imageUrls.map { imageUrl ->
-            imageRepo.insertImage(
+            imageRepo.insert(
                 ImageDTO(url = imageUrl)
             )
         }
