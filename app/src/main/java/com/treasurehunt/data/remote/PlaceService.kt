@@ -16,9 +16,7 @@ interface PlaceService {
     suspend fun insert(@Body placeDTO: PlaceDTO): RemoteIdWrapper
 
     @GET("/places/{id}.json")
-    suspend fun getPlace(
-        @Path("id") id: String
-    ): PlaceDTO
+    suspend fun getRemotePlace(@Path("id") id: String): PlaceDTO
 
     @PATCH("/places/{id}.json")
     suspend fun update(
@@ -27,5 +25,5 @@ interface PlaceService {
     )
 
     @DELETE("/places/{id}.json")
-    suspend fun deletePlace(@Path("id") id: String) : Response<Unit>
+    suspend fun delete(@Path("id") id: String)
 }

@@ -7,9 +7,13 @@ class PlaceRemoteDataSource @Inject constructor(private val placeService: PlaceS
 
     suspend fun insert(placeDTO: PlaceDTO) = placeService.insert(placeDTO).name
 
-    suspend fun getPlace(id: String) = placeService.getPlace(id)
+    suspend fun getRemotePlace(id: String) = placeService.getRemotePlace(id)
 
     suspend fun update(id: String, placeDTO: PlaceDTO) {
         placeService.update(id, placeDTO)
+    }
+
+    suspend fun delete(id: String) {
+        placeService.delete(id)
     }
 }

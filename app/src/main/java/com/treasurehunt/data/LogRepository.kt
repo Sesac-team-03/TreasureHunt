@@ -10,13 +10,13 @@ interface LogRepository {
 
     suspend fun insert(log: LogDTO): String
 
-    suspend fun getRemoteLog(id: String): LogDTO
-
-    suspend fun getRemoteAllLogs(): List<LogDTO>
-
     fun getLogById(id: String): Flow<LogEntity>
 
     fun getAllLogs(): Flow<List<LogEntity>>
+
+    suspend fun getRemoteLog(id: String): LogDTO
+
+    suspend fun getAllRemoteLogs(): List<LogDTO>
 
     fun update(log: LogEntity): Int
 
@@ -24,5 +24,5 @@ interface LogRepository {
 
     suspend fun deleteAll()
 
-    suspend fun deleteLog(logId: String)
+    suspend fun delete(id: String)
 }

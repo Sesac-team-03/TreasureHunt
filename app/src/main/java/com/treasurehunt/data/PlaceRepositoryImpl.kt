@@ -16,13 +16,13 @@ class PlaceRepositoryImpl @Inject constructor(
 
     override suspend fun insert(place: PlaceDTO): String = placeRemoteDataSource.insert(place)
 
-    override suspend fun getRemotePlace(id: String): PlaceDTO = placeRemoteDataSource.getPlace(id)
-
     override fun getPlaceById(id: String): Flow<PlaceEntity> = placeDao.getPlaceById(id)
 
     override fun getAllVisits(): Flow<List<PlaceEntity>> = placeDao.getAllVisits()
 
     override fun getAllPlans(): Flow<List<PlaceEntity>> = placeDao.getAllPlans()
+
+    override suspend fun getRemotePlace(id: String): PlaceDTO = placeRemoteDataSource.getRemotePlace(id)
 
     override suspend fun update(place: PlaceEntity) = placeDao.update(place)
 
@@ -33,10 +33,10 @@ class PlaceRepositoryImpl @Inject constructor(
     override suspend fun delete(vararg places: PlaceEntity) = placeDao.delete(*places)
 
     override suspend fun deleteAll() {
-        placeDao.deleteAllPlaces()
+        placeDao.deleteAll()
     }
 
-    override suspend fun deletePlace(placeId: String) {
-        placeDao.deletePlace(placeId)
+    override suspend fun delete(id: String) {
+        placeRemoteDataSource.delete(id)
     }
 }

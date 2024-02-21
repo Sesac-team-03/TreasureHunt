@@ -31,8 +31,5 @@ interface PlaceDao {
     suspend fun delete(vararg places: PlaceEntity): Int
 
     @Query("DELETE FROM places")
-    suspend fun deleteAllPlaces()
-
-    @Query("DELETE FROM places WHERE id = :placeId")
-    suspend fun deletePlace(placeId: String)
+    suspend fun deleteAll()
 }

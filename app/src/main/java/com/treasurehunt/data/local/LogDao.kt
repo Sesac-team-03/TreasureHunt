@@ -29,7 +29,4 @@ interface LogDao {
 
     @Query("DELETE FROM logs")
     suspend fun deleteAllLogs()
-
-    @Query("DELETE FROM logs WHERE id = :logId")
-    suspend fun deleteLog(logId: String)
 }
