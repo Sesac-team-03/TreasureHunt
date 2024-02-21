@@ -10,7 +10,7 @@
 
         <variable
             name="imageModel"
-            type="com.treasurehunt.ui.savelog.ImageModel" />
+            type="com.treasurehunt.ui.model.ImageModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -23,7 +23,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:scaleType="center"
-            app:imageUrl="@{imageModel.url}"
+            app:imageUrl="@{imageModel.uri}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

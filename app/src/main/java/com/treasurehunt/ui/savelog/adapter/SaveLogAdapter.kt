@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.treasurehunt.databinding.ItemSavelogBinding
 import com.treasurehunt.ui.savelog.ImageClickListener
-import com.treasurehunt.ui.savelog.ImageModel
+import com.treasurehunt.ui.model.ImageModel
 
 class SaveLogAdapter(private val clickListener: ImageClickListener) :
     ListAdapter<ImageModel, SaveLogAdapter.ViewHolder>(diffUtil) {
@@ -43,7 +43,7 @@ class SaveLogAdapter(private val clickListener: ImageClickListener) :
     companion object {
         private val diffUtil = object : DiffUtil.ItemCallback<ImageModel>() {
             override fun areItemsTheSame(oldItem: ImageModel, newItem: ImageModel): Boolean {
-                return oldItem.url == newItem.url
+                return oldItem.uri == newItem.uri
             }
 
             override fun areContentsTheSame(oldItem: ImageModel, newItem: ImageModel): Boolean {
