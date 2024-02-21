@@ -5,9 +5,9 @@ import com.treasurehunt.data.remote.model.ImageDTO
 
 interface ImageRepository {
 
-    suspend fun insertImage(imageEntity: ImageEntity): Long
+    suspend fun insert(imageEntity: ImageEntity): Long
 
-    suspend fun insertImage(imageDTO: ImageDTO): String
+    suspend fun insert(imageDTO: ImageDTO): String
 
     suspend fun getRemoteImage(id: String): ImageDTO
 

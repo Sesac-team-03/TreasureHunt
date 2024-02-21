@@ -16,13 +16,13 @@ class LogRepositoryImpl @Inject constructor(
 
     override suspend fun insert(logDTD: LogDTO) = logRemoteDataSource.insert(logDTD).name
 
-    override suspend fun getRemoteLog(id: String): LogDTO = logRemoteDataSource.getLog(id)
-
-    override suspend fun getRemoteAllLogs(): List<LogDTO> = logRemoteDataSource.getAllLogs()
-
     override fun getLogById(id: String): Flow<LogEntity> = logDao.getLogById(id)
 
     override fun getAllLogs(): Flow<List<LogEntity>> = logDao.getAllLogs()
+
+    override suspend fun getRemoteLog(id: String): LogDTO = logRemoteDataSource.getRemoteLog(id)
+
+    override suspend fun getAllRemoteLogs(): List<LogDTO> = logRemoteDataSource.getAllRemoteLogs()
 
     override fun update(log: LogEntity) = logDao.update(log)
 
@@ -30,5 +30,9 @@ class LogRepositoryImpl @Inject constructor(
 
     override suspend fun deleteAll() {
         logDao.deleteAllLogs()
+    }
+
+    override suspend fun delete(id: String) {
+        logRemoteDataSource.delete(id)
     }
 }
