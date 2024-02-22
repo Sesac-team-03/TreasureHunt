@@ -129,7 +129,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
             val mapSymbol = MapSymbol(
                 symbol.position.latitude,
                 symbol.position.longitude,
-                symbol.caption
+                caption = symbol.caption
             )
             val action =
                 HomeFragmentDirections.actionHomeFragmentToMapDialogFragment(
@@ -190,8 +190,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                 val mapSymbol = MapSymbol(
                     plan.lat,
                     plan.lng,
-                    plan.caption,
                     true,
+                    plan.caption,
                     remotePlaceId
                 )
                 val action = HomeFragmentDirections.actionHomeFragmentToSaveLogFragment(

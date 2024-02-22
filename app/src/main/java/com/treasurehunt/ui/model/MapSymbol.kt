@@ -7,13 +7,13 @@ import kotlinx.parcelize.Parcelize
 data class MapSymbol(
     val lat: Double,
     val lng: Double,
-    val caption: String,
     val isPlan: Boolean = false,
-    val remoteId: String? = null
+    val caption: String,
+    val remotePlanId: String? = null
 ) : Parcelable
 
 fun MapSymbol.toPlace(): PlaceModel {
-    val (lat, lng, caption) = this
+    val (lat, lng, isPlan, caption) = this
     return PlaceModel(
         lat,
         lng,

@@ -30,7 +30,7 @@ class FeedViewModel @Inject constructor(
 
     private fun getAllLogs() {
         viewModelScope.launch {
-            logRepo.getAllLogs().collect { allLogs ->
+            logRepo.getAllLocalLogs().collect { allLogs ->
                 _uiState.update {
                     FeedUiState(convertLogModels(allLogs), true)
                 }
@@ -40,13 +40,13 @@ class FeedViewModel @Inject constructor(
 
     private suspend fun convertLogModels(logEntities: List<LogEntity>): List<LogModel> {
         return logEntities.map { logEntity ->
-            logEntity.toLogModel(getImageUrls(logEntity.imageIds))
+            logEntity.toLogModel(getImageUrls(logEntity.remoteImageIds))
         }
     }
 
     private suspend fun getImageUrls(imageIds: List<String>): List<String> {
         return imageIds.map { id ->
-            imageRepo.getRemoteImage(id).url
+            imageRepo.getRemoteImageById(id).url
         }
     }
 

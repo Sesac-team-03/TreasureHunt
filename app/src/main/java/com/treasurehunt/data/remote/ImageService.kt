@@ -10,8 +10,8 @@ import retrofit2.http.Path
 interface ImageService {
 
     @POST("images.json")
-    suspend fun insert(@Body imageDTO: ImageDTO): RemoteIdWrapper
+    suspend fun insert(@Body image: ImageDTO): RemoteIdWrapper
 
     @GET("images/{id}.json")
-    suspend fun getRemoteImage(@Path("id") id: String): ImageDTO
+    suspend fun getRemoteImageById(@Path("id") id: String): ImageDTO
 }

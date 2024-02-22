@@ -8,15 +8,23 @@ data class UserDTO(
     val email: String?,
     val nickname: String? = null,
     val profileImage: String? = null,
-    val public: Boolean = false,
-    val friends: Map<String, Boolean> = emptyMap(),
-    val logs: Map<String, Boolean> = emptyMap(),
-    val places: Map<String, Boolean> = emptyMap(),
-    val plans: Map<String, Boolean> = emptyMap(),
+    val isPublic: Boolean = false,
+    val remoteFriendIds: Map<String, Boolean> = emptyMap(),
+    val remoteLogIds: Map<String, Boolean> = emptyMap(),
+    val remoteVisitIds: Map<String, Boolean> = emptyMap(),
+    val remotePlanIds: Map<String, Boolean> = emptyMap(),
     val localId: Long = 0,
     val remoteId: String? = null
 )
 
-fun UserDTO.toUserModel(remoteId: String? = null): UserModel {
-    return UserModel(email, nickname, profileImage, friends, logs, places, plans, remoteId)
-}
+fun UserDTO.toUserModel(remoteId: String? = null) =
+    UserModel(
+        email,
+        nickname,
+        profileImage,
+        remoteFriendIds,
+        remoteLogIds,
+        remoteVisitIds,
+        remotePlanIds,
+        remoteId
+    )

@@ -10,13 +10,10 @@ data class ImageEntity(
     val url: String,
     @ColumnInfo("local_path")
     val localPath: String? = null,
-    @ColumnInfo("remote_id")
-    val remoteId: String? = null,
     @PrimaryKey(autoGenerate = true)
-    val id: Long = 0
+    val localId: Long = 0,
+    @ColumnInfo("remote_id")
+    val remoteId: String? = null
 )
 
-fun ImageEntity.toImageDTO(): ImageDTO {
-    val (url, _, _, localId) = this
-    return ImageDTO(url, localId)
-}
+fun ImageEntity.toImageDTO() = ImageDTO(url, localId)

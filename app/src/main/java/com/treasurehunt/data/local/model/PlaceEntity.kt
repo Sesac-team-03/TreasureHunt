@@ -9,16 +9,13 @@ import com.treasurehunt.data.remote.model.PlaceDTO
 data class PlaceEntity(
     val lat: Double,
     val lng: Double,
-    val plan: Boolean,
+    val isPlan: Boolean,
     val caption: String,
-    val log: String? = null,
-    @ColumnInfo("remote_id")
-    val remoteId: String? = null,
+    val remoteLogId: String? = null,
     @PrimaryKey(autoGenerate = true)
-    val id: Long = 0
+    val localId: Long = 0,
+    @ColumnInfo("remote_id")
+    val remoteId: String? = null
 )
 
-fun PlaceEntity.toPlaceDTO(): PlaceDTO {
-    val (lat, lng, plan, caption, log, _, localId) = this
-    return PlaceDTO(lat, lng, plan, caption, log, localId)
-}
+fun PlaceEntity.toPlaceDTO() = PlaceDTO(lat, lng, isPlan, caption, remoteLogId, localId)

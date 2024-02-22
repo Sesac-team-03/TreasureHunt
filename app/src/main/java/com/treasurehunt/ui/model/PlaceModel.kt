@@ -6,14 +6,14 @@ import com.treasurehunt.data.remote.model.PlaceDTO
 data class PlaceModel(
     val lat: Double,
     val lng: Double,
-    val plan: Boolean,
+    val isPlan: Boolean,
     val caption: String,
-    val log: String? = null
+    val remoteLogId: String? = null
 )
 
 fun PlaceModel.asPlaceEntity(remoteId: String? = null, localId: Long = 0): PlaceEntity {
     val (lat, lng, plan, caption, log) = this
-    return PlaceEntity(lat, lng, plan, caption, log, remoteId, localId)
+    return PlaceEntity(lat, lng, plan, caption, log, localId, remoteId)
 }
 
 fun PlaceModel.asPlaceDTO(localId: Long = 0): PlaceDTO {

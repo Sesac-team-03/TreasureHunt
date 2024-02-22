@@ -5,15 +5,20 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class LogDTO(
-    val place: String,
-    val images: Map<String, Boolean>,
+    val remotePlaceId: String,
     val text: String,
     val theme: String,
     val createdDate: Long,
+    val remoteImageIds: Map<String, Boolean>,
     val localId: Long = 0
 )
 
-fun LogDTO.toLogEntity(remoteId: String): LogEntity {
-    val (place, images, text, theme, createdDate, localId) = this
-    return LogEntity(place, images.keys.toList(), text, theme, createdDate, remoteId, localId)
-}
+fun LogDTO.toLogEntity(remoteId: String) = LogEntity(
+    remotePlaceId,
+    text,
+    theme,
+    createdDate,
+    remoteImageIds.keys.toList(),
+    localId,
+    remoteId
+)

@@ -15,14 +15,14 @@ interface PlaceDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(place: PlaceEntity): Long
 
-    @Query("SELECT * from places WHERE id = :id")
-    fun getPlaceById(id: String): Flow<PlaceEntity>
+    @Query("SELECT * from places WHERE localId = :id")
+    fun getLocalPlaceById(id: String): Flow<PlaceEntity>
 
-    @Query("SELECT * from places WHERE `plan` = 0")
-    fun getAllVisits(): Flow<List<PlaceEntity>>
+    @Query("SELECT * from places WHERE isPlan = 0")
+    fun getAllLocalVisits(): Flow<List<PlaceEntity>>
 
-    @Query("SELECT * from places WHERE `plan` = 1")
-    fun getAllPlans(): Flow<List<PlaceEntity>>
+    @Query("SELECT * from places WHERE isPlan = 1")
+    fun getAllLocalPlans(): Flow<List<PlaceEntity>>
 
     @Update
     suspend fun update(place: PlaceEntity): Int
@@ -31,5 +31,5 @@ interface PlaceDao {
     suspend fun delete(vararg places: PlaceEntity): Int
 
     @Query("DELETE FROM places")
-    suspend fun deleteAll()
+    suspend fun deleteAllLocalPlaces()
 }

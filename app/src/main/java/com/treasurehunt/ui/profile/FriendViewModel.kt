@@ -97,7 +97,7 @@ class FriendViewModel @Inject constructor(
         friendIds.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
             .collect { friendIds ->
                 val friends = friendIds.map { friendId ->
-                    userRepo.getRemoteUser(friendId).toUserModel(remoteId = friendId)
+                    userRepo.getRemoteUserById(friendId).toUserModel(remoteId = friendId)
                 }
                 _uiState.update {
                     it.copy(friends = friends.associateWith { true })
@@ -117,29 +117,29 @@ class FriendViewModel @Inject constructor(
     }
 
     suspend fun addFriend(uid: String, friendId: String) {
-        val user = userRepo.getRemoteUser(uid)
-        if (user.friends[friendId] == true) return
+        val user = userRepo.getRemoteUserById(uid)
+        if (user.remoteFriendIds[friendId] == true) return
 
         userRepo.update(
-            uid, user.copy(friends = user.friends + (friendId to true))
+            uid, user.copy(remoteFriendIds = user.remoteFriendIds + (friendId to true))
         )
 
         _uiState.update { uiState ->
-            val friend = userRepo.getRemoteUser(friendId).toUserModel(friendId)
+            val friend = userRepo.getRemoteUserById(friendId).toUserModel(friendId)
             uiState.copy(friends = uiState.friends + (friend to true))
         }
     }
 
     suspend fun removeFriend(uid: String, friendId: String) {
-        val user = userRepo.getRemoteUser(uid)
-        if (user.friends[friendId] != true) return
+        val user = userRepo.getRemoteUserById(uid)
+        if (user.remoteFriendIds[friendId] != true) return
 
         userRepo.update(
-            uid, user.copy(friends = user.friends + (friendId to false))
+            uid, user.copy(remoteFriendIds = user.remoteFriendIds + (friendId to false))
         )
 
         _uiState.update {
-            val friend = userRepo.getRemoteUser(friendId).toUserModel(friendId)
+            val friend = userRepo.getRemoteUserById(friendId).toUserModel(friendId)
             it.copy(friends = it.friends - friend)
         }
     }

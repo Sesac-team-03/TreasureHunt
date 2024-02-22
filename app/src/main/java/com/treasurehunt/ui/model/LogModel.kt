@@ -17,10 +17,10 @@ data class LogModel(
 
 fun LogModel.asLogEntity(remoteId: String? = null, localId: Long = 0): LogEntity {
     val (place, text, theme, createdDate, imageIds) = this
-    return LogEntity(place, imageIds, text, theme, createdDate, remoteId, localId)
+    return LogEntity(place, text, theme, createdDate, imageIds, localId, remoteId)
 }
 
 fun LogModel.asLogDTO(localId: Long = 0): LogDTO {
     val (place, text, theme, createdDate,imageIds) = this
-    return LogDTO(place, imageIds.associateWith { true }, text, theme, createdDate, localId)
+    return LogDTO(place, text, theme, createdDate, imageIds.associateWith { true }, localId)
 }

@@ -71,7 +71,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    suspend fun getRemoteUser(uid: String): UserDTO = userRepo.getRemoteUser(uid)
+    suspend fun getRemoteUser(uid: String): UserDTO = userRepo.getRemoteUserById(uid)
 
     suspend fun updateUser(uid: String, user: UserDTO) {
         userRepo.update(uid, user)
@@ -87,7 +87,7 @@ class HomeViewModel @Inject constructor(
     }.await()
 
     suspend fun getRemotePlaceById(id: String): PlaceDTO = viewModelScope.async {
-        return@async placeRepo.getRemotePlace(id)
+        return@async placeRepo.getRemotePlaceById(id)
     }.await()
 
     suspend fun updatePlace(place: PlaceEntity) {
@@ -103,13 +103,13 @@ class HomeViewModel @Inject constructor(
 
         fetchJob = viewModelScope.launch {
             try {
-                combine(placeRepo.getAllVisits(), placeRepo.getAllPlans()) { visits, plans ->
+                combine(placeRepo.getAllLocalVisits(), placeRepo.getAllLocalPlans()) { visits, plans ->
                     visits + plans
                 }
                     .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
                     .collect { visitsAndPlans ->
                         _uiState.update { uiState ->
-                            val (visits, plans) = visitsAndPlans.partition { !it.plan }
+                            val (visits, plans) = visitsAndPlans.partition { !it.isPlan }
                             uiState.copy(
                                 visitMarkers = visits.mapToMarkers(),
                                 planMarkers = plans.mapToMarkers()
@@ -122,7 +122,7 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun List<PlaceEntity>.mapToMarkers() = map { place ->
-        if (!place.plan) {
+        if (!place.isPlan) {
             Marker(LatLng(place.lat, place.lng)).from(
                 place.remoteId,
                 place.caption,

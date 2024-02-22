@@ -246,7 +246,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
 
     private fun getDatabaseUpdateRequest(): OneTimeWorkRequest {
         val uid = Firebase.auth.currentUser!!.uid
-        val (lat, lng, caption, isPlan, planId) = args.mapSymbol
+        val (lat, lng, isPlan, caption, planId) = args.mapSymbol
         val logText = binding.etText.text.toString()
         val data = Data.Builder()
             .putString(WORK_DATA_UID, uid)

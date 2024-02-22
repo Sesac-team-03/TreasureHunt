@@ -55,23 +55,23 @@ class LoginViewModel @Inject constructor(
 
     suspend fun initLocalData() {
         val curUserUid = Firebase.auth.currentUser!!.uid
-        val userDTO = userRepo.getRemoteUser(curUserUid)
+        val userDTO = userRepo.getRemoteUserById(curUserUid)
         initLocalLogs(userDTO)
         initLocalPlaces(userDTO)
     }
 
     private suspend fun initLocalLogs(userDTO: UserDTO) {
-        logRepo.deleteAll()
-        userDTO.logs.map {
-            val log = logRepo.getRemoteLog(it.key)
+        logRepo.deleteAllLocalLogs()
+        userDTO.remoteLogIds.map {
+            val log = logRepo.getRemoteLogById(it.key)
             logRepo.insert(log.toLogEntity(it.key))
         }
     }
 
     private suspend fun initLocalPlaces(userDTO: UserDTO) {
-        placeRepo.deleteAll()
-        userDTO.places.map {
-            val place = placeRepo.getRemotePlace(it.key)
+        placeRepo.deleteAllLocalPlaces()
+        userDTO.remoteVisitIds.map {
+            val place = placeRepo.getRemotePlaceById(it.key)
             placeRepo.insert(place.toPlaceEntity(it.key))
         }
     }

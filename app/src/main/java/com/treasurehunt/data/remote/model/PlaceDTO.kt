@@ -7,13 +7,18 @@ import kotlinx.serialization.Serializable
 data class PlaceDTO(
     val lat: Double,
     val lng: Double,
-    val plan: Boolean,
+    val isPlan: Boolean,
     val caption: String,
-    val log: String? = null,
+    val remoteLogId: String? = null,
     val localId: Long = 0
 )
 
-fun PlaceDTO.toPlaceEntity(remoteId: String): PlaceEntity {
-    val (lat, lng, plan, caption, log, localId) = this
-    return PlaceEntity(lat, lng, plan, caption, log, remoteId, localId)
-}
+fun PlaceDTO.toPlaceEntity(remoteId: String) = PlaceEntity(
+    lat,
+    lng,
+    isPlan,
+    caption,
+    remoteLogId,
+    localId,
+    remoteId
+)

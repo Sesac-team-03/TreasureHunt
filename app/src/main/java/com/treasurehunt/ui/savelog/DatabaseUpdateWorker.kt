@@ -33,6 +33,7 @@ class DatabaseUpdateWorker @AssistedInject constructor(
 
     private lateinit var uid: String
     private lateinit var mapSymbol: MapSymbol
+    var test = 0
 
     override suspend fun doWork(): Result {
         return try {
@@ -48,7 +49,7 @@ class DatabaseUpdateWorker @AssistedInject constructor(
             val isPlan = inputData.getBoolean(WORK_DATA_IS_PLAN, false)
             val planId = inputData.getString(WORK_DATA_PLAN_ID)
 
-            mapSymbol = MapSymbol(lat, lng, caption, isPlan, planId)
+            mapSymbol = MapSymbol(lat, lng, isPlan, caption, planId)
 
             init(urlStrings, text)
 
@@ -68,7 +69,7 @@ class DatabaseUpdateWorker @AssistedInject constructor(
     }
 
     private suspend fun getRemotePlaceId(): String {
-        val planId = mapSymbol.remoteId
+        val planId = mapSymbol.remotePlanId
         return if (planId.isNullOrEmpty()) {
             insertPlace(mapSymbol)
         } else {
@@ -95,14 +96,14 @@ class DatabaseUpdateWorker @AssistedInject constructor(
     }
 
     private suspend fun updatePlaceFromPlanToVisit(remotePlaceId: String) {
-        val placeDTO = placeRepo.getRemotePlace(remotePlaceId)
+        val placeDTO = placeRepo.getRemotePlaceById(remotePlaceId)
 
         placeRepo.update(
             placeDTO.toPlaceEntity(remotePlaceId)
-                .copy(plan = false)
+                .copy(isPlan = false)
         )
         placeRepo.update(
-            remotePlaceId, placeDTO.copy(plan = false)
+            remotePlaceId, placeDTO.copy(isPlan = false)
         )
     }
 
@@ -114,7 +115,7 @@ class DatabaseUpdateWorker @AssistedInject constructor(
         val theme = "123"
         val createdDate = getCurrentTime()
         val imageIds = imageUrls.map { imageUrl ->
-            imageRepo.insertImage(
+            imageRepo.insert(
                 ImageDTO(url = imageUrl)
             )
         }
@@ -134,25 +135,26 @@ class DatabaseUpdateWorker @AssistedInject constructor(
     }
 
     private suspend fun updatePlaceWithLog(remotePlaceId: String, remoteLogId: String) {
-        val updatedPlace = placeRepo.getRemotePlace(remotePlaceId).copy(log = remoteLogId)
+        val updatedPlace =
+            placeRepo.getRemotePlaceById(remotePlaceId).copy(remoteLogId = remoteLogId)
         placeRepo.update(remotePlaceId, updatedPlace)
     }
 
     private suspend fun updateUser(remotePlaceId: String, remoteLogId: String) {
-        val userDTO = userRepo.getRemoteUser(uid)
+        val userDTO = userRepo.getRemoteUserById(uid)
 
-        if (!mapSymbol.remoteId.isNullOrEmpty()) {
+        if (!mapSymbol.remotePlanId.isNullOrEmpty()) {
             userRepo.update(
                 uid, userDTO.copy(
-                    plans = userDTO.plans.minus(remotePlaceId)
+                    remotePlanIds = userDTO.remotePlanIds.minus(remotePlaceId)
                 )
             )
         }
 
         userRepo.update(
             uid, userDTO.copy(
-                places = userDTO.places.plus(remotePlaceId to true),
-                logs = userDTO.logs.plus(remoteLogId to true)
+                remoteVisitIds = userDTO.remoteVisitIds.plus(remotePlaceId to true),
+                remoteLogIds = userDTO.remoteLogIds.plus(remoteLogId to true)
             )
         )
     }

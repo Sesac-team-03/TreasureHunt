@@ -5,6 +5,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class Converters {
+
     @TypeConverter
     fun fromString(value: String): List<String> = Json.decodeFromString(value)
 

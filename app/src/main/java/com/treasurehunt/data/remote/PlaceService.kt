@@ -12,15 +12,15 @@ import retrofit2.http.Path
 interface PlaceService {
 
     @POST("places.json")
-    suspend fun insert(@Body placeDTO: PlaceDTO): RemoteIdWrapper
+    suspend fun insert(@Body place: PlaceDTO): RemoteIdWrapper
 
     @GET("places/{id}.json")
-    suspend fun getRemotePlace(@Path("id") id: String): PlaceDTO
+    suspend fun getRemotePlaceById(@Path("id") id: String): PlaceDTO
 
     @PATCH("places/{id}.json")
     suspend fun update(
         @Path("id") id: String,
-        @Body data: PlaceDTO
+        @Body place: PlaceDTO
     )
 
     @DELETE("places/{id}.json")

@@ -7,16 +7,18 @@ import kotlinx.coroutines.flow.Flow
 interface UserRepository {
 
     suspend fun insert(user: UserEntity): Long
+
     suspend fun insert(id: String, data: UserDTO)
-    suspend fun getRemoteUser(id: String): UserDTO
 
-    fun getUserById(id: String): Flow<UserEntity>
+    fun getLocalUserById(id: String): Flow<UserEntity>
 
-    fun getAllUsers(): Flow<List<UserEntity>>
+    fun getAllLocalUsers(): Flow<List<UserEntity>>
+
+    suspend fun getRemoteUserById(id: String): UserDTO
 
     fun update(user: UserEntity): Int
 
-    suspend fun update(id: String, data: UserDTO)
+    suspend fun update(id: String, user: UserDTO)
 
     suspend fun delete(vararg users: UserEntity): Int
 

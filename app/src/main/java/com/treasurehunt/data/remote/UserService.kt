@@ -14,18 +14,16 @@ interface UserService {
     @PUT("users/{id}.json")
     suspend fun insert(
         @Path("id") id: String,
-        @Body userDTO: UserDTO
+        @Body user: UserDTO
     )
 
     @GET("users/{id}.json")
-    suspend fun getUser(
-        @Path("id") id: String
-    ): UserDTO
+    suspend fun getRemoteUserById(@Path("id") id: String): UserDTO
 
     @PATCH("users/{id}.json")
     suspend fun update(
         @Path("id") id: String,
-        @Body userDTO: UserDTO
+        @Body user: UserDTO
     )
 
     @GET("users.json")

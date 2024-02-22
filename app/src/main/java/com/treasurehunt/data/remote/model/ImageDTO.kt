@@ -10,12 +10,8 @@ data class ImageDTO(
     val localId: Long = 0
 )
 
-fun ImageDTO.toImageEntity(remoteId: String): ImageEntity {
-    val (url, localId) = this
-    return ImageEntity(url, null, remoteId, localId)
-}
+fun ImageDTO.toImageEntity(remoteId: String): ImageEntity =
+    ImageEntity(url, null, localId, remoteId)
 
-fun ImageDTO.toImageModel(): ImageModel {
-    val (url, localId) = this
-    return ImageModel(url)
-}
+fun ImageDTO.toImageModel(): ImageModel =
+    ImageModel(url)

@@ -14,7 +14,7 @@ interface LogService {
     suspend fun insert(@Body logDTO: LogDTO): RemoteIdWrapper
 
     @GET("logs/{id}.json")
-    suspend fun getRemoteLog(@Path("id") id: String): LogDTO
+    suspend fun getRemoteLogById(@Path("id") id: String): LogDTO
 
     @GET("logs.json")
     suspend fun getAllRemoteLogs(): List<LogDTO>

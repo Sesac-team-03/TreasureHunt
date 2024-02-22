@@ -15,11 +15,11 @@ interface UserDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(user: UserEntity): Long
 
-    @Query("SELECT * from users WHERE id = :id")
-    fun getUserById(id: String): Flow<UserEntity>
+    @Query("SELECT * from users WHERE localId = :id")
+    fun getLocalUserById(id: String): Flow<UserEntity>
 
     @Query("SELECT * from users")
-    fun getAllUsers(): Flow<List<UserEntity>>
+    fun getAllLocalUsers(): Flow<List<UserEntity>>
 
     @Update
     fun update(user: UserEntity): Int
