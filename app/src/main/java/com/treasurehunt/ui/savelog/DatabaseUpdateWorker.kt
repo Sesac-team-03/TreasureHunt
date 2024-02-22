@@ -130,8 +130,8 @@ class DatabaseUpdateWorker @AssistedInject constructor(
     }
 
     private suspend fun insertLog(log: LogModel): String {
-        logRepo.insert(log.asLogEntity())
-        return logRepo.insert(log.asLogDTO())
+        val localLogId = logRepo.insert(log.asLogEntity())
+        return logRepo.insert(log.asLogDTO(localLogId))
     }
 
     private suspend fun updatePlaceWithLog(remotePlaceId: String, remoteLogId: String) {
