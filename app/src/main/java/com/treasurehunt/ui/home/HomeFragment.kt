@@ -129,15 +129,11 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
             val mapSymbol = MapSymbol(
                 symbol.position.latitude,
                 symbol.position.longitude,
-                caption = symbol.caption
+                false,
+                symbol.caption
             )
-            val action =
-                HomeFragmentDirections.actionHomeFragmentToMapDialogFragment(
-                    mapSymbol
-                )
-
+            val action = HomeFragmentDirections.actionHomeFragmentToMapDialogFragment(mapSymbol)
             findNavController().navigate(action)
-
             true
         }
     }
@@ -194,12 +190,9 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                     plan.caption,
                     remotePlaceId
                 )
-                val action = HomeFragmentDirections.actionHomeFragmentToSaveLogFragment(
-                    mapSymbol
-                )
+                val action = HomeFragmentDirections.actionHomeFragmentToSaveLogFragment(mapSymbol)
                 findNavController().navigate(action)
             }
-
             true
         }
     }

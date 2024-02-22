@@ -84,7 +84,7 @@ class DatabaseUpdateWorker @AssistedInject constructor(
         val localPlaceId = placeRepo.insert(place.asPlaceEntity())
 
         placeRepo.update(
-            place.asPlaceEntity(remotePlaceId, localPlaceId)
+            place.asPlaceEntity(localPlaceId, remotePlaceId)
         )
 
         placeRepo.update(
