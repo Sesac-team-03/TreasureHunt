@@ -13,12 +13,12 @@ interface LogService {
     @POST("logs.json")
     suspend fun insert(@Body logDTO: LogDTO): RemoteIdWrapper
 
-    @GET("/logs/{id}.json")
+    @GET("logs/{id}.json")
     suspend fun getRemoteLog(@Path("id") id: String): LogDTO
 
     @GET("logs.json")
     suspend fun getAllRemoteLogs(): List<LogDTO>
 
-    @DELETE("/logs/{id}.json")
+    @DELETE("logs/{id}.json")
     suspend fun delete(@Path("id") id: String)
 }

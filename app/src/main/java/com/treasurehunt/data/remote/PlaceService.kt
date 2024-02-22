@@ -14,15 +14,15 @@ interface PlaceService {
     @POST("places.json")
     suspend fun insert(@Body placeDTO: PlaceDTO): RemoteIdWrapper
 
-    @GET("/places/{id}.json")
+    @GET("places/{id}.json")
     suspend fun getRemotePlace(@Path("id") id: String): PlaceDTO
 
-    @PATCH("/places/{id}.json")
+    @PATCH("places/{id}.json")
     suspend fun update(
         @Path("id") id: String,
         @Body data: PlaceDTO
     )
 
-    @DELETE("/places/{id}.json")
+    @DELETE("places/{id}.json")
     suspend fun delete(@Path("id") id: String)
 }
