@@ -74,7 +74,6 @@ class FeedFragment : Fragment() {
                 .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
                 .collect { pagingLogs ->
                     if (viewModel.isLogsUpdated.value) {
-                        binding.cpiLoading.visibility = View.GONE
                         feedAdapter.submitData(pagingLogs)
                     }
                 }
@@ -87,6 +86,7 @@ class FeedFragment : Fragment() {
                 val isListEmpty =
                     loadState.refresh is LoadState.NotLoading && feedAdapter.itemCount == 0
                 binding.tvNoTreasure.isVisible = isListEmpty
+                binding.cpiLoading.isVisible = loadState.source.refresh is LoadState.Loading
                 binding.rvLogs.isVisible = !isListEmpty
             }
         }
