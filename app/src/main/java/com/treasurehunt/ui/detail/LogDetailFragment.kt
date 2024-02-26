@@ -95,7 +95,7 @@ class LogDetailFragment : BottomSheetDialogFragment() {
             viewLifecycleOwner.lifecycleScope.launch {
                 if (placeId.isNotEmpty() && userId != null) {
                     val placeDTO = viewModel.getRemotePlace(placeId)
-                    placeDTO.log?.let { logId ->
+                    placeDTO.remoteLogId?.let { logId ->
                         viewModel.deleteLogAndAssociatedData(logId, placeId, userId)
                         Toast.makeText(requireContext(), "삭제", Toast.LENGTH_SHORT).show()
                         dismiss()

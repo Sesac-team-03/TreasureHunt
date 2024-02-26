@@ -26,14 +26,17 @@ class LogDetailViewModel @Inject constructor(
 ) : ViewModel() {
 
     suspend fun getLogByRemotePlaceId(placeId: String): LogModel? {
-        val placeDTO: PlaceDTO = placeRepo.getRemotePlace(placeId)
-        val logId = placeDTO.log ?: return null
-        val logDTO: LogDTO = logRepo.getRemoteLog(logId)
+        val placeDTO: PlaceDTO = placeRepo.getRemotePlaceById(placeId)
+        val logId = placeDTO.remoteLogId ?: return null
+        val logDTO: LogDTO = logRepo.getRemoteLogById(logId)
+        val imageUrls = logDTO.remoteImageIds.filterValues { it }.keys.map { id ->
+            imageRepo.getRemoteImageById(id).url
+        }
 
-        return logDTO.toLogModel(imageRepo)
+        return logDTO.toLogModel(imageUrls)
     }
 
-    suspend fun getRemotePlace(placeId: String) = placeRepo.getRemotePlace(placeId)
+    suspend fun getRemotePlace(placeId: String) = placeRepo.getRemotePlaceById(placeId)
 
     suspend fun deleteLogAndAssociatedData(logId: String, placeId: String, userId: String) {
         deleteImages(logId, userId)
@@ -43,35 +46,35 @@ class LogDetailViewModel @Inject constructor(
     }
 
     private suspend fun deleteImages(logId: String, userId: String) {
-        val remoteLog = logRepo.getRemoteLog(logId)
+        val remoteLog = logRepo.getRemoteLogById(logId)
         val storageRef = Firebase.storage.reference.child("${userId}/log_images")
-        remoteLog.images.filterValues { true }.keys.forEach { imageId ->
-            val imageFileName = imageRepo.getRemoteImage(imageId).url.substringAfter("log_images/")
+        remoteLog.remoteImageIds.filterValues { it }.keys.forEach { id ->
+            val imageFileName = imageRepo.getRemoteImageById(id).url.substringAfter("log_images/")
             storageRef.child("/$imageFileName").delete()
-            imageRepo.delete(imageId)
+            imageRepo.delete(id)
         }
     }
 
     private suspend fun deleteLog(logId: String) {
-        val remoteLog = logRepo.getRemoteLog(logId)
+        val remoteLog = logRepo.getRemoteLogById(logId)
         val localLog = remoteLog.toLogEntity(logId)
         logRepo.delete(localLog)
         logRepo.delete(logId)
     }
 
     private suspend fun deletePlace(placeId: String) {
-        val place = placeRepo.getRemotePlace(placeId).toPlaceEntity(placeId)
+        val place = placeRepo.getRemotePlaceById(placeId).toPlaceEntity(placeId)
         placeRepo.delete(place)
         placeRepo.delete(placeId)
     }
 
     private suspend fun updateUser(logId: String, placeId: String, userId: String) {
-        val user = userRepo.getRemoteUser(userId)
+        val user = userRepo.getRemoteUserById(userId)
         userRepo.update(
             userId,
             user.copy(
-                places = user.places + (placeId to false),
-                logs = user.logs + (logId to false)
+                remoteVisitIds = user.remoteVisitIds + (placeId to false),
+                remoteLogIds = user.remoteLogIds + (logId to false)
             )
         )
     }
