@@ -14,9 +14,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.paging.PagingData
+import androidx.recyclerview.widget.GridLayoutManager
 import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentFeedBinding
 import com.treasurehunt.ui.feed.adapter.FeedAdapter
+import com.treasurehunt.ui.feed.adapter.FeedStateAdapter
 import com.treasurehunt.ui.model.LogModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
@@ -53,7 +55,22 @@ class FeedFragment : Fragment() {
     }
 
     private fun initAdapter() {
+        val stateAdapter = FeedStateAdapter { feedAdapter.retry() }
+        val feedAdapter = feedAdapter.withLoadStateFooter(
+            footer = stateAdapter
+        )
+        val layoutManager = GridLayoutManager(context, 3)
         binding.rvLogs.adapter = feedAdapter
+        binding.rvLogs.layoutManager = layoutManager
+        layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                return if (position == feedAdapter.itemCount - 1 && stateAdapter.itemCount > 0) {
+                    3
+                } else {
+                    1
+                }
+            }
+        }
     }
 
     private fun initSegmentedButton() {
@@ -79,6 +96,7 @@ class FeedFragment : Fragment() {
                 }
         }
     }
+
 
     private fun showFeed() {
         viewLifecycleOwner.lifecycleScope.launch {

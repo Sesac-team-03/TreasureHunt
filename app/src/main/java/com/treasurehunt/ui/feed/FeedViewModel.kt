@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 private const val PAGE_SIZE = 9
-private const val INITIAL_PAGE_SIZE = 16
+private const val INITIAL_PAGE_SIZE = 15
 
 @HiltViewModel
 class FeedViewModel @Inject constructor(
