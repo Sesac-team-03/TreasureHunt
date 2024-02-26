@@ -50,10 +50,9 @@ class MapDialogFragment : BottomSheetDialogFragment() {
                 findNavController().navigateUp()
             }
 
-            val action =
-                MapDialogFragmentDirections.actionMapDialogFragmentToSaveLogFragment(
-                    args.mapSymbol
-                )
+            val action = MapDialogFragmentDirections.actionMapDialogFragmentToSaveLogFragment(
+                args.mapSymbol
+            )
             findNavController().navigate(action)
         }
     }
@@ -65,7 +64,7 @@ class MapDialogFragment : BottomSheetDialogFragment() {
             }
 
             val uid = viewModel.uiState.value.uid ?: return@setOnClickListener
-            val (lat, lng, caption) = args.mapSymbol
+            val (lat, lng, _, caption) = args.mapSymbol
             val planEntity = PlaceEntity(
                 lat,
                 lng,
@@ -84,13 +83,16 @@ class MapDialogFragment : BottomSheetDialogFragment() {
                 val localPlanId = viewModel.addPlace(planEntity)
                 val remotePlanId = viewModel.addPlace(planDTO.copy(localId = localPlanId))
                 viewModel.updatePlace(
-                    planEntity.copy(id = localPlanId, remoteId = remotePlanId)
+                    planEntity.copy(localId = localPlanId, remoteId = remotePlanId)
                 )
                 viewModel.updatePlace(
                     remotePlanId,
                     planDTO.copy(localId = localPlanId)
                 )
-                viewModel.updateUser(uid, user.copy(plans = user.plans + (remotePlanId to true)))
+                viewModel.updateUser(
+                    uid,
+                    user.copy(remotePlanIds = user.remotePlanIds + (remotePlanId to true))
+                )
 
                 findNavController().navigateUp()
             }

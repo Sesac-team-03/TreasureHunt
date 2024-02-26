@@ -41,7 +41,7 @@ class ProfileViewModel @Inject constructor(
     fun getUserData() {
         val uid = Firebase.auth.currentUser!!.uid
         viewModelScope.launch {
-            _userData.value = userRepository.getRemoteUser(uid)
+            _userData.value = userRepository.getRemoteUserById(uid)
         }
     }
 

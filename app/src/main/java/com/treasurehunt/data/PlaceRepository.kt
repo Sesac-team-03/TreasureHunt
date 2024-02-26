@@ -10,19 +10,21 @@ interface PlaceRepository {
 
     suspend fun insert(place: PlaceDTO): String
 
-    suspend fun getRemotePlace(id: String): PlaceDTO
+    fun getLocalPlaceById(id: String): Flow<PlaceEntity>
 
-    fun getPlaceById(id: String): Flow<PlaceEntity>
+    fun getAllLocalVisits(): Flow<List<PlaceEntity>>
 
-    fun getAllVisits(): Flow<List<PlaceEntity>>
+    fun getAllLocalPlans(): Flow<List<PlaceEntity>>
 
-    fun getAllPlans(): Flow<List<PlaceEntity>>
+    suspend fun getRemotePlaceById(id: String): PlaceDTO
 
     suspend fun update(place: PlaceEntity): Int
 
-    suspend fun update(id: String, placeDTO: PlaceDTO)
+    suspend fun update(id: String, place: PlaceDTO)
 
     suspend fun delete(vararg places: PlaceEntity): Int
 
-    suspend fun deleteAll()
+    suspend fun deleteAllLocalPlaces()
+
+    suspend fun delete(id: String)
 }

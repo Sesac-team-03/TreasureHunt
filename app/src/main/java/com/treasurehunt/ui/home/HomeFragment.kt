@@ -129,15 +129,11 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
             val mapSymbol = MapSymbol(
                 symbol.position.latitude,
                 symbol.position.longitude,
+                false,
                 symbol.caption
             )
-            val action =
-                HomeFragmentDirections.actionHomeFragmentToMapDialogFragment(
-                    mapSymbol
-                )
-
+            val action = HomeFragmentDirections.actionHomeFragmentToMapDialogFragment(mapSymbol)
             findNavController().navigate(action)
-
             true
         }
     }
@@ -190,16 +186,13 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                 val mapSymbol = MapSymbol(
                     plan.lat,
                     plan.lng,
-                    plan.caption,
                     true,
+                    plan.caption,
                     remotePlaceId
                 )
-                val action = HomeFragmentDirections.actionHomeFragmentToSaveLogFragment(
-                    mapSymbol
-                )
+                val action = HomeFragmentDirections.actionHomeFragmentToSaveLogFragment(mapSymbol)
                 findNavController().navigate(action)
             }
-
             true
         }
     }

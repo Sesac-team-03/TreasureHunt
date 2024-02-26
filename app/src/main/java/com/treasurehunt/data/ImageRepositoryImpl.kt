@@ -11,11 +11,9 @@ class ImageRepositoryImpl @Inject constructor(
     private val imageRemoteDataSource: ImageRemoteDataSource
 ) : ImageRepository {
 
-    override suspend fun insertImage(imageEntity: ImageEntity): Long = imageDao.insert(imageEntity)
+    override suspend fun insert(image: ImageEntity) = imageDao.insert(image)
 
-    override suspend fun insertImage(imageDTO: ImageDTO): String =
-        imageRemoteDataSource.insert(imageDTO)
+    override suspend fun insert(image: ImageDTO) = imageRemoteDataSource.insert(image)
 
-    override suspend fun getRemoteImage(id: String): ImageDTO =
-        imageRemoteDataSource.getImage(id)
+    override suspend fun getRemoteImageById(id: String) = imageRemoteDataSource.getRemoteImageById(id)
 }

@@ -4,7 +4,6 @@ import com.treasurehunt.data.local.LogDao
 import com.treasurehunt.data.local.model.LogEntity
 import com.treasurehunt.data.remote.LogRemoteDataSource
 import com.treasurehunt.data.remote.model.LogDTO
-import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class LogRepositoryImpl @Inject constructor(
@@ -14,21 +13,25 @@ class LogRepositoryImpl @Inject constructor(
 
     override suspend fun insert(log: LogEntity) = logDao.insert(log)
 
-    override suspend fun insert(logDTD: LogDTO) = logRemoteDataSource.insert(logDTD).name
+    override suspend fun insert(log: LogDTO) = logRemoteDataSource.insert(log).name
 
-    override suspend fun getRemoteLog(id: String): LogDTO = logRemoteDataSource.getLog(id)
+    override fun getLocalLogById(id: String) = logDao.getLocalLogById(id)
 
-    override suspend fun getRemoteAllLogs(): List<LogDTO> = logRemoteDataSource.getAllLogs()
+    override fun getAllLocalLogs() = logDao.getAllLocalLogs()
 
-    override fun getLogById(id: String): Flow<LogEntity> = logDao.getLogById(id)
+    override suspend fun getRemoteLogById(id: String) = logRemoteDataSource.getRemoteLogById(id)
 
-    override fun getAllLogs(): Flow<List<LogEntity>> = logDao.getAllLogs()
+    override suspend fun getAllRemoteLogs() = logRemoteDataSource.getAllRemoteLogs()
 
     override fun update(log: LogEntity) = logDao.update(log)
 
     override suspend fun delete(vararg logs: LogEntity) = logDao.delete(*logs)
 
-    override suspend fun deleteAll() {
-        logDao.deleteAllLogs()
+    override suspend fun deleteAllLocalLogs() {
+        logDao.deleteAllLocalLogs()
+    }
+
+    override suspend fun delete(id: String) {
+        logRemoteDataSource.delete(id)
     }
 }

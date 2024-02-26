@@ -11,24 +11,22 @@ import retrofit2.http.Query
 
 interface UserService {
 
-    @PUT("/users/{id}.json")
+    @PUT("users/{id}.json")
     suspend fun insert(
         @Path("id") id: String,
-        @Body userDTO: UserDTO
+        @Body user: UserDTO
     )
 
-    @GET("/users/{id}.json")
-    suspend fun getUser(
-        @Path("id") id: String
-    ): UserDTO
+    @GET("users/{id}.json")
+    suspend fun getRemoteUserById(@Path("id") id: String): UserDTO
 
-    @PATCH("/users/{id}.json")
+    @PATCH("users/{id}.json")
     suspend fun update(
         @Path("id") id: String,
-        @Body userDTO: UserDTO
+        @Body user: UserDTO
     )
 
-    @GET("/users.json")
+    @GET("users.json")
     suspend fun search(
         @Query("orderBy") orderBy: String,
         @Query("startAt") startAt: String,

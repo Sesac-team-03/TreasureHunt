@@ -3,32 +3,25 @@ package com.treasurehunt.data.local.model
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.treasurehunt.data.ImageRepository
 import com.treasurehunt.data.remote.model.LogDTO
 import com.treasurehunt.ui.model.LogModel
 
 @Entity(tableName = "logs")
 data class LogEntity(
-    val place: String,
-    val imageIds: List<String>,
+    val remotePlaceId: String,
     val text: String,
     val theme: String,
     @ColumnInfo("created_date")
     val createdDate: Long,
-    @ColumnInfo("remote_id")
-    val remoteId: String? = null,
+    val remoteImageIds: List<String>,
     @PrimaryKey(autoGenerate = true)
-    val id: Long = 0
+    val localId: Long = 0,
+    @ColumnInfo("remote_id")
+    val remoteId: String? = null
 )
 
-fun LogEntity.toLogDTO(): LogDTO {
-    val (place, images, text, theme, createdDate, _, localId) = this
-    return LogDTO(place, images.associateWith { true }, text, theme, createdDate, localId)
-}
+fun LogEntity.toLogDTO() =
+    LogDTO(remotePlaceId, text, theme, createdDate, remoteImageIds.associateWith { true }, localId)
 
-fun LogEntity.toLogModel(
-    imagesUrls: List<String>
-): LogModel {
-    val (place, imageIds, text, theme, createdDate, _, id) = this
-    return LogModel(place, text, theme, createdDate, imageIds, imagesUrls)
-}
+fun LogEntity.toLogModel(imagesUrls: List<String>) =
+    LogModel(remotePlaceId, text, theme, createdDate, remoteImageIds, imagesUrls)

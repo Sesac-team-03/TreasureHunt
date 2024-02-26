@@ -5,9 +5,13 @@ import javax.inject.Inject
 
 class LogRemoteDataSource @Inject constructor(private val logService: LogService) {
 
-    suspend fun getLog(id: String) = logService.getLog(id)
+    suspend fun insert(log: LogDTO) = logService.insert(log)
 
-    suspend fun getAllLogs(): List<LogDTO> = logService.getAllLogs()
+    suspend fun getRemoteLogById(id: String) = logService.getRemoteLogById(id)
 
-    suspend fun insert(logDTO: LogDTO) = logService.insert(logDTO)
+    suspend fun getAllRemoteLogs() = logService.getAllRemoteLogs()
+
+    suspend fun delete(id: String) {
+        logService.delete(id)
+    }
 }

@@ -15,11 +15,11 @@ interface LogDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(log: LogEntity): Long
 
-    @Query("SELECT * from logs WHERE id = :id")
-    fun getLogById(id: String): Flow<LogEntity>
+    @Query("SELECT * from logs WHERE localId = :id")
+    fun getLocalLogById(id: String): Flow<LogEntity>
 
     @Query("SELECT * from logs ORDER BY created_date DESC")
-    fun getAllLogs(): Flow<List<LogEntity>>
+    fun getAllLocalLogs(): Flow<List<LogEntity>>
 
     @Update
     fun update(log: LogEntity): Int
@@ -28,5 +28,5 @@ interface LogDao {
     suspend fun delete(vararg logs: LogEntity): Int
 
     @Query("DELETE FROM logs")
-    suspend fun deleteAllLogs()
+    suspend fun deleteAllLocalLogs()
 }

@@ -4,7 +4,6 @@ import com.treasurehunt.data.local.UserDao
 import com.treasurehunt.data.local.model.UserEntity
 import com.treasurehunt.data.remote.UserRemoteDataSource
 import com.treasurehunt.data.remote.model.UserDTO
-import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
@@ -14,20 +13,20 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun insert(user: UserEntity) = userDao.insert(user)
 
-    override suspend fun insert(id: String, data: UserDTO) {
-        userRemoteDataSource.insert(id, data)
+    override suspend fun insert(id: String, user: UserDTO) {
+        userRemoteDataSource.insert(id, user)
     }
 
-    override suspend fun getRemoteUser(id: String): UserDTO = userRemoteDataSource.getUserData(id)
+    override fun getLocalUserById(id: String) = userDao.getLocalUserById(id)
 
-    override fun getUserById(id: String): Flow<UserEntity> = userDao.getUserById(id)
+    override fun getAllLocalUsers() = userDao.getAllLocalUsers()
 
-    override fun getAllUsers(): Flow<List<UserEntity>> = userDao.getAllUsers()
+    override suspend fun getRemoteUserById(id: String) = userRemoteDataSource.getRemoteUserById(id)
 
     override fun update(user: UserEntity) = userDao.update(user)
 
-    override suspend fun update(id: String, data: UserDTO) {
-        userRemoteDataSource.update(id, data)
+    override suspend fun update(id: String, user: UserDTO) {
+        userRemoteDataSource.update(id, user)
     }
 
     override suspend fun delete(vararg users: UserEntity) = userDao.delete(*users)
