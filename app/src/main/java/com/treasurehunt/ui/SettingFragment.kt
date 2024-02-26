@@ -1,11 +1,16 @@
 package com.treasurehunt.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
+import com.navercorp.nid.NaverIdLoginSDK
+import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentSettingBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -26,6 +31,7 @@ class SettingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         backProfile()
+        setLogout()
     }
 
     override fun onDestroyView() {
@@ -36,6 +42,19 @@ class SettingFragment : Fragment() {
     private fun backProfile() {
         binding.ibBack.setOnClickListener {
             findNavController().navigateUp()
+        }
+    }
+
+    private fun setLogout() {
+        binding.tvLogout.setOnClickListener {
+            val naverToken = NaverIdLoginSDK.getAccessToken() ?: ""
+            if (naverToken.isNotEmpty()) {
+                NaverIdLoginSDK.logout()
+                findNavController().navigate(R.id.action_settingFragment_to_logInFragment)
+            } else {
+                Firebase.auth.signOut()
+                findNavController().navigate(R.id.action_settingFragment_to_logInFragment)
+            }
         }
     }
 }

@@ -144,4 +144,14 @@
             app:popUpTo="@id/feedFragment"
             app:popUpToInclusive="true" />
     </fragment>
+
+    <fragment
+        android:id="@+id/settingFragment"
+        android:name="com.treasurehunt.ui.SettingFragment"
+        android:label="SettingFragment"
+        tools:layout="@layout/fragment_setting">
+        <action
+            android:id="@+id/action_settingFragment_to_logInFragment"
+            app:destination="@id/logInFragment" />
+    </fragment>
 </navigation>
