@@ -112,7 +112,8 @@
         android:id="@+id/profileFragment"
         android:name="com.treasurehunt.ui.profile.ProfileFragment"
         android:label="ProfileFragment"
-        tools:layout="@layout/fragment_profile" />
+        tools:layout="@layout/fragment_profile">
+    </fragment>
 
     <dialog
         android:id="@+id/mapDialogFragment"
@@ -132,7 +133,8 @@
     <fragment
         android:id="@+id/feedFragment"
         android:name="com.treasurehunt.ui.feed.FeedFragment"
-        android:label="FeedFragment">
+        android:label="FeedFragment"
+        tools:layout="@layout/fragment_feed">
         <action
             android:id="@+id/action_feedFragment_to_logDetailFragment"
             app:destination="@id/logDetailFragment" />

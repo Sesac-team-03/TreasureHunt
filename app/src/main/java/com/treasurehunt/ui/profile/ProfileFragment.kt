@@ -10,6 +10,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.firebase.Firebase
@@ -59,6 +60,7 @@ class ProfileFragment : Fragment() {
         setCancelButton()
         setCompleteButton()
         initTabLayout()
+        showSetting()
     }
 
     override fun onDestroyView() {
@@ -200,6 +202,11 @@ class ProfileFragment : Fragment() {
 
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = getString(ProfileViewPagerAdapter.Tab.entries[position].restId)
+        }
+    }
+
+    private fun showSetting() {
+        binding.ibSetting.setOnClickListener {
         }
     }
 }
