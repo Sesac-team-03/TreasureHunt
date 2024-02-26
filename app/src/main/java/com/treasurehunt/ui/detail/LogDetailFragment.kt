@@ -131,9 +131,7 @@ class LogDetailFragment : BottomSheetDialogFragment() {
         popup.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.action_edit -> {
-                    binding.btnEdit.setOnClickListener {
-                        findNavController().navigate(R.id.action_logDetailFragment_to_saveLogFragment)
-                    }
+                    Toast.makeText(requireContext(), "수정", Toast.LENGTH_SHORT).show()
                     true
                 }
 
