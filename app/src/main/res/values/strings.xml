@@ -74,4 +74,9 @@
     <string name="notification_channel">Upload</string>
     <string name="notification_description">데이터 업로드가 완료될 때, 알림을 보냅니다</string>
 
+    <!-- 설정 화면 -->
+    <string name="setting_tv_setting">설정</string>
+    <string name="setting_tv_login">자동로그인</string>
+    <string name="setting_tv_logout">로그아웃</string>
+    <string name="setting_tv_user_delete">회원탈퇴</string>
 </resources>
