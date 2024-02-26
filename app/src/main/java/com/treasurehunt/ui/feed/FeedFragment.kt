@@ -1,7 +1,6 @@
 package com.treasurehunt.ui.feed
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,7 +12,6 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
-import androidx.paging.PagingData
 import androidx.recyclerview.widget.GridLayoutManager
 import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentFeedBinding
@@ -21,7 +19,6 @@ import com.treasurehunt.ui.feed.adapter.FeedAdapter
 import com.treasurehunt.ui.feed.adapter.FeedStateAdapter
 import com.treasurehunt.ui.model.LogModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
