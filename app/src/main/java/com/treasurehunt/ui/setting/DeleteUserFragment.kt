@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import androidx.fragment.app.DialogFragment
+import androidx.navigation.fragment.findNavController
 import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentDeleteUserBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -36,11 +37,26 @@ class DeleteUserFragment : DialogFragment() {
         val view = inflater.inflate(R.layout.fragment_delete_user, container, false)
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog?.window?.requestFeature(Window.FEATURE_NO_TITLE)
+        dialog?.setCancelable(false)
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setBackButton()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun setBackButton() {
+        binding.ibClose.setOnClickListener {
+            findNavController().navigateUp()
+        }
+        binding.btnCancel.setOnClickListener {
+            findNavController().navigateUp()
+        }
     }
 }
