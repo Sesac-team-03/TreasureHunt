@@ -51,6 +51,8 @@ class HomeActivity : AppCompatActivity() {
                 R.id.logInFragment -> View.GONE
                 R.id.saveLogFragment -> View.GONE
                 R.id.saveLogMapFragment -> View.GONE
+                R.id.settingFragment -> View.GONE
+                R.id.deleteUserFragment -> View.GONE
                 else -> View.VISIBLE
             }
         }

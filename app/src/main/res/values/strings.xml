@@ -79,4 +79,9 @@
     <string name="setting_tv_login">자동로그인</string>
     <string name="setting_tv_logout">로그아웃</string>
     <string name="setting_tv_user_delete">회원탈퇴</string>
+    
+    <!-- 회원 탈퇴 다이얼로그 -->
+    <string name="delete_user_tv_warning_title">정말 회원 탈퇴 하시겠습니까?</string>
+    <string name="delete_user_btn_cancel">아니요</string>
+    <string name="delete_user_btn_delete">네, 삭제할래요</string>
 </resources>
