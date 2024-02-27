@@ -1,7 +1,6 @@
-package com.treasurehunt.ui
+package com.treasurehunt.ui.setting
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,6 +31,7 @@ class SettingFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         backProfile()
         setLogout()
+        deleteUser()
     }
 
     override fun onDestroyView() {
@@ -55,6 +55,12 @@ class SettingFragment : Fragment() {
                 Firebase.auth.signOut()
                 findNavController().navigate(R.id.action_settingFragment_to_logInFragment)
             }
+        }
+    }
+
+    private fun deleteUser() {
+        binding.tvUserDelete.setOnClickListener {
+            findNavController().navigate(R.id.action_settingFragment_to_deleteUserFragment)
         }
     }
 }

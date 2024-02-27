@@ -147,11 +147,19 @@
 
     <fragment
         android:id="@+id/settingFragment"
-        android:name="com.treasurehunt.ui.SettingFragment"
+        android:name="com.treasurehunt.ui.setting.SettingFragment"
         android:label="SettingFragment"
         tools:layout="@layout/fragment_setting">
         <action
             android:id="@+id/action_settingFragment_to_logInFragment"
             app:destination="@id/logInFragment" />
+        <action
+            android:id="@+id/action_settingFragment_to_deleteUserFragment"
+            app:destination="@id/deleteUserFragment" />
     </fragment>
+    <dialog
+        android:id="@+id/deleteUserFragment"
+        android:name="com.treasurehunt.ui.setting.DeleteUserFragment"
+        android:label="DeleteUserFragment"
+        tools:layout="@layout/fragment_delete_user" />
 </navigation>
