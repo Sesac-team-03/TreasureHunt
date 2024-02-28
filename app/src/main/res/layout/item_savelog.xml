@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:bind="http://schemas.android.com/apk/res-auto">
 
     <data>
 
@@ -27,13 +28,13 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:scaleType="center"
-            app:imageUri="@{imageModel.uri}"
-            app:isLoadedFromStorage="@{isLoadedFromStorage}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:shapeAppearance="@style/SaveLogImage" />
+            app:shapeAppearance="@style/SaveLogImage"
+            bind:imageUri="@{imageModel.uri}"
+            bind:isLoadedFromStorage="@{isLoadedFromStorage}" />
 
         <ImageView
             android:id="@+id/iv_delete"
@@ -45,6 +46,5 @@
             android:src="@drawable/ic_delete"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

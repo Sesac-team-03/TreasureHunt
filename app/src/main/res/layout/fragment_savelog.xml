@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:bind="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
@@ -93,11 +94,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
                 android:orientation="horizontal"
-                app:dataset="@{viewModel.images}"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/ib_select_photo"
                 app:layout_constraintTop_toTopOf="@+id/ib_select_photo"
+                bind:dataset="@{viewModel.images}"
                 tools:listitem="@layout/item_savelog" />
 
             <TextView
@@ -139,8 +140,6 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
-
         </androidx.constraintlayout.widget.ConstraintLayout>
-
     </androidx.core.widget.NestedScrollView>
 </layout>
