@@ -45,9 +45,9 @@ class LogDetailFragment : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setDotsIndicator()
+        setImageSliderAdapter()
         loadLog()
-        setPopupMenu(binding.btnEdit)
+        setPopupButton(getPopupMenu())
         setCloseButton()
         setShareButton()
     }
@@ -57,25 +57,23 @@ class LogDetailFragment : BottomSheetDialogFragment() {
         _binding = null
     }
 
-    private fun setDotsIndicator() {
+    private fun setImageSliderAdapter() {
         imageSliderAdapter = ImageSliderAdapter()
-        binding.vpPhoto.adapter = imageSliderAdapter
-        binding.diText.setViewPager2(binding.vpPhoto)
     }
 
     private fun loadLog() {
-        val placeId = args.remotePlaceId
-        if (placeId.isNotEmpty()) {
-            viewLifecycleOwner.lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val placeId = args.remotePlaceId
+
+            if (placeId.isNotEmpty()) {
                 val log = viewModel.getLogByRemotePlaceId(placeId) ?: return@launch
                 setTextAndImages(log)
-                updateDotsIndicator()
-            }
-        } else {
-            args.log?.let { log ->
+            } else {
+                val log = args.log ?: return@launch
                 setTextAndImages(log)
-                updateDotsIndicator()
             }
+
+            setDotsIndicator()
         }
     }
 
@@ -85,9 +83,68 @@ class LogDetailFragment : BottomSheetDialogFragment() {
         imageSliderAdapter.submitList(imageItems)
     }
 
-    private fun updateDotsIndicator() {
+    private fun setDotsIndicator() {
         binding.vpPhoto.adapter = imageSliderAdapter
         binding.diText.setViewPager2(binding.vpPhoto)
+    }
+
+    private fun setPopupButton(popup: PopupMenu) {
+        binding.btnPopup.setOnClickListener {
+            popup.show()
+        }
+    }
+
+    private fun getPopupMenu(): PopupMenu {
+        return PopupMenu(requireContext(), binding.btnPopup).apply {
+            menuInflater.inflate(R.menu.edit_menu, menu)
+
+            setOnMenuItemClickListener { menuItem ->
+                val menu = LogDetailMenuAction.from(menuItem.itemId)
+                    ?: return@setOnMenuItemClickListener false
+                when (menu) {
+                    LogDetailMenuAction.EDIT -> {
+                        setEditLog()
+                        true
+                    }
+
+                    LogDetailMenuAction.DELETE -> {
+                        setDeleteLog()
+                        // TODO: 피드 화면에서 상세 화면으로 진입한 경우는 구분해서 처리
+                        val action =
+                            LogDetailFragmentDirections.actionLogDetailFragmentToHomeFragment(args.remotePlaceId)
+                        findNavController().navigate(action)
+                        true
+                    }
+                }
+            }
+        }
+    }
+
+    private fun setEditLog() {
+        Toast.makeText(requireContext(), "수정", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun setDeleteLog() {
+        val placeId = args.remotePlaceId
+        val userId = Firebase.auth.currentUser?.uid
+
+        if (placeId.isNotEmpty() && userId != null) {
+            viewLifecycleOwner.lifecycleScope.launch {
+                val placeDTO = viewModel.getRemotePlace(placeId)
+                placeDTO.remoteLogId?.let { logId ->
+                    viewModel.deleteLogAndAssociatedData(logId, placeId, userId)
+                    Toast.makeText(requireContext(), "삭제", Toast.LENGTH_SHORT)
+                        .show()
+                    dismiss()
+                } ?: run {
+                    Toast.makeText(requireContext(), "삭제 실패", Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
+        } else {
+            Toast.makeText(requireContext(), "삭제 처리 실패", Toast.LENGTH_SHORT)
+                .show()
+        }
     }
 
     private fun setCloseButton() {
@@ -124,49 +181,11 @@ class LogDetailFragment : BottomSheetDialogFragment() {
         return dynamicLink.uri.toString()
     }
 
-    private fun setPopupMenu(view: View) {
-        val popup = PopupMenu(requireContext(), view)
-        popup.menuInflater.inflate(R.menu.edit_menu, popup.menu)
+    enum class LogDetailMenuAction(val itemId: Int) {
+        EDIT(R.id.action_edit), DELETE(R.id.action_delete);
 
-        popup.setOnMenuItemClickListener { menuItem ->
-            when (menuItem.itemId) {
-                R.id.action_edit -> {
-                    Toast.makeText(requireContext(), "수정", Toast.LENGTH_SHORT).show()
-                    true
-                }
-
-                R.id.action_delete -> {
-                    val placeId = args.remotePlaceId
-                    val userId = Firebase.auth.currentUser?.uid
-
-                    if (placeId.isNotEmpty() && userId != null) {
-                        viewLifecycleOwner.lifecycleScope.launch {
-                            val placeDTO = viewModel.getRemotePlace(placeId)
-                            placeDTO.remoteLogId?.let { logId ->
-                                viewModel.deleteLogAndAssociatedData(logId, placeId, userId)
-                                Toast.makeText(requireContext(), "삭제", Toast.LENGTH_SHORT)
-                                    .show()
-                                dismiss()
-                            } ?: run {
-                                Toast.makeText(requireContext(), "삭제 실패", Toast.LENGTH_SHORT)
-                                    .show()
-                            }
-                        }
-                    } else {
-                        Toast.makeText(requireContext(), "삭제 처리 실패", Toast.LENGTH_SHORT)
-                            .show()
-                    }
-                    true
-//                        val action =
-//                            LogDetailFragmentDirections.actionLogDetailFragmentToHomeFragment(args.remotePlaceId)
-//                        findNavController().navigate(action)
-
-                }
-
-                else -> false
-            }
-            false
+        companion object {
+            fun from(itemId: Int) = entries.find { it.itemId == itemId }
         }
-        view.setOnClickListener { popup.show() }
     }
 }

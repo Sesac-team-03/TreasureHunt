@@ -10,7 +10,17 @@
     android:paddingBottom="16dp">
 
     <ImageButton
-        android:id="@+id/btn_Close"
+        android:id="@+id/btn_popup"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="22dp"
+        android:layout_marginTop="22dp"
+        android:background="@drawable/ic_popupwhite"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/btn_close"
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_marginTop="22dp"
@@ -18,16 +28,6 @@
         android:layout_marginBottom="24dp"
         android:background="@drawable/ic_close"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageButton
-        android:id="@+id/btn_edit"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_marginStart="22dp"
-        android:layout_marginTop="22dp"
-        android:background="@drawable/ic_popupwhite"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
@@ -66,7 +66,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/vp_photo"
         app:selectedDotColor="@color/black" />
-
 
     <TextView
         android:id="@+id/tv_text"
