@@ -21,7 +21,6 @@ interface LogRepository {
 
     fun getPagingLogs(): PagingSource<Int, LogEntity>
 
-
     fun update(log: LogEntity): Int
 
     suspend fun update(id: String, log: LogDTO)

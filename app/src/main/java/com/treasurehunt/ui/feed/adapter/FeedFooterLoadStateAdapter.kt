@@ -8,17 +8,17 @@ import androidx.paging.LoadStateAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.treasurehunt.databinding.ItemFeedFooterBinding
 
-class FeedStateAdapter(private val retry: () -> Unit) :
-    LoadStateAdapter<FeedStateAdapter.ViewHolder>() {
-
-    override fun onBindViewHolder(holder: ViewHolder, loadState: LoadState) {
-        holder.bind(loadState)
-    }
+class FeedFooterLoadStateAdapter(private val retry: () -> Unit) :
+    LoadStateAdapter<FeedFooterLoadStateAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, loadState: LoadState): ViewHolder {
         val binding =
             ItemFeedFooterBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding, retry)
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, loadState: LoadState) {
+        holder.bind(loadState)
     }
 
     class ViewHolder(
