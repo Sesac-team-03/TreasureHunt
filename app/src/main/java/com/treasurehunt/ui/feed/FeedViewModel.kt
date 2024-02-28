@@ -29,14 +29,21 @@ class FeedViewModel @Inject constructor(
     private val imageRepo: ImageRepository
 ) : ViewModel() {
 
+    private val _isLogsDataUpdated: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val isLogsDataUpdated = _isLogsDataUpdated.asStateFlow()
 
-    private val _isLogsUpdated: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    val isLogsUpdated = _isLogsUpdated.asStateFlow()
+    private val _isRefreshed = MutableStateFlow(true)
+    val isRefreshed = _isRefreshed.asStateFlow()
 
-    val pagingLogs: Flow<PagingData<LogModel>>
+    var pagingLogs: Flow<PagingData<LogModel>>
 
     init {
         pagingLogs = getLogs()
+    }
+
+    fun initLogs() {
+        pagingLogs = getLogs()
+        _isRefreshed.update { false }
     }
 
     private fun getLogs(): Flow<PagingData<LogModel>> {
@@ -54,7 +61,7 @@ class FeedViewModel @Inject constructor(
 
     private suspend fun initPagingData(pagingData: PagingData<LogEntity>)
             : PagingData<LogModel> {
-        _isLogsUpdated.update { true }
+        _isLogsDataUpdated.update { true }
         return pagingData.map { logEntity ->
             logEntity.toLogModel(
                 getImageUrls(

@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentFeedBinding
 import com.treasurehunt.ui.feed.adapter.FeedAdapter
-import com.treasurehunt.ui.feed.adapter.FeedStateAdapter
+import com.treasurehunt.ui.feed.adapter.FeedFooterLoadStateAdapter
 import com.treasurehunt.ui.model.LogModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -44,6 +44,7 @@ class FeedFragment : Fragment() {
         initSegmentedButton()
         bindLogs()
         showFeed()
+        refreshLogs()
     }
 
     override fun onDestroyView() {
@@ -51,14 +52,20 @@ class FeedFragment : Fragment() {
         _binding = null
     }
 
+    private fun refreshLogs() {
+        binding.splLogs.setOnRefreshListener {
+            viewModel.initLogs()
+            binding.splLogs.isRefreshing = viewModel.isRefreshed.value
+        }
+    }
+
     private fun initAdapter() {
-        val stateAdapter = FeedStateAdapter { feedAdapter.retry() }
+        val stateAdapter = FeedFooterLoadStateAdapter { feedAdapter.retry() }
         val feedAdapter = feedAdapter.withLoadStateFooter(
-            footer = stateAdapter
+            stateAdapter
         )
-        val layoutManager = GridLayoutManager(context, 3)
         binding.rvLogs.adapter = feedAdapter
-        binding.rvLogs.layoutManager = layoutManager
+        val layoutManager = binding.rvLogs.layoutManager as GridLayoutManager
         layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
                 return if (position == feedAdapter.itemCount - 1 && stateAdapter.itemCount > 0) {
@@ -87,13 +94,12 @@ class FeedFragment : Fragment() {
             viewModel.pagingLogs
                 .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
                 .collect { pagingLogs ->
-                    if (viewModel.isLogsUpdated.value) {
+                    if (viewModel.isLogsDataUpdated.value) {
                         feedAdapter.submitData(pagingLogs)
                     }
                 }
         }
     }
-
 
     private fun showFeed() {
         viewLifecycleOwner.lifecycleScope.launch {
