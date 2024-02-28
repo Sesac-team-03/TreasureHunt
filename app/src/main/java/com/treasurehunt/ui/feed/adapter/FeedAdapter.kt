@@ -20,21 +20,19 @@ class FeedAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(getItem(position), logClickListener)
+        getItem(position)?.let {
+            holder.bind(it, logClickListener)
+        }
     }
 
 
     class ViewHolder(private val binding: ItemFeedBinding) : RecyclerView.ViewHolder(binding.root) {
-
-        fun bind(log: LogModel?, logClickListener: LogClickListener) {
-            log?.let {
-                val images = it.imageUrls
-                if (images.size > 1) binding.ivAlbum.visibility = View.VISIBLE
-                binding.log = it
-                binding.logClickListener = logClickListener
-            }
+        fun bind(log: LogModel, logClickListener: LogClickListener) {
+            val images = log.imageUrls
+            if (images.size > 1) binding.ivAlbum.visibility = View.VISIBLE
+            binding.log = log
+            binding.logClickListener = logClickListener
         }
-
     }
 
     companion object {

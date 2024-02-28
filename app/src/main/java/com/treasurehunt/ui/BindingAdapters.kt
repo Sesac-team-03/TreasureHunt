@@ -36,10 +36,10 @@ fun bindImageSource(
 }
 
 @BindingAdapter("imageStorageUrl")
-fun bindImageStorageUrl(view: ImageView, url: String?) {
+fun bindImageStorageUrl(view: ImageView, url: String) {
     try {
         view.run {
-            val storageRef = storage.getReferenceFromUrl(url!!)
+            val storageRef = storage.getReferenceFromUrl(url)
             val thumbnailRequestBuilder = Glide.with(view.context)
                 .load(storageRef)
                 .placeholder(R.color.gray_200)
