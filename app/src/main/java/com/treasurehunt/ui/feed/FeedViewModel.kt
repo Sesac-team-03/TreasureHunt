@@ -2,8 +2,6 @@ package com.treasurehunt.ui.feed
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
@@ -47,19 +45,12 @@ class FeedViewModel @Inject constructor(
     }
 
     private fun getLogs(): Flow<PagingData<LogModel>> {
-        return Pager(
-            config = PagingConfig(
-                PAGE_SIZE,
-                initialLoadSize = INITIAL_PAGE_SIZE,
-                enablePlaceholders = false,
-            )
-        ) { logRepo.getPagingLogs() }
-            .flow
-            .map { pagingData -> initPagingData(pagingData) }
+        return logRepo.getPagingLogs(PAGE_SIZE, INITIAL_PAGE_SIZE)
+            .map { pagingData -> initPagingLogs(pagingData) }
             .cachedIn(viewModelScope)
     }
 
-    private suspend fun initPagingData(pagingData: PagingData<LogEntity>)
+    private suspend fun initPagingLogs(pagingData: PagingData<LogEntity>)
             : PagingData<LogModel> {
         _isLogsDataUpdated.update { true }
         return pagingData.map { logEntity ->

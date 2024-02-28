@@ -23,7 +23,7 @@ interface LogDao {
     fun getAllLocalLogs(): Flow<List<LogEntity>>
 
     @Query("SELECT * FROM logs ORDER BY created_date DESC")
-    fun allSelect(): PagingSource<Int, LogEntity>
+    fun getPagingLogs(): PagingSource<Int, LogEntity>
 
     @Update
     fun update(log: LogEntity): Int
