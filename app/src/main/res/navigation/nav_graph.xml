@@ -74,6 +74,11 @@
         <argument
             android:name="mapSymbol"
             app:argType="com.treasurehunt.ui.model.MapSymbol" />
+        <argument
+            android:name="log"
+            android:defaultValue="@null"
+            app:argType="com.treasurehunt.ui.model.LogModel"
+            app:nullable="true" />
     </fragment>
 
     <fragment

@@ -76,6 +76,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        loadLogIfExists()
         setShowMapFullScreen()
         loadMap()
         initViewModel()
@@ -88,6 +89,17 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun loadLogIfExists() {
+        args.log?.let { log ->
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewModel.getImageUrls(log.remoteImageIds).forEach { imageUrl ->
+                    viewModel.addImage(ImageModel(imageUrl))
+                }
+                viewModel.setTextInput(log.text)
+            }
+        }
     }
 
     private fun setImageLauncher(result: ActivityResult) {
@@ -167,7 +179,8 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun initAdapter() {
-        binding.rvPhoto.adapter = SaveLogAdapter { imageModel -> viewModel.removeImage(imageModel) }
+        val isLoadedFromStorage = args.log != null
+        binding.rvPhoto.adapter = SaveLogAdapter(isLoadedFromStorage) { imageModel -> viewModel.removeImage(imageModel) }
     }
 
     private fun setAlbumPermission() {

@@ -1,6 +1,7 @@
 package com.treasurehunt.data.remote.model
 
 import com.treasurehunt.data.local.model.PlaceEntity
+import com.treasurehunt.ui.model.MapSymbol
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -21,4 +22,11 @@ fun PlaceDTO.toPlaceEntity(remoteId: String) = PlaceEntity(
     remoteLogId,
     localId,
     remoteId
+)
+
+fun PlaceDTO.toMapSymbol() = MapSymbol(
+    lat,
+    lng,
+    isPlan,
+    caption
 )

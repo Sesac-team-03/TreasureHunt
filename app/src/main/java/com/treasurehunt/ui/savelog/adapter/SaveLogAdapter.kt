@@ -9,20 +9,21 @@ import com.treasurehunt.databinding.ItemSavelogBinding
 import com.treasurehunt.ui.savelog.ImageClickListener
 import com.treasurehunt.ui.model.ImageModel
 
-class SaveLogAdapter(private val clickListener: ImageClickListener) :
+class SaveLogAdapter(private val isLoadedFromStorage: Boolean, private val clickListener: ImageClickListener) :
     ListAdapter<ImageModel, SaveLogAdapter.ViewHolder>(diffUtil) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder.from(parent)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(getItem(position), clickListener)
+        holder.bind(getItem(position), isLoadedFromStorage, clickListener)
     }
 
     class ViewHolder(private val binding: ItemSavelogBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(imageModel: ImageModel, clickListener: ImageClickListener) {
+        fun bind(imageModel: ImageModel, isLoadedFromStorage: Boolean, clickListener: ImageClickListener) {
             binding.imageModel = imageModel
+            binding.isLoadedFromStorage = isLoadedFromStorage
             binding.clickListener = clickListener
             binding.executePendingBindings()
         }

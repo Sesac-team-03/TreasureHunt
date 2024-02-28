@@ -11,7 +11,6 @@ import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.dynamiclinks.DynamicLink
@@ -32,7 +31,6 @@ class LogDetailFragment : BottomSheetDialogFragment() {
     private val binding get() = _binding!!
     private lateinit var imageSliderAdapter: ImageSliderAdapter
     private val viewModel: LogDetailViewModel by viewModels()
-    private val args: LogDetailFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -63,17 +61,12 @@ class LogDetailFragment : BottomSheetDialogFragment() {
 
     private fun loadLog() {
         viewLifecycleOwner.lifecycleScope.launch {
-            val placeId = args.remotePlaceId
+            viewModel.log.collect { log ->
+                if (log == null) return@collect
 
-            if (placeId.isNotEmpty()) {
-                val log = viewModel.getLogByRemotePlaceId(placeId) ?: return@launch
                 setTextAndImages(log)
-            } else {
-                val log = args.log ?: return@launch
-                setTextAndImages(log)
+                setDotsIndicator()
             }
-
-            setDotsIndicator()
         }
     }
 
@@ -111,7 +104,9 @@ class LogDetailFragment : BottomSheetDialogFragment() {
                         setDeleteLog()
                         // TODO: 피드 화면에서 상세 화면으로 진입한 경우는 구분해서 처리
                         val action =
-                            LogDetailFragmentDirections.actionLogDetailFragmentToHomeFragment(args.remotePlaceId)
+                            LogDetailFragmentDirections.actionLogDetailFragmentToHomeFragment(
+                                viewModel.args.remotePlaceId
+                            )
                         findNavController().navigate(action)
                         true
                     }
@@ -121,11 +116,31 @@ class LogDetailFragment : BottomSheetDialogFragment() {
     }
 
     private fun setEditLog() {
-        Toast.makeText(requireContext(), "수정", Toast.LENGTH_SHORT).show()
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.log.collect { log ->
+                if (log == null) {
+                    Toast.makeText(
+                        requireContext(),
+                        "데이터를 불러오는 중입니다. 잠시 후 다시 시도해 주세요",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return@collect
+                }
+
+                val mapSymbol = viewModel.run {
+                    getMapSymbol(args.log, args.remotePlaceId)
+                }
+                val action = LogDetailFragmentDirections.actionLogDetailFragmentToSaveLogFragment(
+                    mapSymbol,
+                    log
+                )
+                findNavController().navigate(action)
+            }
+        }
     }
 
     private fun setDeleteLog() {
-        val placeId = args.remotePlaceId
+        val placeId = viewModel.args.remotePlaceId
         val userId = Firebase.auth.currentUser?.uid
 
         if (placeId.isNotEmpty() && userId != null) {
@@ -133,16 +148,16 @@ class LogDetailFragment : BottomSheetDialogFragment() {
                 val placeDTO = viewModel.getRemotePlace(placeId)
                 placeDTO.remoteLogId?.let { logId ->
                     viewModel.deleteLogAndAssociatedData(logId, placeId, userId)
-                    Toast.makeText(requireContext(), "삭제", Toast.LENGTH_SHORT)
+                    Toast.makeText(requireContext(), "기록이 삭제되었습니다", Toast.LENGTH_SHORT)
                         .show()
                     dismiss()
                 } ?: run {
-                    Toast.makeText(requireContext(), "삭제 실패", Toast.LENGTH_SHORT)
+                    Toast.makeText(requireContext(), "문제가 생겨 잠시 후 다시 시도해 주세요", Toast.LENGTH_SHORT)
                         .show()
                 }
             }
         } else {
-            Toast.makeText(requireContext(), "삭제 처리 실패", Toast.LENGTH_SHORT)
+            Toast.makeText(requireContext(), "문제가 생겨 잠시 후 다시 시도해 주세요", Toast.LENGTH_SHORT)
                 .show()
         }
     }

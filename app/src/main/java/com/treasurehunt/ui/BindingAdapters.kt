@@ -19,16 +19,18 @@ fun bindDataset(view: RecyclerView, itemList: List<Any>?) {
     }
 }
 
-@BindingAdapter("imageUrl")
-fun bindImageUrl(view: ImageView, url: String?) {
-    when (url) {
+@BindingAdapter(value = ["imageUri", "isLoadedFromStorage"], requireAll = true)
+fun bindImageUri(view: ImageView, imageUri: String?, isLoadedFromStorage: Boolean) {
+    when (imageUri) {
         null -> view.run {
             setImageResource(R.drawable.ic_no_profile_image)
             scaleType = ImageView.ScaleType.CENTER_INSIDE
         }
 
         else -> view.run {
-            Glide.with(context).load(url)
+            val storageRefOrUri = if (isLoadedFromStorage) storage.getReferenceFromUrl(imageUri) else imageUri
+            Glide.with(context)
+                .load(storageRefOrUri)
                 .into(this)
             scaleType = ImageView.ScaleType.CENTER_CROP
         }
