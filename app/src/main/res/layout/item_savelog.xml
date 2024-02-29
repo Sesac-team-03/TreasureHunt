@@ -12,10 +12,6 @@
         <variable
             name="imageModel"
             type="com.treasurehunt.ui.model.ImageModel" />
-
-        <variable
-            name="isLoadedFromStorage"
-            type="Boolean" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -27,15 +23,13 @@
             android:id="@+id/siv_image"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:scaleType="center"
+            android:scaleType="centerCrop"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:shapeAppearance="@style/SaveLogImage"
-            bind:imageUri="@{imageModel.uri}"
-            bind:storageUrl="@{imageModel.storageUrl}"
-            bind:isLoadedFromStorage="@{isLoadedFromStorage}" />
+            bind:imageSource="@{imageModel}" />
 
         <ImageView
             android:id="@+id/iv_delete"

@@ -44,7 +44,6 @@ internal const val WORK_DATA_LNG = "lng"
 internal const val WORK_DATA_CAPTION = "caption"
 internal const val WORK_DATA_IS_PLAN = "isPlan"
 internal const val WORK_DATA_PLAN_ID = "planId"
-internal const val WORK_DATA_URLS = "url"
 internal const val WORK_DATA_URL_STRINGS = "urlStrings"
 
 @AndroidEntryPoint
@@ -247,14 +246,14 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         val images = viewModel.images.value
         val (contentUris, storageUrls) = if (args.log == null) {
             images.indices.map { i ->
-                images[i].uri
+                images[i].contentUri
             }.toTypedArray() to emptyArray()
         } else {
             images.partition { image ->
-                image.uri.isNotEmpty()
+                image.contentUri.isNotEmpty()
             }.run {
                 first.map { image ->
-                    image.uri
+                    image.contentUri
                 }.toTypedArray() to second.map { image ->
                     image.storageUrl
                 }.toTypedArray()
@@ -263,7 +262,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         val data = Data.Builder()
             .putString(WORK_DATA_UID, uid)
             .putStringArray(WORK_DATA_URI_STRINGS, contentUris)
-            .putStringArray(WORK_DATA_URLS, storageUrls)
+            .putStringArray(WORK_DATA_URL_STRINGS, storageUrls)
             .build()
 
         return OneTimeWorkRequestBuilder<ImageUploadWorker>()

@@ -25,7 +25,6 @@ class SaveLogAdapter(private val clickListener: ImageClickListener) :
 
         fun bind(imageModel: ImageModel, clickListener: ImageClickListener) {
             binding.imageModel = imageModel
-            binding.isLoadedFromStorage = imageModel.uri.isEmpty()
             binding.clickListener = clickListener
             binding.executePendingBindings()
         }
@@ -46,7 +45,7 @@ class SaveLogAdapter(private val clickListener: ImageClickListener) :
     companion object {
         private val diffUtil = object : DiffUtil.ItemCallback<ImageModel>() {
             override fun areItemsTheSame(oldItem: ImageModel, newItem: ImageModel): Boolean {
-                return oldItem.uri == newItem.uri
+                return oldItem.contentUri == newItem.contentUri
             }
 
             override fun areContentsTheSame(oldItem: ImageModel, newItem: ImageModel): Boolean {

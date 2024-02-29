@@ -46,7 +46,7 @@ class ImageUploadWorker @AssistedInject constructor(
         val result = uploadImages(uid, uris)
 
         return if (result) {
-            val urls = inputData.getStringArray(WORK_DATA_URLS)?.asList()
+            val urls = inputData.getStringArray(WORK_DATA_URL_STRINGS)?.asList()
             if (!urls.isNullOrEmpty()) {
                 urlStrings.addAll(urls)
             }

@@ -33,7 +33,6 @@ class DatabaseUpdateWorker @AssistedInject constructor(
 
     private lateinit var uid: String
     private lateinit var mapSymbol: MapSymbol
-    var test = 0
 
     override suspend fun doWork(): Result {
         return try {
@@ -59,9 +58,9 @@ class DatabaseUpdateWorker @AssistedInject constructor(
         }
     }
 
-    private suspend fun init(imageUrls: List<String>, text: String) {
+    private suspend fun init(imageStorageUrls: List<String>, text: String) {
         val remotePlaceId = getRemotePlaceId()
-        val log = getLogFor(imageUrls, remotePlaceId, text)
+        val log = getLogFor(imageStorageUrls, remotePlaceId, text)
         val remoteLogId = insertLog(log)
 
         updatePlaceWithLog(remotePlaceId, remoteLogId)
@@ -108,13 +107,13 @@ class DatabaseUpdateWorker @AssistedInject constructor(
     }
 
     private suspend fun getLogFor(
-        imageUrls: List<String>,
+        imageStorageUrls: List<String>,
         remotePlaceId: String,
         text: String
     ): LogModel {
         val theme = "123"
         val createdDate = getCurrentTime()
-        val imageIds = imageUrls.map { imageUrl ->
+        val imageIds = imageStorageUrls.map { imageUrl ->
             imageRepo.insert(
                 ImageDTO(url = imageUrl)
             )
