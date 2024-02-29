@@ -1,10 +1,7 @@
 package com.treasurehunt.ui
 
-import android.graphics.Color
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
-import androidx.paging.PagingData
-import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide

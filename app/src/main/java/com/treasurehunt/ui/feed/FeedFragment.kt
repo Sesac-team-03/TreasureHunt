@@ -106,9 +106,11 @@ class FeedFragment : Fragment() {
             feedAdapter.loadStateFlow.collect { loadState ->
                 val isListEmpty =
                     loadState.refresh is LoadState.NotLoading && feedAdapter.itemCount == 0
+                val isNotListEmpty =
+                    loadState.refresh is LoadState.NotLoading && feedAdapter.itemCount > 0
                 binding.tvNoTreasure.isVisible = isListEmpty
                 binding.cpiLoading.isVisible = loadState.source.refresh is LoadState.Loading
-                binding.rvLogs.isVisible = !isListEmpty
+                binding.rvLogs.isVisible = isNotListEmpty
             }
         }
     }
