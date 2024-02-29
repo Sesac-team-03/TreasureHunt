@@ -34,6 +34,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:shapeAppearance="@style/SaveLogImage"
             bind:imageUri="@{imageModel.uri}"
+            bind:storageUrl="@{imageModel.storageUrl}"
             bind:isLoadedFromStorage="@{isLoadedFromStorage}" />
 
         <ImageView

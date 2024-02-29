@@ -44,6 +44,7 @@ internal const val WORK_DATA_LNG = "lng"
 internal const val WORK_DATA_CAPTION = "caption"
 internal const val WORK_DATA_IS_PLAN = "isPlan"
 internal const val WORK_DATA_PLAN_ID = "planId"
+internal const val WORK_DATA_URLS = "url"
 internal const val WORK_DATA_URL_STRINGS = "urlStrings"
 
 @AndroidEntryPoint
@@ -76,13 +77,16 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        loadLogIfExists()
+        viewLifecycleOwner.lifecycleScope.launch {
+            loadLogIfExists()
+            setSaveButton()
+        }
+
         setShowMapFullScreen()
         loadMap()
         initViewModel()
         initAdapter()
         setAlbumPermission()
-        setSaveButton()
         setCancelButton()
     }
 
@@ -91,14 +95,12 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         _binding = null
     }
 
-    private fun loadLogIfExists() {
+    private suspend fun loadLogIfExists() {
         args.log?.let { log ->
-            viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.getImageUrls(log.remoteImageIds).forEach { imageUrl ->
-                    viewModel.addImage(ImageModel(imageUrl))
-                }
-                viewModel.setTextInput(log.text)
+            viewModel.getImageUrls(log.remoteImageIds).forEach { imageUrl ->
+                viewModel.addImage(ImageModel(storageUrl = imageUrl))
             }
+            viewModel.setTextInput(log.text)
         }
     }
 
@@ -179,8 +181,9 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun initAdapter() {
-        val isLoadedFromStorage = args.log != null
-        binding.rvPhoto.adapter = SaveLogAdapter(isLoadedFromStorage) { imageModel -> viewModel.removeImage(imageModel) }
+        binding.rvPhoto.adapter = SaveLogAdapter { imageModel ->
+            viewModel.removeImage(imageModel)
+        }
     }
 
     private fun setAlbumPermission() {
@@ -195,15 +198,13 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
 
     private fun setSaveButton() {
         binding.btnSave.setOnClickListener {
-            viewLifecycleOwner.lifecycleScope.launch {
-                // TODO: return if uid == null
+            // TODO: return if uid == null
 
-                handleNotificationPermission()
+            handleNotificationPermission()
 
-                scheduleImageUploadAndDatabaseUpdateWorks()
+            scheduleImageUploadAndDatabaseUpdateWorks()
 
-                findNavController().navigate(R.id.action_saveLogFragment_to_homeFragment)
-            }
+            findNavController().navigate(R.id.action_saveLogFragment_to_homeFragment)
         }
     }
 
@@ -244,12 +245,25 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
     private fun getImageUploadRequest(): OneTimeWorkRequest {
         val uid = Firebase.auth.currentUser!!.uid
         val images = viewModel.images.value
-        val uris = images.indices.map { i ->
-            images[i].uri
-        }.toTypedArray()
+        val (contentUris, storageUrls) = if (args.log == null) {
+            images.indices.map { i ->
+                images[i].uri
+            }.toTypedArray() to emptyArray()
+        } else {
+            images.partition { image ->
+                image.uri.isNotEmpty()
+            }.run {
+                first.map { image ->
+                    image.uri
+                }.toTypedArray() to second.map { image ->
+                    image.storageUrl
+                }.toTypedArray()
+            }
+        }
         val data = Data.Builder()
             .putString(WORK_DATA_UID, uid)
-            .putStringArray(WORK_DATA_URI_STRINGS, uris)
+            .putStringArray(WORK_DATA_URI_STRINGS, contentUris)
+            .putStringArray(WORK_DATA_URLS, storageUrls)
             .build()
 
         return OneTimeWorkRequestBuilder<ImageUploadWorker>()
