@@ -3,6 +3,7 @@ package com.treasurehunt.ui.detail
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -103,11 +104,6 @@ class LogDetailFragment : BottomSheetDialogFragment() {
                     LogDetailMenuAction.DELETE -> {
                         setDeleteLog()
                         // TODO: 피드 화면에서 상세 화면으로 진입한 경우는 구분해서 처리
-                        val action =
-                            LogDetailFragmentDirections.actionLogDetailFragmentToHomeFragment(
-                                viewModel.args.remotePlaceId
-                            )
-                        findNavController().navigate(action)
                         true
                     }
                 }
@@ -155,6 +151,11 @@ class LogDetailFragment : BottomSheetDialogFragment() {
                     Toast.makeText(requireContext(), "문제가 생겨 잠시 후 다시 시도해 주세요", Toast.LENGTH_SHORT)
                         .show()
                 }
+                val action =
+                    LogDetailFragmentDirections.actionLogDetailFragmentToHomeFragment(
+                        viewModel.args.remotePlaceId
+                    )
+                findNavController().navigate(action)
             }
         } else {
             Toast.makeText(requireContext(), "문제가 생겨 잠시 후 다시 시도해 주세요", Toast.LENGTH_SHORT)
