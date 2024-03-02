@@ -26,11 +26,10 @@ class LogRepositoryImpl @Inject constructor(
     override suspend fun getRemoteLogById(id: String) = logRemoteDataSource.getRemoteLogById(id)
 
     override suspend fun getAllRemoteLogs() = logRemoteDataSource.getAllRemoteLogs()
-    override fun getPagingLogs(pageSize: Int, initSize: Int): Flow<PagingData<LogEntity>> {
+    override fun getPagingLogs(pageSize: Int): Flow<PagingData<LogEntity>> {
         return Pager(
             config = PagingConfig(
                 pageSize,
-                initialLoadSize = initSize,
                 enablePlaceholders = false,
             )
         ) { logDao.getPagingLogs() }
