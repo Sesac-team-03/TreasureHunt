@@ -33,6 +33,10 @@ android {
         )
         buildConfigField("String", "APP_NAME", getApiKey("APP_NAME"))
         buildConfigField("String", "BASE_URL", getApiKey("BASE_URL"))
+
+        buildConfigField("String", "X_NAVER_CLIENT_ID", getApiKey("X_NAVER_CLIENT_ID"))
+        buildConfigField("String", "X_NAVER_CLIENT_SECRET", getApiKey("X_NAVER_CLIENT_SECRET"))
+        buildConfigField("String", "NAVER_SEARCH_API_BASE_URL", getApiKey("NAVER_SEARCH_API_BASE_URL"))
     }
 
     buildTypes {
