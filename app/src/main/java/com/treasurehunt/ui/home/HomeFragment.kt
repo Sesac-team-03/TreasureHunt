@@ -91,6 +91,15 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         setLocationOverlay()
         showMarkers()
         setSymbolClick()
+
+        binding.tietSearchFriend.setOnEditorActionListener { _, _, _ ->
+            viewLifecycleOwner.lifecycleScope.launch {
+                val keyword = binding.tietSearchFriend.text.toString()
+                val result = viewModel.search(keyword)
+                // TODO: show result
+            }
+            true
+        }
     }
 
     private fun initMap(naverMap: NaverMap) {
