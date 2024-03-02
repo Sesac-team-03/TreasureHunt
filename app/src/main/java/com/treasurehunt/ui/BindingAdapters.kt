@@ -37,22 +37,21 @@ fun bindImageStorageUrl(view: ImageView, url: String) {
     try {
         view.run {
             val storageRef = storage.getReferenceFromUrl(url)
-            val thumbnailRequestBuilder = Glide.with(view.context)
+            val thumbnailRequestBuilder = Glide.with(context)
                 .load(storageRef)
                 .placeholder(R.color.gray_200)
                 .sizeMultiplier(0.25f)
-            Glide.with(view.context)
+            Glide.with(context)
                 .load(storageRef)
                 .error(R.drawable.ic_no_image)
                 .thumbnail(thumbnailRequestBuilder)
-                .diskCacheStrategy(DiskCacheStrategy.DATA)
                 .into(this)
             scaleType = ImageView.ScaleType.CENTER_CROP
         }
     } catch (e: Exception) {
         view.run {
             setImageResource(R.drawable.ic_no_image)
-            scaleType = android.widget.ImageView.ScaleType.CENTER_INSIDE
+            scaleType = ImageView.ScaleType.CENTER_INSIDE
         }
     }
 }
