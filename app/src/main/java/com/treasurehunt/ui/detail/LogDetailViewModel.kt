@@ -68,7 +68,7 @@ class LogDetailViewModel @Inject constructor(
             imageRepo.getRemoteImageById(id).url
         }
 
-        return logDTO.toLogModel(imageUrls)
+        return logDTO.toLogModel(imageUrls, logDTO.localId, logId)
     }
 
     suspend fun getRemotePlace(placeId: String) = placeRepo.getRemotePlaceById(placeId)
