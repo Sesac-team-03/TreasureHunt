@@ -31,13 +31,21 @@ class DatabaseUpdateWorker @AssistedInject constructor(
     private val imageRepo: ImageRepository
 ) : CoroutineWorker(context, params) {
 
-    private lateinit var uid: String
+    private val uid = inputData.getString(WORK_DATA_UID) ?: ""
     private lateinit var mapSymbol: MapSymbol
+    private val localLogId = inputData.getLong(WORK_DATA_LOCAL_LOG_ID, -1)
+    private val remoteLogId = inputData.getString(WORK_DATA_REMOTE_LOG_ID)
+    private var localPlaceId = -1L
+    private val remotePlaceId = inputData.getString(WORK_DATA_REMOTE_PLACE_ID)
 
     override suspend fun doWork(): Result {
+        remotePlaceId?.let { remotePlaceId ->
+            localPlaceId = placeRepo.getRemotePlaceById(remotePlaceId).localId
+        }
+
         return try {
-            uid = inputData.getString(WORK_DATA_UID)
-                ?: return Result.failure()
+            if (uid.isEmpty()) return Result.failure()
+
             val urlStrings = inputData.getStringArray(WORK_DATA_URL_STRINGS)?.asList()
                 ?: return Result.failure()
             val text = inputData.getString(WORK_DATA_LOG_TEXT)
@@ -67,7 +75,10 @@ class DatabaseUpdateWorker @AssistedInject constructor(
         updateUser(remotePlaceId, remoteLogId)
     }
 
+    // 기록 저장 화면 진입 경로 (처리 순서대로): 기록 상세 화면 수정 / 홈 지도 화면 다이얼로그 "네, 가봤어요" / 홈 지도 화면 닫힌 보물상자 마커
     private suspend fun getRemotePlaceId(): String {
+        if (remotePlaceId != null) return remotePlaceId
+
         val planId = mapSymbol.remotePlanId
         return if (planId.isNullOrEmpty()) {
             insertPlace(mapSymbol)
@@ -129,6 +140,12 @@ class DatabaseUpdateWorker @AssistedInject constructor(
     }
 
     private suspend fun insertLog(log: LogModel): String {
+        if (remoteLogId != null) {
+            logRepo.update(log.asLogEntity(localLogId))
+            logRepo.update(remoteLogId, log.asLogDTO(localLogId))
+            return remoteLogId
+        }
+
         val localLogId = logRepo.insert(log.asLogEntity())
         return logRepo.insert(log.asLogDTO(localLogId))
     }

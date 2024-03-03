@@ -3,6 +3,7 @@ package com.treasurehunt.ui.savelog
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -38,13 +39,17 @@ private const val MAX_COUNT = 5
 
 internal const val WORK_DATA_UID = "uid"
 internal const val WORK_DATA_URI_STRINGS = "uriStrings"
+internal const val WORK_DATA_URL_STRINGS = "urlStrings"
 internal const val WORK_DATA_LOG_TEXT = "logText"
 internal const val WORK_DATA_LAT = "lat"
 internal const val WORK_DATA_LNG = "lng"
 internal const val WORK_DATA_CAPTION = "caption"
 internal const val WORK_DATA_IS_PLAN = "isPlan"
 internal const val WORK_DATA_PLAN_ID = "planId"
-internal const val WORK_DATA_URL_STRINGS = "urlStrings"
+internal const val WORK_DATA_LOCAL_LOG_ID = "localLogId"
+internal const val WORK_DATA_REMOTE_LOG_ID = "remoteLogId"
+internal const val WORK_DATA_LOCAL_PLACE_ID = "localPlaceId"
+internal const val WORK_DATA_REMOTE_PLACE_ID = "remotePlaceId"
 
 @AndroidEntryPoint
 class SaveLogFragment : Fragment(), OnMapReadyCallback {
@@ -242,39 +247,58 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun getImageUploadRequest(): OneTimeWorkRequest {
-        val uid = Firebase.auth.currentUser!!.uid
-        val images = viewModel.images.value
-        val (contentUris, storageUrls) = if (args.log == null) {
-            images.indices.map { i ->
-                images[i].contentUri
-            }.toTypedArray() to emptyArray()
-        } else {
-            images.partition { image ->
-                image.contentUri.isNotEmpty()
-            }.run {
-                first.map { image ->
-                    image.contentUri
-                }.toTypedArray() to second.map { image ->
-                    image.storageUrl
-                }.toTypedArray()
-            }
-        }
-        val data = Data.Builder()
-            .putString(WORK_DATA_UID, uid)
-            .putStringArray(WORK_DATA_URI_STRINGS, contentUris)
-            .putStringArray(WORK_DATA_URL_STRINGS, storageUrls)
-            .build()
-
         return OneTimeWorkRequestBuilder<ImageUploadWorker>()
-            .setInputData(data)
+            .setInputData(getImageUploadInputData())
             .build()
     }
 
+    private fun getImageUploadInputData(): Data {
+        val uid = Firebase.auth.currentUser!!.uid
+        val images = viewModel.images.value
+        val (contentUris, storageUrls) = if (args.log == null) {
+            images.mapToContentUriArray() to emptyArray()
+        } else {
+            images.partitionIntoContentAndStorageImages().run {
+                first.mapToContentUriArray() to second.mapToStorageUriArray()
+            }
+        }
+        Log.d("$$ Fragment: images", "$images")
+        Log.d("$$ Fragment: contentUris", "${contentUris.asList()}")
+        Log.d("$$ Fragment: storageUrls", "${storageUrls.asList()}")
+
+        return Data.Builder()
+            .putString(WORK_DATA_UID, uid)
+            .putStringArray(WORK_DATA_URI_STRINGS, contentUris)
+            .putStringArray(WORK_DATA_URL_STRINGS, storageUrls)
+            .apply {
+                args.log?.let { log ->
+                    // TODO: check Feed
+                    requireNotNull(log.remoteId)
+                    putString(WORK_DATA_REMOTE_LOG_ID, log.remoteId)
+                }
+            }
+            .build()
+    }
+
+    private fun List<ImageModel>.partitionIntoContentAndStorageImages() =
+        partition { it.contentUri.isNotEmpty() }
+
+    private fun List<ImageModel>.mapToContentUriArray() = map { it.contentUri }.toTypedArray()
+
+    private fun List<ImageModel>.mapToStorageUriArray() = map { it.storageUrl }.toTypedArray()
+
     private fun getDatabaseUpdateRequest(): OneTimeWorkRequest {
+        return OneTimeWorkRequestBuilder<DatabaseUpdateWorker>()
+            .setInputData(getDatabaseUpdateInputData())
+            .build()
+    }
+
+    private fun getDatabaseUpdateInputData(): Data {
         val uid = Firebase.auth.currentUser!!.uid
         val (lat, lng, isPlan, caption, planId) = args.mapSymbol
         val logText = binding.etText.text.toString()
-        val data = Data.Builder()
+
+        return Data.Builder()
             .putString(WORK_DATA_UID, uid)
             .putString(WORK_DATA_LOG_TEXT, logText)
             .putDouble(WORK_DATA_LAT, lat)
@@ -282,10 +306,17 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
             .putString(WORK_DATA_CAPTION, caption)
             .putBoolean(WORK_DATA_IS_PLAN, isPlan)
             .putString(WORK_DATA_PLAN_ID, planId)
-            .build()
-
-        return OneTimeWorkRequestBuilder<DatabaseUpdateWorker>()
-            .setInputData(data)
+            .apply {
+                args.log?.let { log ->
+                    // TODO: check Feed
+                    requireNotNull(log.localId)
+                    requireNotNull(log.remoteId)
+                    requireNotNull(log.remotePlaceId)
+                    putLong(WORK_DATA_LOCAL_LOG_ID, log.localId)
+                    putString(WORK_DATA_REMOTE_LOG_ID, log.remoteId)
+                    putString(WORK_DATA_REMOTE_PLACE_ID, log.remotePlaceId)
+                }
+            }
             .build()
     }
 

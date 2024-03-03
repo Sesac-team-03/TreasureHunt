@@ -18,6 +18,9 @@ import com.google.firebase.storage.UploadTask.TaskSnapshot
 import com.google.firebase.storage.storage
 import com.treasurehunt.BuildConfig
 import com.treasurehunt.R
+import com.treasurehunt.data.ImageRepository
+import com.treasurehunt.data.LogRepository
+import com.treasurehunt.data.remote.model.LogDTO
 import com.treasurehunt.util.UPLOAD_NOTIFICATION_ID
 import com.treasurehunt.util.UPLOAD_NOTIFICATION_ID_STRING
 import dagger.assisted.Assisted
@@ -27,10 +30,15 @@ import kotlinx.coroutines.tasks.await
 @HiltWorker
 class ImageUploadWorker @AssistedInject constructor(
     @Assisted private val context: Context,
-    @Assisted params: WorkerParameters
+    @Assisted params: WorkerParameters,
+    private val logRepo: LogRepository,
+    private val imageRepo: ImageRepository
 ) : CoroutineWorker(context, params) {
 
-    private val urlStrings = mutableListOf<String>()
+    private val uid = inputData.getString(WORK_DATA_UID) ?: ""
+    private val urlStrings =
+        inputData.getStringArray(WORK_DATA_URL_STRINGS)?.asList()?.toMutableList()
+            ?: mutableListOf()
     private var totalByteCount = 0L
     private var bytesTransferred = 0L
     private val notificationManager =
@@ -38,35 +46,68 @@ class ImageUploadWorker @AssistedInject constructor(
     private lateinit var builder: NotificationCompat.Builder
 
     override suspend fun doWork(): Result {
-        val uid = inputData.getString(WORK_DATA_UID)
-            ?: return Result.failure()
+        val remoteLogId = inputData.getString(WORK_DATA_REMOTE_LOG_ID)
+        handleLogIfExists(remoteLogId) { id ->
+            val log = logRepo.getRemoteLogById(id)
+            deleteReplacedStorageImages(log, uid)
+            resetRemoteImageIds(log)
+        }
+
         val uriStrings = inputData.getStringArray(WORK_DATA_URI_STRINGS)?.asList()
             ?: return Result.failure()
         val uris = uriStrings.map { it.toUri() }
         val result = uploadImages(uid, uris)
 
-        return if (result) {
-            val urls = inputData.getStringArray(WORK_DATA_URL_STRINGS)?.asList()
-            if (!urls.isNullOrEmpty()) {
-                urlStrings.addAll(urls)
+        return try {
+            if (result) {
+                val outputData = Data.Builder()
+                    .putStringArray(WORK_DATA_URL_STRINGS, urlStrings.toTypedArray())
+                    .build()
+                notificationManager.updateNotification(
+                    builder,
+                    context.getString(R.string.savelog_image_upload_notification_success),
+                    Triple(100, 100, false)
+                )
+                Result.success(outputData)
+            } else {
+                notificationManager.updateNotification(
+                    builder,
+                    context.getString(R.string.savelog_image_upload_notification_fail)
+                )
+                Result.failure()
             }
-
-            val outputData = Data.Builder()
-                .putStringArray(WORK_DATA_URL_STRINGS, urlStrings.toTypedArray())
-                .build()
-
-            notificationManager.updateNotification(
-                builder,
-                context.getString(R.string.savelog_image_upload_notification_success),
-                Triple(100, 100, false)
-            )
-            Result.success(outputData)
-        } else {
+        } catch (e: Exception) {
             notificationManager.updateNotification(
                 builder,
                 context.getString(R.string.savelog_image_upload_notification_fail)
             )
             Result.failure()
+        }
+    }
+
+    private suspend fun handleLogIfExists(remoteLogId: String?, block: suspend (String) -> Unit) {
+        remoteLogId?.let {
+            block(it)
+        }
+    }
+
+    private suspend fun deleteReplacedStorageImages(log: LogDTO, uid: String) {
+        val storageRef = Firebase.storage.reference.child("${uid}/log_images")
+        log.remoteImageIds.filterReplacedRemoteImageIds(urlStrings).forEach { id ->
+            val imageFileName = imageRepo.getRemoteImageById(id).url.substringAfter("log_images/")
+            storageRef.child("/$imageFileName").delete()
+        }
+    }
+
+    private suspend fun Map<String, Boolean>.filterReplacedRemoteImageIds(urlStrings: List<String>) =
+        filterValues { it }.keys.filter { remoteImageId ->
+            val url = imageRepo.getRemoteImageById(remoteImageId).url
+            !urlStrings.contains(url)
+        }
+
+    private suspend fun resetRemoteImageIds(log: LogDTO) {
+        log.remoteImageIds.filterValues { it }.keys.forEach {
+            imageRepo.delete(it)
         }
     }
 

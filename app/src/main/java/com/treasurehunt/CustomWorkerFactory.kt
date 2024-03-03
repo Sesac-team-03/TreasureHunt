@@ -37,7 +37,10 @@ class CustomWorkerFactory @Inject constructor(
                 )
 
             ImageUploadWorker::class.java.name ->
-                ImageUploadWorker(appContext, workerParameters)
+                ImageUploadWorker(appContext,
+                    workerParameters,
+                    logRepo,
+                    imageRepo)
 
             else -> null
         }
