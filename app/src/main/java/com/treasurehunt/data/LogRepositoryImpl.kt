@@ -25,6 +25,10 @@ class LogRepositoryImpl @Inject constructor(
 
     override fun update(log: LogEntity) = logDao.update(log)
 
+    override suspend fun update(id: String, log: LogDTO) {
+        logRemoteDataSource.update(id, log)
+    }
+
     override suspend fun delete(vararg logs: LogEntity) = logDao.delete(*logs)
 
     override suspend fun deleteAllLocalLogs() {
