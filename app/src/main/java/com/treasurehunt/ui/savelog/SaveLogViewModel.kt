@@ -17,8 +17,8 @@ class SaveLogViewModel @Inject constructor(private val imageRepo: ImageRepositor
     val images = _images.asStateFlow()
     private val _text: MutableStateFlow<String> = MutableStateFlow("")
     val text = _text.asStateFlow()
-    private val _isEnabled: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    val isEnabled = _isEnabled.asStateFlow()
+    private val _isSaveButtonEnabled: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val isSaveButtonEnabled = _isSaveButtonEnabled.asStateFlow()
 
     fun getImagePick() =
         Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).apply {
@@ -28,21 +28,21 @@ class SaveLogViewModel @Inject constructor(private val imageRepo: ImageRepositor
 
     fun addImage(image: ImageModel) {
         _images.value += image
-        setButtonState()
+        setSaveButtonState()
     }
 
     fun removeImage(image: ImageModel) {
         _images.value -= image
-        setButtonState()
+        setSaveButtonState()
     }
 
     fun setTextInput(input: CharSequence) {
         _text.value = input.toString()
-        setButtonState()
+        setSaveButtonState()
     }
 
-    private fun setButtonState() {
-        _isEnabled.value = _images.value.isNotEmpty() && _text.value.isNotEmpty()
+    private fun setSaveButtonState() {
+        _isSaveButtonEnabled.value = _images.value.isNotEmpty() && _text.value.isNotEmpty()
     }
 
     suspend fun getImageUrls(ids: List<String>): List<String> = ids.map { id ->

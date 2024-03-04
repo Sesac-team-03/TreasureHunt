@@ -3,7 +3,6 @@ package com.treasurehunt.ui.savelog
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -48,7 +47,6 @@ internal const val WORK_DATA_IS_PLAN = "isPlan"
 internal const val WORK_DATA_PLAN_ID = "planId"
 internal const val WORK_DATA_LOCAL_LOG_ID = "localLogId"
 internal const val WORK_DATA_REMOTE_LOG_ID = "remoteLogId"
-internal const val WORK_DATA_LOCAL_PLACE_ID = "localPlaceId"
 internal const val WORK_DATA_REMOTE_PLACE_ID = "remotePlaceId"
 
 @AndroidEntryPoint
@@ -57,17 +55,15 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
     private var _binding: FragmentSavelogBinding? = null
     private val binding get() = _binding!!
     private val viewModel: SaveLogViewModel by viewModels()
-    private val imageLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            setImageLauncher(result)
-        }
     private lateinit var map: NaverMap
-    private val source: FusedLocationSource =
-        FusedLocationSource(this, LOCATION_PERMISSION_REQUEST_CODE)
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             setLocationTrackingMode(isGranted)
             setAddImage(isGranted)
+        }
+    private val pickImagesLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            addImages(result)
         }
     private val args: SaveLogFragmentArgs by navArgs()
     private var isNotificationPermissionGranted = false
@@ -81,22 +77,35 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        initViewModel()
+        initAdapter()
+
         viewLifecycleOwner.lifecycleScope.launch {
             loadLogIfExists()
             setSaveButton()
         }
 
-        setShowMapFullScreen()
         loadMap()
-        initViewModel()
-        initAdapter()
-        setAlbumPermission()
+        setShowMapFullScreen()
+        setPickImageButton()
         setCancelButton()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun initViewModel() {
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.viewModel = viewModel
+    }
+
+    private fun initAdapter() {
+        binding.rvPhoto.adapter = SaveLogAdapter { imageModel ->
+            viewModel.removeImage(imageModel)
+        }
     }
 
     private suspend fun loadLogIfExists() {
@@ -108,41 +117,15 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun setImageLauncher(result: ActivityResult) {
-        if (result.data?.clipData != null) {
-            val count = result.data?.clipData!!.itemCount
-            if (viewModel.images.value.size + count > MAX_COUNT) {
-                binding.root.showSnackbar(R.string.savelog_sb_warning_count)
-                return
-            }
-            for (i in 0 until count) {
-                viewModel.addImage(ImageModel(result.data?.clipData!!.getItemAt(i).uri.toString()))
-            }
-        } else if (result.data?.data != null) {
-            if (viewModel.images.value.size + 1 > MAX_COUNT) {
-                binding.root.showSnackbar(R.string.savelog_sb_warning_count)
-                return
-            }
-            val uri = result.data?.data
-            viewModel.addImage(ImageModel(uri.toString()))
-        }
-    }
-
-    private fun setAddImage(isGranted: Boolean) {
-        if (isGranted) {
-            imageLauncher.launch(viewModel.getImagePick())
-        }
+    private fun loadMap() {
+        val mapFragment = childFragmentManager.findFragmentById(R.id.fcv_map) as MapFragment
+        mapFragment.getMapAsync(this)
     }
 
     private fun setShowMapFullScreen() {
         binding.ibFullScreen.setOnClickListener {
             findNavController().navigate(R.id.action_saveLogFragment_to_saveLogMapFragment)
         }
-    }
-
-    private fun loadMap() {
-        val mapFragment = childFragmentManager.findFragmentById(R.id.fcv_map) as MapFragment
-        mapFragment.getMapAsync(this)
     }
 
     private fun setLocationTrackingMode(isGranted: Boolean) {
@@ -155,7 +138,8 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
 
     private fun initMap(naverMap: NaverMap) {
         map = naverMap.apply {
-            locationSource = source
+            locationSource =
+                FusedLocationSource(this@SaveLogFragment, LOCATION_PERMISSION_REQUEST_CODE)
             uiSettings.isZoomControlEnabled = false
         }
     }
@@ -179,19 +163,41 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun initViewModel() {
-        binding.lifecycleOwner = viewLifecycleOwner
-        binding.viewModel = viewModel
-    }
-
-    private fun initAdapter() {
-        binding.rvPhoto.adapter = SaveLogAdapter { imageModel ->
-            viewModel.removeImage(imageModel)
+    private fun setAddImage(isGranted: Boolean) {
+        if (isGranted) {
+            pickImagesLauncher.launch(viewModel.getImagePick())
         }
     }
 
-    private fun setAlbumPermission() {
-        binding.ibSelectPhoto.setOnClickListener {
+    private fun addImages(result: ActivityResult) {
+        val intent = result.data ?: return
+        val count = intent.clipData?.itemCount ?: 1
+        if (isMaxCountExceeded(count)) return
+
+        intent.clipData?.let { clipData ->
+            repeat(count) {
+                viewModel.addImage(ImageModel(clipData.getItemAt(it).uri.toString()))
+            }
+            return
+        }
+
+        intent.data?.let { uri ->
+            viewModel.addImage(ImageModel(uri.toString()))
+            return
+        }
+    }
+
+    private fun isMaxCountExceeded(count: Int): Boolean {
+        return if (viewModel.images.value.size + count > MAX_COUNT) {
+            binding.root.showSnackbar(R.string.savelog_sb_warning_count)
+            true
+        } else {
+            false
+        }
+    }
+
+    private fun setPickImageButton() {
+        binding.ibPickImage.setOnClickListener {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 requestPermissionLauncher.launch(android.Manifest.permission.READ_MEDIA_IMAGES)
             } else {
@@ -262,9 +268,6 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
                 first.mapToContentUriArray() to second.mapToStorageUriArray()
             }
         }
-        Log.d("$$ Fragment: images", "$images")
-        Log.d("$$ Fragment: contentUris", "${contentUris.asList()}")
-        Log.d("$$ Fragment: storageUrls", "${storageUrls.asList()}")
 
         return Data.Builder()
             .putString(WORK_DATA_UID, uid)
