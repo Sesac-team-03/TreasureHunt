@@ -73,7 +73,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
-                android:text="@{@string/savelog_tv_photo_count(viewModel.images.size())}"
+                android:text="@{@string/savelog_tv_photo_count(viewModel.uiState.images.size())}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/fcv_map" />
 
@@ -98,7 +98,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/ib_pick_image"
                 app:layout_constraintTop_toTopOf="@+id/ib_pick_image"
-                bind:dataset="@{viewModel.images}"
+                bind:dataset="@{viewModel.uiState.images}"
                 tools:listitem="@layout/item_savelog" />
 
             <TextView
@@ -119,10 +119,9 @@
                 android:layout_height="130dp"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="16dp"
-                android:onTextChanged="@{ (s, start, before, count) -> viewModel.setTextInput(s) }"
+                android:onTextChanged="@{ (s, start, before, count) -> (start == 0 || before == 0) ? viewModel.setTextFieldState(s) : null }"
                 android:paddingStart="16dp"
                 android:paddingTop="16dp"
-                android:text="@{viewModel.text}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_text"
@@ -134,7 +133,7 @@
                 android:layout_width="0dp"
                 android:layout_height="52dp"
                 android:layout_marginHorizontal="16dp"
-                android:enabled="@{viewModel.isSaveButtonEnabled}"
+                android:enabled="@{viewModel.uiState.isSaveButtonEnabled}"
                 android:text="@string/savelog_btn_save"
                 app:cornerRadius="12dp"
                 app:layout_constraintBottom_toBottomOf="parent"

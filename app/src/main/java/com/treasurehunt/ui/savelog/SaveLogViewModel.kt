@@ -5,20 +5,18 @@ import android.provider.MediaStore
 import androidx.lifecycle.ViewModel
 import com.treasurehunt.data.ImageRepository
 import com.treasurehunt.ui.model.ImageModel
+import com.treasurehunt.ui.model.SaveLogUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @HiltViewModel
 class SaveLogViewModel @Inject constructor(private val imageRepo: ImageRepository) : ViewModel() {
 
-    private val _images: MutableStateFlow<List<ImageModel>> = MutableStateFlow(emptyList())
-    val images = _images.asStateFlow()
-    private val _text: MutableStateFlow<String> = MutableStateFlow("")
-    val text = _text.asStateFlow()
-    private val _isSaveButtonEnabled: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    val isSaveButtonEnabled = _isSaveButtonEnabled.asStateFlow()
+    private val _uiState = MutableStateFlow(SaveLogUiState())
+    val uiState: StateFlow<SaveLogUiState> = _uiState
 
     fun getImagePick() =
         Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).apply {
@@ -27,25 +25,33 @@ class SaveLogViewModel @Inject constructor(private val imageRepo: ImageRepositor
         }
 
     fun addImage(image: ImageModel) {
-        _images.value += image
+        _uiState.update {  uiState ->
+            uiState.copy(images = uiState.images + image)
+        }
         setSaveButtonState()
     }
 
     fun removeImage(image: ImageModel) {
-        _images.value -= image
+        _uiState.update {  uiState ->
+            uiState.copy(images = uiState.images - image)
+        }
         setSaveButtonState()
     }
 
-    fun setTextInput(input: CharSequence) {
-        _text.value = input.toString()
+    fun setTextFieldState(input: CharSequence) {
+        _uiState.update { uiState ->
+            uiState.copy(isTextFieldNotEmpty = input.isNotEmpty())
+        }
         setSaveButtonState()
     }
 
     private fun setSaveButtonState() {
-        _isSaveButtonEnabled.value = _images.value.isNotEmpty() && _text.value.isNotEmpty()
+        _uiState.update {  uiState ->
+            uiState.copy(isSaveButtonEnabled = uiState.images.isNotEmpty() && uiState.isTextFieldNotEmpty)
+        }
     }
 
-    suspend fun getImageUrls(ids: List<String>): List<String> = ids.map { id ->
+    suspend fun getImageStorageUrls(ids: List<String>): List<String> = ids.map { id ->
         imageRepo.getRemoteImageById(id).url
     }
 }

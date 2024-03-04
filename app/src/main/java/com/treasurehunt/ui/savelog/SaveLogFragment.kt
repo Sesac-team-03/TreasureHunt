@@ -34,7 +34,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 private const val LOCATION_PERMISSION_REQUEST_CODE = 1001
-private const val MAX_COUNT = 5
+private const val PICK_IMAGE_MAX_COUNT = 5
 
 internal const val WORK_DATA_UID = "uid"
 internal const val WORK_DATA_URI_STRINGS = "uriStrings"
@@ -110,10 +110,10 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
 
     private suspend fun loadLogIfExists() {
         args.log?.let { log ->
-            viewModel.getImageUrls(log.remoteImageIds).forEach { imageUrl ->
+            viewModel.getImageStorageUrls(log.remoteImageIds).forEach { imageUrl ->
                 viewModel.addImage(ImageModel(storageUrl = imageUrl))
             }
-            viewModel.setTextInput(log.text)
+            viewModel.setTextFieldState(log.text)
         }
     }
 
@@ -188,7 +188,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun isMaxCountExceeded(count: Int): Boolean {
-        return if (viewModel.images.value.size + count > MAX_COUNT) {
+        return if (viewModel.uiState.value.images.size + count > PICK_IMAGE_MAX_COUNT) {
             binding.root.showSnackbar(R.string.savelog_sb_warning_count)
             true
         } else {
@@ -260,7 +260,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
 
     private fun getImageUploadInputData(): Data {
         val uid = Firebase.auth.currentUser!!.uid
-        val images = viewModel.images.value
+        val images = viewModel.uiState.value.images
         val (contentUris, storageUrls) = if (args.log == null) {
             images.mapToContentUriArray() to emptyArray()
         } else {
