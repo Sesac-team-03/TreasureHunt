@@ -21,6 +21,8 @@ import com.treasurehunt.ui.model.LogModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+const val INIT_LOG_COUNT = 15
+
 @AndroidEntryPoint
 class FeedFragment : Fragment() {
 
@@ -61,15 +63,14 @@ class FeedFragment : Fragment() {
 
     private fun initAdapter() {
         val stateAdapter = FeedFooterLoadStateAdapter { feedAdapter.retry() }
-        val feedAdapter = feedAdapter.withLoadStateFooter(
-            stateAdapter
-        )
+        val feedAdapter = feedAdapter.withLoadStateFooter(stateAdapter)
         binding.rvLogs.adapter = feedAdapter
         val layoutManager = binding.rvLogs.layoutManager as GridLayoutManager
         layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
-                return if (position == feedAdapter.itemCount - 1 && stateAdapter.itemCount > 0) {
-                    3
+                return if (position == feedAdapter.itemCount - 1 && stateAdapter.itemCount == 1) {
+                    if (feedAdapter.itemCount > INIT_LOG_COUNT) 3
+                    else 0
                 } else {
                     1
                 }

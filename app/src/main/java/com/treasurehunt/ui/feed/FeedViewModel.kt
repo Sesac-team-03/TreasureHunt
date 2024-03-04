@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
+private const val INITIAL_LOAD_SIZE = 3
 private const val PAGE_SIZE = 3
 
 @HiltViewModel
@@ -44,7 +45,7 @@ class FeedViewModel @Inject constructor(
     }
 
     private fun getLogs(): Flow<PagingData<LogModel>> {
-        return logRepo.getPagingLogs(PAGE_SIZE)
+        return logRepo.getPagingLogs(PAGE_SIZE, INITIAL_LOAD_SIZE)
             .map { pagingData -> initPagingLogs(pagingData) }
             .cachedIn(viewModelScope)
     }

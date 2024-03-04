@@ -19,7 +19,7 @@ interface LogRepository {
 
     suspend fun getAllRemoteLogs(): List<LogDTO>
 
-    fun getPagingLogs(pageSize: Int): Flow<PagingData<LogEntity>>
+    fun getPagingLogs(pageSize: Int, initialLoadSize: Int): Flow<PagingData<LogEntity>>
 
     fun update(log: LogEntity): Int
 
