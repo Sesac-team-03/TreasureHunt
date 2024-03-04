@@ -113,8 +113,12 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
             viewModel.getImageStorageUrls(log.remoteImageIds).forEach { imageUrl ->
                 viewModel.addImage(ImageModel(storageUrl = imageUrl))
             }
-            viewModel.setTextFieldState(log.text)
+            setTextField(log.text)
         }
+    }
+
+    private fun setTextField(input: String) {
+        binding.etText.setText(input)
     }
 
     private fun loadMap() {
