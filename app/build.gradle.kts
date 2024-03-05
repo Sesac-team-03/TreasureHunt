@@ -117,6 +117,11 @@ dependencies {
 
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01")
     implementation("androidx.paging:paging-runtime-ktx:3.2.1")
+
+    implementation("androidx.hilt:hilt-work:1.2.0-beta01")
+    ksp("androidx.hilt:hilt-compiler:1.2.0-beta01")
+
+    implementation(kotlin("reflect"))
 }
 
 kapt {
