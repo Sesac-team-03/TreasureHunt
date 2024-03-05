@@ -1,15 +1,16 @@
 package com.treasurehunt.ui
 
-import android.graphics.Color
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.treasurehunt.R
 import com.treasurehunt.ui.model.ImageModel
+import java.lang.Exception
 
 private val storage = Firebase.storage
 
@@ -32,24 +33,25 @@ fun bindImageSource(
 }
 
 @BindingAdapter("imageStorageUrl")
-fun bindImageStorageUrl(view: ImageView, url: String?) {
+fun bindImageStorageUrl(view: ImageView, url: String) {
     try {
         view.run {
-            val storageRef = storage.getReferenceFromUrl(url!!)
-            val thumbnailRequestBuilder = Glide.with(view.context)
+            val storageRef = storage.getReferenceFromUrl(url)
+            val thumbnailRequestBuilder = Glide.with(context)
                 .load(storageRef)
                 .placeholder(R.color.gray_200)
                 .sizeMultiplier(0.25f)
-            Glide.with(view.context)
+            Glide.with(context)
                 .load(storageRef)
+                .error(R.drawable.ic_no_image)
                 .thumbnail(thumbnailRequestBuilder)
                 .into(this)
             scaleType = ImageView.ScaleType.CENTER_CROP
         }
     } catch (e: Exception) {
         view.run {
-            setBackgroundColor(Color.GRAY)
-            scaleType = android.widget.ImageView.ScaleType.CENTER_INSIDE
+            setImageResource(R.drawable.ic_no_image)
+            scaleType = ImageView.ScaleType.CENTER_INSIDE
         }
     }
 }

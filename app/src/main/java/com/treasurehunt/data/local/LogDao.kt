@@ -1,5 +1,6 @@
 package com.treasurehunt.data.local
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -20,6 +21,9 @@ interface LogDao {
 
     @Query("SELECT * from logs ORDER BY created_date DESC")
     fun getAllLocalLogs(): Flow<List<LogEntity>>
+
+    @Query("SELECT * FROM logs ORDER BY created_date DESC")
+    fun getPagingLogs(): PagingSource<Int, LogEntity>
 
     @Update
     fun update(log: LogEntity): Int

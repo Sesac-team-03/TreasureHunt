@@ -1,9 +1,13 @@
 package com.treasurehunt.data
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.treasurehunt.data.local.LogDao
 import com.treasurehunt.data.local.model.LogEntity
 import com.treasurehunt.data.remote.LogRemoteDataSource
 import com.treasurehunt.data.remote.model.LogDTO
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class LogRepositoryImpl @Inject constructor(
@@ -22,6 +26,16 @@ class LogRepositoryImpl @Inject constructor(
     override suspend fun getRemoteLogById(id: String) = logRemoteDataSource.getRemoteLogById(id)
 
     override suspend fun getAllRemoteLogs() = logRemoteDataSource.getAllRemoteLogs()
+    override fun getPagingLogs(pageSize: Int,initialLoadSize:Int): Flow<PagingData<LogEntity>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize,
+                initialLoadSize = 3,
+                enablePlaceholders = false,
+            )
+        ) { logDao.getPagingLogs() }
+            .flow
+    }
 
     override fun update(log: LogEntity) = logDao.update(log)
 

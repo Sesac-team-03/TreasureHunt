@@ -4,6 +4,7 @@ import android.content.Intent
 import android.provider.MediaStore
 import androidx.lifecycle.ViewModel
 import com.treasurehunt.data.ImageRepository
+import com.treasurehunt.data.remote.model.LogDTO
 import com.treasurehunt.ui.model.ImageModel
 import com.treasurehunt.ui.model.SaveLogUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
