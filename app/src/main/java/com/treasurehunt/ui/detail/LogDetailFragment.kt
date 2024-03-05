@@ -18,6 +18,7 @@ import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
 import com.google.firebase.ktx.Firebase
 import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentLogdetailBinding
+import com.treasurehunt.ui.detail.adapter.ImageSliderAdapter
 import com.treasurehunt.ui.model.LogModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

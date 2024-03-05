@@ -1,4 +1,4 @@
-package com.treasurehunt.ui.detail
+package com.treasurehunt.ui.detail.adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +11,7 @@ import com.bumptech.glide.Glide
 import com.google.firebase.storage.FirebaseStorage
 import com.treasurehunt.R
 import com.treasurehunt.databinding.ItemImageBinding
+import com.treasurehunt.ui.detail.ImageItem
 
 class ImageSliderAdapter :
     ListAdapter<ImageItem.Url, ImageSliderAdapter.ImageViewHolder>(ImageDiffCallback()) {

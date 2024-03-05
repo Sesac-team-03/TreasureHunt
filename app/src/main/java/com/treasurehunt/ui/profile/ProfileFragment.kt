@@ -20,6 +20,7 @@ import com.google.firebase.storage.storage
 import com.treasurehunt.R
 import com.treasurehunt.data.remote.model.UserDTO
 import com.treasurehunt.databinding.FragmentProfileBinding
+import com.treasurehunt.ui.profile.adapter.ProfileViewPagerAdapter
 import com.treasurehunt.util.FILENAME_EXTENSION_PNG
 import com.treasurehunt.util.STORAGE_LOCATION_PROFILE_IMAGE
 import com.treasurehunt.util.extractDigits
@@ -135,8 +136,9 @@ class ProfileFragment : Fragment() {
     private suspend fun uploadProfileImage(uri: Uri) {
         val uid = Firebase.auth.currentUser!!.uid
         val filename = uri.toString().extractDigits()
-        val profileImageStorageRef = Firebase.storage.reference.child(uid).child(STORAGE_LOCATION_PROFILE_IMAGE)
-            .child("$filename$FILENAME_EXTENSION_PNG")
+        val profileImageStorageRef =
+            Firebase.storage.reference.child(uid).child(STORAGE_LOCATION_PROFILE_IMAGE)
+                .child("$filename$FILENAME_EXTENSION_PNG")
         val uploadTask = profileImageStorageRef.putFile(uri)
         uploadTask.addOnSuccessListener { taskSnapshot ->
             viewModel.setProfileUri(taskSnapshot.storage.toString())
