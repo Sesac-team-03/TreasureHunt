@@ -21,11 +21,12 @@ import com.treasurehunt.R
 import com.treasurehunt.data.ImageRepository
 import com.treasurehunt.data.LogRepository
 import com.treasurehunt.data.remote.model.LogDTO
-import com.treasurehunt.util.UPLOAD_NOTIFICATION_ID
-import com.treasurehunt.util.UPLOAD_NOTIFICATION_ID_STRING
+import com.treasurehunt.ui.home.UPLOAD_NOTIFICATION_CHANNEL_ID
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.tasks.await
+
+private const val UPLOAD_NOTIFICATION_ID = 0
 
 @HiltWorker
 class ImageUploadWorker @AssistedInject constructor(
@@ -174,7 +175,7 @@ class ImageUploadWorker @AssistedInject constructor(
         val pendingIntent =
             PendingIntent.getActivity(context, 0, launchIntent, PendingIntent.FLAG_IMMUTABLE)
 
-        return NotificationCompat.Builder(context, UPLOAD_NOTIFICATION_ID_STRING)
+        return NotificationCompat.Builder(context, UPLOAD_NOTIFICATION_CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_chest_open)
             .setContentTitle(context.getString(R.string.savelog_image_upload_notification_title))
             .setContentText(context.getString(R.string.savelog_image_upload_notification_progress))

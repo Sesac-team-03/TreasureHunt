@@ -27,6 +27,7 @@ import kotlinx.coroutines.tasks.await
 
 @AndroidEntryPoint
 class ProfileFragment : Fragment() {
+
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
     private val viewModel: ProfileViewModel by viewModels()

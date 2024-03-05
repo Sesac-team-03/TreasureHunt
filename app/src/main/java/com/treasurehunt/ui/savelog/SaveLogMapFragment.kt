@@ -17,6 +17,8 @@ import com.naver.maps.map.util.FusedLocationSource
 import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentSavelogMapBinding
 
+private const val LOCATION_PERMISSION_REQUEST_CODE = 1002
+
 class SaveLogMapFragment : Fragment(), OnMapReadyCallback {
 
     private var _binding: FragmentSavelogMapBinding? = null
@@ -96,9 +98,5 @@ class SaveLogMapFragment : Fragment(), OnMapReadyCallback {
     override fun onMapReady(naverMap: NaverMap) {
         initMap(naverMap)
         handleLocationAccessPermission()
-    }
-
-    companion object {
-        private const val LOCATION_PERMISSION_REQUEST_CODE = 1002
     }
 }
