@@ -7,7 +7,7 @@ import com.google.firebase.auth.userProfileChangeRequest
 import com.google.firebase.ktx.Firebase
 import com.treasurehunt.data.LogRepository
 import com.treasurehunt.data.PlaceRepository
-import com.treasurehunt.data.User
+import com.treasurehunt.ui.model.NaverUser
 import com.treasurehunt.data.UserRepository
 import com.treasurehunt.data.remote.model.UserDTO
 import com.treasurehunt.data.remote.model.toLogEntity
@@ -25,8 +25,8 @@ class LoginViewModel @Inject constructor(
     private val placeRepo: PlaceRepository
 ) : ViewModel() {
 
-    suspend fun insertNaverUser(user: User) {
-        updateProfile(user)
+    suspend fun insertNaverUser(naverUser: NaverUser) {
+        updateProfile(naverUser)
         delay(USER_UPDATE_DELAY)
         val currentUser = Firebase.auth.currentUser!!
         val userDTO = UserDTO(
@@ -45,10 +45,10 @@ class LoginViewModel @Inject constructor(
         userRepo.insert(currentUser.uid, userDTO)
     }
 
-    private fun updateProfile(user: User) {
+    private fun updateProfile(naverUser: NaverUser) {
         val profileUpdate = userProfileChangeRequest {
-            displayName = user.nickname
-            photoUri = Uri.parse(user.profileImage)
+            displayName = naverUser.nickname
+            photoUri = Uri.parse(naverUser.profileImage)
         }
         Firebase.auth.currentUser!!.updateProfile(profileUpdate)
     }

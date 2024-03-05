@@ -1,8 +1,8 @@
-package com.treasurehunt.data
+package com.treasurehunt.ui.model
 
-data class User(
-    val email: String? = null,
+data class NaverUser(
     val id: String,
+    val email: String? = null,
     val nickname: String? = null,
     val profileImage: String? = null
 )
