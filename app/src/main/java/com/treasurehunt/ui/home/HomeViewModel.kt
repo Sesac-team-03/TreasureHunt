@@ -14,7 +14,7 @@ import com.treasurehunt.data.UserRepository
 import com.treasurehunt.data.local.model.PlaceEntity
 import com.treasurehunt.data.remote.model.PlaceDTO
 import com.treasurehunt.data.remote.model.UserDTO
-import com.treasurehunt.ui.model.MapUiState
+import com.treasurehunt.ui.model.HomeMapUiState
 import com.treasurehunt.util.ConnectivityRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -22,6 +22,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -43,8 +44,8 @@ class HomeViewModel @Inject constructor(
 ) :
     ViewModel() {
 
-    private val _uiState = MutableStateFlow(MapUiState())
-    val uiState: StateFlow<MapUiState> = _uiState
+    private val _uiState: MutableStateFlow<HomeMapUiState> = MutableStateFlow(HomeMapUiState())
+    val uiState: StateFlow<HomeMapUiState> = _uiState.asStateFlow()
     private var fetchJob: Job? = null
 
     init {

@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -44,8 +45,8 @@ class FriendViewModel @Inject constructor(
     private val connectivityRepo: ConnectivityRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(FriendUiState(false))
-    val uiState: StateFlow<FriendUiState> = _uiState
+    private val _uiState: MutableStateFlow<FriendUiState> = MutableStateFlow(FriendUiState(false))
+    val uiState: StateFlow<FriendUiState> = _uiState.asStateFlow()
     private val db = FirebaseDatabase.getInstance(BASE_URL)
     private val friendIds: Flow<List<String>> = getFriendIdsFlow()
 
