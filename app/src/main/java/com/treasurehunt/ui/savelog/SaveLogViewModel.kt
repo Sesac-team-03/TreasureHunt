@@ -13,6 +13,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
+private const val MIME_TYPE_IMAGE = "image/*"
+
 @HiltViewModel
 class SaveLogViewModel @Inject constructor(private val imageRepo: ImageRepository) : ViewModel() {
 
@@ -21,7 +23,7 @@ class SaveLogViewModel @Inject constructor(private val imageRepo: ImageRepositor
 
     fun getImagePick() =
         Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).apply {
-            type = "image/*"
+            type = MIME_TYPE_IMAGE
             putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
         }
 

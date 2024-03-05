@@ -27,6 +27,8 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.tasks.await
 
 private const val UPLOAD_NOTIFICATION_ID = 0
+private const val STORAGE_LOCATION_IMAGES = "%s/log_images"
+private const val PATH_STRING_FILE_NAME = "%s.png"
 
 @HiltWorker
 class ImageUploadWorker @AssistedInject constructor(
@@ -127,15 +129,21 @@ class ImageUploadWorker @AssistedInject constructor(
     }
 
     private fun getStorageReferences(uid: String, uris: List<Uri>): List<StorageReference> {
-        val storageRef = Firebase.storage.getReference("${uid}/log_images")
+        val storageRef = Firebase.storage.getReference(
+            String.format(STORAGE_LOCATION_IMAGES, uid)
+        )
         val fileNames = uris.map {
-            it.toString().replace("[^0-9]".toRegex(), "")
+            it.toString().extractDigits()
         }
 
         return fileNames.map {
-            storageRef.child("$it.png")
+            storageRef.child(
+                String.format(PATH_STRING_FILE_NAME, it)
+            )
         }
     }
+
+    private fun String.extractDigits() = replace("[^0-9]".toRegex(), "")
 
     private fun execUploadTasks(uris: List<Uri>, refs: List<StorageReference>): List<UploadTask> {
         return uris.mapIndexed { i, uri ->

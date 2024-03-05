@@ -25,6 +25,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
+private const val STORAGE_LOCATION_PROFILE_IMAGE = "%s/profile_image"
+private const val PATH_STRING_FILE_NAME = "%s.png"
+private const val NULL_STRING = "null"
+
 @AndroidEntryPoint
 class ProfileFragment : Fragment() {
 
@@ -136,10 +140,14 @@ class ProfileFragment : Fragment() {
     private suspend fun uploadProfileImage(uri: Uri) {
         val uid = Firebase.auth.currentUser!!.uid
         val storage = Firebase.storage
-        val storageRef = storage.getReference("${uid}/profile_image")
-        val fileName = uri.toString().replace("[^0-9]".toRegex(), "")
-        val mountainsRef = storageRef.child("${fileName}.png")
-        val uploadTask = mountainsRef.putFile(uri)
+        val storageRef = storage.getReference(
+            String.format(STORAGE_LOCATION_PROFILE_IMAGE, uid)
+        )
+        val fileName = uri.toString().extractDigits()
+        val fileRef = storageRef.child(
+            String.format(PATH_STRING_FILE_NAME, fileName)
+        )
+        val uploadTask = fileRef.putFile(uri)
         uploadTask.addOnSuccessListener { taskSnapshot ->
             viewModel.setProfileUri(taskSnapshot.storage.toString())
         }.addOnFailureListener {
@@ -147,6 +155,8 @@ class ProfileFragment : Fragment() {
         }
         uploadTask.await()
     }
+
+    private fun String.extractDigits() = replace("[^0-9]".toRegex(), "")
 
     private fun saveProfile() {
         lifecycleScope.launch {
@@ -185,7 +195,7 @@ class ProfileFragment : Fragment() {
         if (userDTO.profileImage.toString().contains(getString(R.string.profile_check_url))) {
             Glide.with(requireContext()).load(userDTO.profileImage.toString())
                 .into(binding.ivProfileImage)
-        } else if (userDTO.profileImage.isNullOrEmpty() || userDTO.profileImage == "null") {
+        } else if (userDTO.profileImage.isNullOrEmpty() || userDTO.profileImage == NULL_STRING) {
             Glide.with(requireContext()).load(R.drawable.ic_no_profile_image)
                 .into(binding.ivProfileImage)
         } else {
