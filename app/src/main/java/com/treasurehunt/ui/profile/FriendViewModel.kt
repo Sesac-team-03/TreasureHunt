@@ -1,6 +1,5 @@
 package com.treasurehunt.ui.profile
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.FirebaseException
@@ -18,7 +17,7 @@ import com.treasurehunt.data.remote.REMOTE_DATABASE_USERS
 import com.treasurehunt.data.remote.model.UserDTO
 import com.treasurehunt.data.remote.model.toUserModel
 import com.treasurehunt.ui.model.FriendUiState
-import com.treasurehunt.util.COMPILATION_WARNING_UNCHECKED_CAST_
+import com.treasurehunt.util.COMPILATION_WARNING_UNCHECKED_CAST
 import com.treasurehunt.util.ConnectivityRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
@@ -62,7 +61,7 @@ class FriendViewModel @Inject constructor(
         val friendsRef =
             db.reference.child(REMOTE_DATABASE_USERS).child(uid).child(pathStringFriends)
         val callback = object : ValueEventListener {
-            @Suppress(COMPILATION_WARNING_UNCHECKED_CAST_)
+            @Suppress(COMPILATION_WARNING_UNCHECKED_CAST)
             override fun onDataChange(snapshot: DataSnapshot) {
                 val friendIds = (snapshot.value as? Map<String, Boolean>
                     ?: emptyMap()).filter { it.value }.keys.toList()

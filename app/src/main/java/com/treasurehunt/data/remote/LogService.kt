@@ -9,23 +9,25 @@ import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 
+internal const val REMOTE_DATABASE_LOGS = "logs"
+
 interface LogService {
 
-    @POST("logs.json")
+    @POST("$REMOTE_DATABASE_LOGS.json")
     suspend fun insert(@Body log: LogDTO): RemoteIdWrapper
 
-    @GET("logs/{id}.json")
+    @GET("$REMOTE_DATABASE_LOGS/{id}.json")
     suspend fun getRemoteLogById(@Path("id") id: String): LogDTO
 
-    @GET("logs.json")
+    @GET("$REMOTE_DATABASE_LOGS.json")
     suspend fun getAllRemoteLogs(): List<LogDTO>
 
-    @PATCH("logs/{id}.json")
+    @PATCH("$REMOTE_DATABASE_LOGS/{id}.json")
     suspend fun update(
         @Path("id") id: String,
         @Body log: LogDTO
     )
 
-    @DELETE("logs/{id}.json")
+    @DELETE("$REMOTE_DATABASE_LOGS/{id}.json")
     suspend fun delete(@Path("id") id: String)
 }

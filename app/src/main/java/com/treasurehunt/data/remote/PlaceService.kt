@@ -9,20 +9,22 @@ import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 
+internal const val REMOTE_DATABASE_PLACES = "places"
+
 interface PlaceService {
 
-    @POST("places.json")
+    @POST("$REMOTE_DATABASE_PLACES.json")
     suspend fun insert(@Body place: PlaceDTO): RemoteIdWrapper
 
-    @GET("places/{id}.json")
+    @GET("$REMOTE_DATABASE_PLACES/{id}.json")
     suspend fun getRemotePlaceById(@Path("id") id: String): PlaceDTO
 
-    @PATCH("places/{id}.json")
+    @PATCH("$REMOTE_DATABASE_PLACES/{id}.json")
     suspend fun update(
         @Path("id") id: String,
         @Body place: PlaceDTO
     )
 
-    @DELETE("places/{id}.json")
+    @DELETE("$REMOTE_DATABASE_PLACES/{id}.json")
     suspend fun delete(@Path("id") id: String)
 }

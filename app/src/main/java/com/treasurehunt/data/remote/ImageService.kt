@@ -8,14 +8,16 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
 
+internal const val REMOTE_DATABASE_IMAGES = "images"
+
 interface ImageService {
 
-    @POST("images.json")
+    @POST("$REMOTE_DATABASE_IMAGES.json")
     suspend fun insert(@Body image: ImageDTO): RemoteIdWrapper
 
-    @GET("images/{id}.json")
+    @GET("$REMOTE_DATABASE_IMAGES/{id}.json")
     suspend fun getRemoteImageById(@Path("id") id: String): ImageDTO
 
-    @DELETE("images/{id}.json")
+    @DELETE("$REMOTE_DATABASE_IMAGES/{id}.json")
     suspend fun delete(@Path("id") id: String)
 }
