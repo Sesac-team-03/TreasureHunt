@@ -89,7 +89,7 @@ class FeedFragment : Fragment() {
         val curDestination = findNavController().currentDestination?.id
         curDestination?.let {
             if (it == R.id.feedFragment) {
-                val action = FeedFragmentDirections.actionFeedFragmentToDetailFragment(log)
+                val action = FeedFragmentDirections.actionFeedFragmentToLogDetailFragment(log)
                 findNavController().navigate(action)
             }
         }
