@@ -11,15 +11,21 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentDeleteUserBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class DeleteUserFragment : DialogFragment() {
     private var _binding: FragmentDeleteUserBinding? = null
     private val binding get() = _binding!!
+    private val viewModel: SettingViewModel by viewModels()
 
     @SuppressLint("UseGetLayoutInflater")
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -44,6 +50,7 @@ class DeleteUserFragment : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setBackButton()
+        setDeleteUserInfo()
     }
 
     override fun onDestroyView() {
@@ -57,6 +64,20 @@ class DeleteUserFragment : DialogFragment() {
         }
         binding.btnCancel.setOnClickListener {
             findNavController().navigateUp()
+        }
+    }
+
+    private fun setDeleteUserInfo() {
+        val userId = Firebase.auth.currentUser?.uid
+        val user = Firebase.auth.currentUser
+        binding.btnDelete.setOnClickListener {
+            if (userId != null) {
+                viewLifecycleOwner.lifecycleScope.launch {
+                    viewModel.deleteAllData(userId)
+                    user?.delete()
+                    findNavController().navigate(R.id.action_deleteUserFragment_to_logInFragment)
+                }
+            }
         }
     }
 }

@@ -161,5 +161,9 @@
         android:id="@+id/deleteUserFragment"
         android:name="com.treasurehunt.ui.setting.DeleteUserFragment"
         android:label="DeleteUserFragment"
-        tools:layout="@layout/fragment_delete_user" />
+        tools:layout="@layout/fragment_delete_user" >
+        <action
+            android:id="@+id/action_deleteUserFragment_to_logInFragment"
+            app:destination="@id/logInFragment" />
+    </dialog>
 </navigation>
