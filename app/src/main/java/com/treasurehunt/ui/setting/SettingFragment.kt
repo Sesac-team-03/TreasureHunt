@@ -31,7 +31,7 @@ class SettingFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         backProfile()
         setLogout()
-        deleteUser()
+        showDeleteDialog()
     }
 
     override fun onDestroyView() {
@@ -58,7 +58,7 @@ class SettingFragment : Fragment() {
         }
     }
 
-    private fun deleteUser() {
+    private fun showDeleteDialog() {
         binding.tvUserDelete.setOnClickListener {
             findNavController().navigate(R.id.action_settingFragment_to_deleteUserFragment)
         }
