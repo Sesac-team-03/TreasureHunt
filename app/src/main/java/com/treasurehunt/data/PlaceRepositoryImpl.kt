@@ -4,7 +4,6 @@ import com.treasurehunt.data.local.PlaceDao
 import com.treasurehunt.data.local.model.PlaceEntity
 import com.treasurehunt.data.remote.PlaceRemoteDataSource
 import com.treasurehunt.data.remote.model.PlaceDTO
-import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class PlaceRepositoryImpl @Inject constructor(
@@ -22,7 +21,8 @@ class PlaceRepositoryImpl @Inject constructor(
 
     override fun getAllLocalPlans() = placeDao.getAllLocalPlans()
 
-    override suspend fun getRemotePlaceById(id: String) = placeRemoteDataSource.getRemotePlaceById(id)
+    override suspend fun getRemotePlaceById(id: String) =
+        placeRemoteDataSource.getRemotePlaceById(id)
 
     override suspend fun update(place: PlaceEntity) = placeDao.update(place)
 

@@ -1,6 +1,7 @@
 package com.treasurehunt.data.remote.model
 
 import com.treasurehunt.data.local.model.LogEntity
+import com.treasurehunt.ui.model.LogModel
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -21,4 +22,13 @@ fun LogDTO.toLogEntity(remoteId: String) = LogEntity(
     remoteImageIds.keys.toList(),
     localId,
     remoteId
+)
+
+fun LogDTO.toLogModel(imageUrls: List<String>) = LogModel(
+    remotePlaceId,
+    text,
+    theme,
+    createdDate,
+    remoteImageIds.keys.toList(),
+    imageUrls
 )

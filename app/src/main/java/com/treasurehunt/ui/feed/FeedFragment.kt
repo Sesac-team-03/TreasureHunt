@@ -81,7 +81,7 @@ class FeedFragment : Fragment() {
     }
 
     private fun moveToDetail(log: LogModel) {
-        val action = FeedFragmentDirections.actionFeedFragmentToDetailFragment(log)
+        val action = FeedFragmentDirections.actionFeedFragmentToLogDetailFragment(log)
         findNavController().navigate(action)
     }
 }

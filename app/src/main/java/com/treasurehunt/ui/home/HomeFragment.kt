@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.PointF
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +16,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.naver.maps.map.LocationTrackingMode
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
@@ -27,6 +29,8 @@ import com.treasurehunt.databinding.FragmentHomeBinding
 import com.treasurehunt.ui.model.MapSymbol
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+
+private const val LOCATION_PERMISSION_REQUEST_CODE = 1000
 
 @AndroidEntryPoint
 class HomeFragment : Fragment(), OnMapReadyCallback {
@@ -41,6 +45,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         registerForActivityResult(RequestPermission()) { isGranted ->
             setLocationTrackingMode(isGranted)
         }
+    private val args: HomeFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -134,6 +139,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
             )
             val action = HomeFragmentDirections.actionHomeFragmentToMapDialogFragment(mapSymbol)
             findNavController().navigate(action)
+
             true
         }
     }
@@ -153,6 +159,13 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                         marker.show()
                         marker.setPlanClick()
                     }
+
+                    val markerToRemove = args.remotePlaceId?.let { remotePlaceId ->
+                        uiState.allMarkers.keys.find { marker ->
+                            marker.tag == remotePlaceId
+                        }
+                    }
+                    markerToRemove?.hide()
                 }
             }
         }
@@ -162,12 +175,15 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         map = this@HomeFragment.map
     }
 
+    private fun Marker.hide() {
+        map = null
+    }
+
     private fun Marker.setVisitClick() {
         val remotePlaceId = tag.toString()
 
         setOnClickListener {
-            val action =
-                HomeFragmentDirections.actionHomeFragmentToDetailFragment(null, remotePlaceId)
+            val action = HomeFragmentDirections.actionHomeFragmentToLogDetailFragment(null, remotePlaceId)
             findNavController().navigate(action)
             true
         }
@@ -195,9 +211,5 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
             }
             true
         }
-    }
-
-    companion object {
-        private const val LOCATION_PERMISSION_REQUEST_CODE = 1000
     }
 }

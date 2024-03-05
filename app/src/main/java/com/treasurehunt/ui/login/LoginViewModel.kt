@@ -62,7 +62,7 @@ class LoginViewModel @Inject constructor(
 
     private suspend fun initLocalLogs(userDTO: UserDTO) {
         logRepo.deleteAllLocalLogs()
-        userDTO.remoteLogIds.map {
+        userDTO.remoteLogIds.filterValues { it }.map {
             val log = logRepo.getRemoteLogById(it.key)
             logRepo.insert(log.toLogEntity(it.key))
         }
@@ -70,7 +70,7 @@ class LoginViewModel @Inject constructor(
 
     private suspend fun initLocalPlaces(userDTO: UserDTO) {
         placeRepo.deleteAllLocalPlaces()
-        userDTO.remoteVisitIds.map {
+        (userDTO.remoteVisitIds + userDTO.remotePlanIds).filterValues { it }.map {
             val place = placeRepo.getRemotePlaceById(it.key)
             placeRepo.insert(place.toPlaceEntity(it.key))
         }
