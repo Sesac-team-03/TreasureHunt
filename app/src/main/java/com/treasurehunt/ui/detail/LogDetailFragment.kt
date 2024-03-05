@@ -3,7 +3,6 @@ package com.treasurehunt.ui.detail
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,6 +24,7 @@ import kotlinx.coroutines.launch
 
 const val LINK_URL = "https://treasurehuntsesac.page.link/KPo2"
 const val DOMAIN_URI_PREFIX = "https://treasurehuntsesac.page.link"
+const val MIME_TYPE_TEXT_PLAIN = "text/plain"
 
 @AndroidEntryPoint
 class LogDetailFragment : BottomSheetDialogFragment() {
@@ -34,9 +34,7 @@ class LogDetailFragment : BottomSheetDialogFragment() {
     private val viewModel: LogDetailViewModel by viewModels()
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = FragmentLogdetailBinding.inflate(inflater, container, false)
         return binding.root
@@ -115,11 +113,7 @@ class LogDetailFragment : BottomSheetDialogFragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.log.collect { log ->
                 if (log == null) {
-                    Toast.makeText(
-                        requireContext(),
-                        "데이터를 불러오는 중입니다. 잠시 후 다시 시도해 주세요",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    showToast(R.string.logdetail_log_still_loading_message)
                     return@collect
                 }
 
@@ -127,8 +121,7 @@ class LogDetailFragment : BottomSheetDialogFragment() {
                     getMapSymbol(args.log, args.remotePlaceId)
                 }
                 val action = LogDetailFragmentDirections.actionLogDetailFragmentToSaveLogFragment(
-                    mapSymbol,
-                    log
+                    mapSymbol, log
                 )
                 findNavController().navigate(action)
             }
@@ -144,22 +137,18 @@ class LogDetailFragment : BottomSheetDialogFragment() {
                 val placeDTO = viewModel.getRemotePlace(placeId)
                 placeDTO.remoteLogId?.let { logId ->
                     viewModel.deleteLogAndAssociatedData(logId, placeId, userId)
-                    Toast.makeText(requireContext(), "기록이 삭제되었습니다", Toast.LENGTH_SHORT)
-                        .show()
+                    showToast(R.string.logdetail_log_deleted_message)
                     dismiss()
                 } ?: run {
-                    Toast.makeText(requireContext(), "문제가 생겨 잠시 후 다시 시도해 주세요", Toast.LENGTH_SHORT)
-                        .show()
+                    showToast(R.string.logdetail_error_message)
                 }
-                val action =
-                    LogDetailFragmentDirections.actionLogDetailFragmentToHomeFragment(
-                        viewModel.args.remotePlaceId
-                    )
+                val action = LogDetailFragmentDirections.actionLogDetailFragmentToHomeFragment(
+                    viewModel.args.remotePlaceId
+                )
                 findNavController().navigate(action)
             }
         } else {
-            Toast.makeText(requireContext(), "문제가 생겨 잠시 후 다시 시도해 주세요", Toast.LENGTH_SHORT)
-                .show()
+            showToast(R.string.logdetail_error_message)
         }
     }
 
@@ -176,25 +165,28 @@ class LogDetailFragment : BottomSheetDialogFragment() {
     }
 
     private fun shareContent(link: String) {
-        val shareText = getString(R.string.Logdetail_content, link)
+        val shareText = getString(R.string.logdetail_content, link)
         val intent = Intent().apply {
             action = Intent.ACTION_SEND
             putExtra(Intent.EXTRA_TEXT, shareText)
-            type = "text/plain"
+            type = MIME_TYPE_TEXT_PLAIN
         }
-        startActivity(Intent.createChooser(intent, getString(R.string.Logdetail_chooser_title)))
+        startActivity(Intent.createChooser(intent, getString(R.string.logdetail_chooser_title)))
     }
 
     private fun getDynamicLink(): String {
-        val dynamicLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
-            .setLink(Uri.parse(LINK_URL))
-            .setDomainUriPrefix(DOMAIN_URI_PREFIX)
-            .setAndroidParameters(
-                DynamicLink.AndroidParameters.Builder().setMinimumVersion(1).build()
-            )
-            .buildDynamicLink()
+        val dynamicLink =
+            FirebaseDynamicLinks.getInstance().createDynamicLink().setLink(Uri.parse(LINK_URL))
+                .setDomainUriPrefix(DOMAIN_URI_PREFIX).setAndroidParameters(
+                    DynamicLink.AndroidParameters.Builder().setMinimumVersion(1).build()
+                ).buildDynamicLink()
 
         return dynamicLink.uri.toString()
+    }
+
+    private fun showToast(stringResId: Int, durationId: Int = Toast.LENGTH_SHORT) {
+        Toast.makeText(requireContext(), stringResId, durationId)
+            .show()
     }
 
     enum class LogDetailMenuAction(val itemId: Int) {

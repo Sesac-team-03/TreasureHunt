@@ -17,12 +17,16 @@ import com.treasurehunt.data.remote.model.toMapSymbol
 import com.treasurehunt.data.remote.model.toPlaceEntity
 import com.treasurehunt.ui.model.LogModel
 import com.treasurehunt.ui.model.MapSymbol
+import com.treasurehunt.util.STORAGE_LOCATION_LOG_IMAGES
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+private const val STORAGE_LOCATION_USER_IMAGES = "%s/$STORAGE_LOCATION_LOG_IMAGES"
+private const val IMAGE_FILE_NAME_PREFIX = "$STORAGE_LOCATION_LOG_IMAGES/"
 
 @HiltViewModel
 class LogDetailViewModel @Inject constructor(
@@ -81,9 +85,12 @@ class LogDetailViewModel @Inject constructor(
 
     private suspend fun deleteImages(logId: String, userId: String) {
         val remoteLog = logRepo.getRemoteLogById(logId)
-        val storageRef = Firebase.storage.reference.child("${userId}/log_images")
+        val storageRef = Firebase.storage.getReference(
+            String.format(STORAGE_LOCATION_USER_IMAGES, userId)
+        )
         remoteLog.remoteImageIds.filterValues { it }.keys.forEach { id ->
-            val imageFileName = imageRepo.getRemoteImageById(id).url.substringAfter("log_images/")
+            val imageFileName = imageRepo.getRemoteImageById(id).url
+                .substringAfter(IMAGE_FILE_NAME_PREFIX)
             storageRef.child("/$imageFileName").delete()
             imageRepo.delete(id)
         }

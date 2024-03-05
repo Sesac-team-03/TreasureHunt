@@ -22,13 +22,15 @@ import com.treasurehunt.data.ImageRepository
 import com.treasurehunt.data.LogRepository
 import com.treasurehunt.data.remote.model.LogDTO
 import com.treasurehunt.ui.home.UPLOAD_NOTIFICATION_CHANNEL_ID
+import com.treasurehunt.util.STORAGE_LOCATION_LOG_IMAGES
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.tasks.await
 
 private const val UPLOAD_NOTIFICATION_ID = 0
-private const val STORAGE_LOCATION_IMAGES = "%s/log_images"
+private const val STORAGE_LOCATION_USER_IMAGES = "%s/$STORAGE_LOCATION_LOG_IMAGES"
 private const val PATH_STRING_FILE_NAME = "%s.png"
+private const val IMAGE_FILE_NAME_PREFIX = "$STORAGE_LOCATION_LOG_IMAGES/"
 
 @HiltWorker
 class ImageUploadWorker @AssistedInject constructor(
@@ -95,9 +97,12 @@ class ImageUploadWorker @AssistedInject constructor(
     }
 
     private suspend fun deleteReplacedStorageImages(log: LogDTO, uid: String) {
-        val storageRef = Firebase.storage.reference.child("${uid}/log_images")
+        val storageRef = Firebase.storage.getReference(
+            String.format(STORAGE_LOCATION_USER_IMAGES, uid)
+        )
         log.remoteImageIds.filterReplacedRemoteImageIds(urlStrings).forEach { id ->
-            val imageFileName = imageRepo.getRemoteImageById(id).url.substringAfter("log_images/")
+            val imageFileName = imageRepo.getRemoteImageById(id).url
+                .substringAfter(IMAGE_FILE_NAME_PREFIX)
             storageRef.child("/$imageFileName").delete()
         }
     }
@@ -130,7 +135,7 @@ class ImageUploadWorker @AssistedInject constructor(
 
     private fun getStorageReferences(uid: String, uris: List<Uri>): List<StorageReference> {
         val storageRef = Firebase.storage.getReference(
-            String.format(STORAGE_LOCATION_IMAGES, uid)
+            String.format(STORAGE_LOCATION_USER_IMAGES, uid)
         )
         val fileNames = uris.map {
             it.toString().extractDigits()
