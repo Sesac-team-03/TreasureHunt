@@ -1,8 +1,9 @@
-package com.treasurehunt.ui.profile
+package com.treasurehunt.ui.profile.adapter
 
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.treasurehunt.R
+import com.treasurehunt.ui.profile.FriendFragment
 
 class ProfileViewPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
 

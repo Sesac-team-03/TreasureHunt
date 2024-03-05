@@ -16,6 +16,8 @@ import com.treasurehunt.data.remote.model.UserDTO
 import com.treasurehunt.data.remote.model.toUserModel
 import com.treasurehunt.databinding.FragmentFriendBinding
 import com.treasurehunt.ui.model.UserModel
+import com.treasurehunt.ui.profile.adapter.FriendAdapter
+import com.treasurehunt.ui.profile.adapter.SearchFriendAdapter
 import com.treasurehunt.util.hide
 import com.treasurehunt.util.show
 import com.treasurehunt.util.showSnackbar

@@ -20,6 +20,7 @@ import com.google.firebase.storage.storage
 import com.treasurehunt.R
 import com.treasurehunt.data.remote.model.UserDTO
 import com.treasurehunt.databinding.FragmentProfileBinding
+import com.treasurehunt.ui.profile.adapter.ProfileViewPagerAdapter
 import com.treasurehunt.util.showSnackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

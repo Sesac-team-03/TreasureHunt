@@ -3,7 +3,6 @@ package com.treasurehunt.ui.detail
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,6 +18,7 @@ import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
 import com.google.firebase.ktx.Firebase
 import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentLogdetailBinding
+import com.treasurehunt.ui.detail.adapter.ImageSliderAdapter
 import com.treasurehunt.ui.model.LogModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
