@@ -20,6 +20,7 @@ import com.treasurehunt.ui.model.MapSymbol
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -34,8 +35,8 @@ class LogDetailViewModel @Inject constructor(
 ) : ViewModel() {
 
     val args = LogDetailFragmentArgs.fromSavedStateHandle(savedStateHandle)
-    private val _log = MutableStateFlow<LogModel?>(null)
-    val log: StateFlow<LogModel?> = _log
+    private val _log: MutableStateFlow<LogModel?> = MutableStateFlow(null)
+    val log: StateFlow<LogModel?> = _log.asStateFlow()
 
     init {
         initLog()

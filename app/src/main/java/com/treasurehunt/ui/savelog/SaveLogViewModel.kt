@@ -10,14 +10,15 @@ import com.treasurehunt.ui.model.SaveLogUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @HiltViewModel
 class SaveLogViewModel @Inject constructor(private val imageRepo: ImageRepository) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(SaveLogUiState())
-    val uiState: StateFlow<SaveLogUiState> = _uiState
+    private val _uiState: MutableStateFlow<SaveLogUiState> = MutableStateFlow(SaveLogUiState())
+    val uiState: StateFlow<SaveLogUiState> = _uiState.asStateFlow()
 
     fun getImagePick() =
         Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).apply {

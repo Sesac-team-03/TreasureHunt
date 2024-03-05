@@ -17,6 +17,7 @@ import javax.inject.Inject
 class ProfileViewModel @Inject constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {
+
     private val _userData: MutableLiveData<UserDTO> = MutableLiveData<UserDTO>()
     val userData: LiveData<UserDTO> = _userData
     private val _imageUri: MutableLiveData<String> = MutableLiveData<String>()
