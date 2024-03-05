@@ -9,6 +9,7 @@ import com.bumptech.glide.Glide
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.treasurehunt.R
+import com.treasurehunt.ui.model.ImageModel
 
 private val storage = Firebase.storage
 
@@ -19,20 +20,15 @@ fun bindDataset(view: RecyclerView, itemList: List<Any>?) {
     }
 }
 
-@BindingAdapter("imageUrl")
-fun bindImageUrl(view: ImageView, url: String?) {
-    when (url) {
-        null -> view.run {
-            setImageResource(R.drawable.ic_no_profile_image)
-            scaleType = ImageView.ScaleType.CENTER_INSIDE
-        }
-
-        else -> view.run {
-            Glide.with(context).load(url)
-                .into(this)
-            scaleType = ImageView.ScaleType.CENTER_CROP
-        }
-    }
+@BindingAdapter("imageSource")
+fun bindImageSource(
+    view: ImageView,
+    imageSource: ImageModel
+) {
+    val src = imageSource.contentUri.ifEmpty { storage.getReferenceFromUrl(imageSource.storageUrl) }
+    Glide.with(view.context)
+        .load(src)
+        .into(view)
 }
 
 @BindingAdapter("imageStorageUrl")

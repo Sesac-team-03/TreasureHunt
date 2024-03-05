@@ -24,11 +24,14 @@ fun LogDTO.toLogEntity(remoteId: String) = LogEntity(
     remoteId
 )
 
-fun LogDTO.toLogModel(imageUrls: List<String>) = LogModel(
-    remotePlaceId,
-    text,
-    theme,
-    createdDate,
-    remoteImageIds.keys.toList(),
-    imageUrls
-)
+fun LogDTO.toLogModel(imageUrls: List<String>, localId: Long? = null, remoteId: String? = null) =
+    LogModel(
+        remotePlaceId,
+        text,
+        theme,
+        createdDate,
+        remoteImageIds.keys.toList(),
+        imageUrls,
+        localId,
+        remoteId
+    )

@@ -12,7 +12,9 @@ data class LogModel(
     val theme: String,
     val createdDate: Long,
     val remoteImageIds: List<String>,
-    val imageUrls: List<String> = emptyList()
+    val imageUrls: List<String> = emptyList(),
+    val localId: Long? = null,
+    val remoteId: String? = null
 ) : Parcelable
 
 fun LogModel.asLogEntity(localId: Long = 0, remoteId: String? = null) =

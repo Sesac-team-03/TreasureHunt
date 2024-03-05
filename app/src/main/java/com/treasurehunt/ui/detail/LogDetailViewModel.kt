@@ -1,6 +1,8 @@
 package com.treasurehunt.ui.detail
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.Firebase
 import com.google.firebase.storage.storage
 import com.treasurehunt.data.ImageRepository
@@ -11,9 +13,15 @@ import com.treasurehunt.data.remote.model.LogDTO
 import com.treasurehunt.data.remote.model.PlaceDTO
 import com.treasurehunt.data.remote.model.toLogEntity
 import com.treasurehunt.data.remote.model.toLogModel
+import com.treasurehunt.data.remote.model.toMapSymbol
 import com.treasurehunt.data.remote.model.toPlaceEntity
 import com.treasurehunt.ui.model.LogModel
+import com.treasurehunt.ui.model.MapSymbol
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,11 +29,37 @@ class LogDetailViewModel @Inject constructor(
     private val placeRepo: PlaceRepository,
     private val logRepo: LogRepository,
     private val userRepo: UserRepository,
-    private val imageRepo: ImageRepository
-
+    private val imageRepo: ImageRepository,
+    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    suspend fun getLogByRemotePlaceId(placeId: String): LogModel? {
+    val args = LogDetailFragmentArgs.fromSavedStateHandle(savedStateHandle)
+    private val _log = MutableStateFlow<LogModel?>(null)
+    val log: StateFlow<LogModel?> = _log
+
+    init {
+        initLog()
+    }
+
+    private fun initLog() {
+        viewModelScope.launch {
+            val placeId = LogDetailFragmentArgs.fromSavedStateHandle(savedStateHandle).remotePlaceId
+            val log = if (placeId.isNotEmpty()) {
+                getLogByRemotePlaceId(placeId)
+            } else {
+                args.log
+            }
+            _log.update { log }
+        }
+    }
+
+    suspend fun getMapSymbol(log: LogModel? = null, remotePlaceId: String = ""): MapSymbol {
+        val placeId = remotePlaceId.ifEmpty { log!!.remotePlaceId }
+        val placeDTO = placeRepo.getRemotePlaceById(placeId)
+        return placeDTO.toMapSymbol()
+    }
+
+    private suspend fun getLogByRemotePlaceId(placeId: String): LogModel? {
         val placeDTO: PlaceDTO = placeRepo.getRemotePlaceById(placeId)
         val logId = placeDTO.remoteLogId ?: return null
         val logDTO: LogDTO = logRepo.getRemoteLogById(logId)
@@ -33,7 +67,7 @@ class LogDetailViewModel @Inject constructor(
             imageRepo.getRemoteImageById(id).url
         }
 
-        return logDTO.toLogModel(imageUrls)
+        return logDTO.toLogModel(imageUrls, logDTO.localId, logId)
     }
 
     suspend fun getRemotePlace(placeId: String) = placeRepo.getRemotePlaceById(placeId)

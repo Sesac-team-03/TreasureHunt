@@ -11,6 +11,7 @@ import com.treasurehunt.ui.model.ImageModel
 
 class SaveLogAdapter(private val clickListener: ImageClickListener) :
     ListAdapter<ImageModel, SaveLogAdapter.ViewHolder>(diffUtil) {
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder.from(parent)
     }
@@ -21,6 +22,7 @@ class SaveLogAdapter(private val clickListener: ImageClickListener) :
 
     class ViewHolder(private val binding: ItemSavelogBinding) :
         RecyclerView.ViewHolder(binding.root) {
+
         fun bind(imageModel: ImageModel, clickListener: ImageClickListener) {
             binding.imageModel = imageModel
             binding.clickListener = clickListener
@@ -43,7 +45,7 @@ class SaveLogAdapter(private val clickListener: ImageClickListener) :
     companion object {
         private val diffUtil = object : DiffUtil.ItemCallback<ImageModel>() {
             override fun areItemsTheSame(oldItem: ImageModel, newItem: ImageModel): Boolean {
-                return oldItem.uri == newItem.uri
+                return oldItem.contentUri == newItem.contentUri
             }
 
             override fun areContentsTheSame(oldItem: ImageModel, newItem: ImageModel): Boolean {
