@@ -11,6 +11,8 @@ import com.treasurehunt.R
 import com.treasurehunt.databinding.ItemFriendBinding
 import com.treasurehunt.ui.model.UserModel
 
+private const val AT_SIGN = '@'
+
 class FriendAdapter(
     private val friendClickListener: FriendClickListener,
     private val isClickable: Boolean
@@ -38,7 +40,7 @@ class FriendAdapter(
         ) {
             bindImage(binding.ivProfileImage, friend.profileImage)
             binding.tvNickname.text = friend.nickName
-            binding.tvEmail.text = friend.email.toString().substringBefore('@')
+            binding.tvEmail.text = friend.email.toString().substringBefore(AT_SIGN)
 
             _isClickable = isClickable
             binding.ibRemove.setOnClickListener {

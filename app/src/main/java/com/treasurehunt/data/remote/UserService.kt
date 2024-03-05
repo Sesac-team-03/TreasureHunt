@@ -9,6 +9,8 @@ import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
+internal const val REMOTE_DATABASE_USERS = "users"
+
 interface UserService {
 
     @PUT("users/{id}.json")

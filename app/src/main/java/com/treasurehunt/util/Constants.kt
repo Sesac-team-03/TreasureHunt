@@ -1,5 +1,3 @@
 package com.treasurehunt.util
 
-internal val UPLOAD_NOTIFICATION_ID = 0
-
-internal val UPLOAD_NOTIFICATION_ID_STRING = "Upload"
+internal const val COMPILATION_WARNING_UNCHECKED_CAST_ = "UNCHECKED_CAST"
