@@ -7,13 +7,12 @@ import com.treasurehunt.data.ImageRepository
 import com.treasurehunt.data.remote.model.LogDTO
 import com.treasurehunt.ui.model.ImageModel
 import com.treasurehunt.ui.model.SaveLogUiState
+import com.treasurehunt.util.MIME_TYPE_IMAGE
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
-
-private const val MIME_TYPE_IMAGE = "image/*"
 
 @HiltViewModel
 class SaveLogViewModel @Inject constructor(private val imageRepo: ImageRepository) : ViewModel() {

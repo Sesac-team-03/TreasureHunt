@@ -22,15 +22,14 @@ import com.treasurehunt.data.ImageRepository
 import com.treasurehunt.data.LogRepository
 import com.treasurehunt.data.remote.model.LogDTO
 import com.treasurehunt.ui.home.UPLOAD_NOTIFICATION_CHANNEL_ID
+import com.treasurehunt.util.FILENAME_EXTENSION_PNG
 import com.treasurehunt.util.STORAGE_LOCATION_LOG_IMAGES
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.tasks.await
 
 private const val UPLOAD_NOTIFICATION_ID = 0
-private const val STORAGE_LOCATION_USER_IMAGES = "%s/$STORAGE_LOCATION_LOG_IMAGES"
-private const val PATH_STRING_FILE_NAME = "%s.png"
-private const val IMAGE_FILE_NAME_PREFIX = "$STORAGE_LOCATION_LOG_IMAGES/"
+private const val IMAGE_FILENAME_PREFIX = "$STORAGE_LOCATION_LOG_IMAGES/"
 
 @HiltWorker
 class ImageUploadWorker @AssistedInject constructor(
@@ -44,6 +43,8 @@ class ImageUploadWorker @AssistedInject constructor(
     private val urlStrings =
         inputData.getStringArray(WORK_DATA_URL_STRINGS)?.asList()?.toMutableList()
             ?: mutableListOf()
+    private val imagesStorageRef =
+        Firebase.storage.reference.child(uid).child(STORAGE_LOCATION_LOG_IMAGES)
     private var totalByteCount = 0L
     private var bytesTransferred = 0L
     private val notificationManager =
@@ -97,13 +98,10 @@ class ImageUploadWorker @AssistedInject constructor(
     }
 
     private suspend fun deleteReplacedStorageImages(log: LogDTO, uid: String) {
-        val storageRef = Firebase.storage.getReference(
-            String.format(STORAGE_LOCATION_USER_IMAGES, uid)
-        )
         log.remoteImageIds.filterReplacedRemoteImageIds(urlStrings).forEach { id ->
-            val imageFileName = imageRepo.getRemoteImageById(id).url
-                .substringAfter(IMAGE_FILE_NAME_PREFIX)
-            storageRef.child("/$imageFileName").delete()
+            val imageFilename = imageRepo.getRemoteImageById(id).url
+                .substringAfter(IMAGE_FILENAME_PREFIX)
+            imagesStorageRef.child(imageFilename).delete()
         }
     }
 
@@ -121,7 +119,7 @@ class ImageUploadWorker @AssistedInject constructor(
 
     private suspend fun uploadImages(uid: String, uris: List<Uri>): Boolean {
         return try {
-            val refs = getStorageReferences(uid, uris)
+            val refs = getImageStorageReferences(uid, uris)
             builder = buildNotification()
             Tasks.whenAll(execUploadTasks(uris, refs)).await()
 
@@ -133,18 +131,13 @@ class ImageUploadWorker @AssistedInject constructor(
         }
     }
 
-    private fun getStorageReferences(uid: String, uris: List<Uri>): List<StorageReference> {
-        val storageRef = Firebase.storage.getReference(
-            String.format(STORAGE_LOCATION_USER_IMAGES, uid)
-        )
-        val fileNames = uris.map {
+    private fun getImageStorageReferences(uid: String, uris: List<Uri>): List<StorageReference> {
+        val filenames = uris.map {
             it.toString().extractDigits()
         }
 
-        return fileNames.map {
-            storageRef.child(
-                String.format(PATH_STRING_FILE_NAME, it)
-            )
+        return filenames.map { filename ->
+            imagesStorageRef.child("$filename$FILENAME_EXTENSION_PNG")
         }
     }
 

@@ -20,14 +20,13 @@ import com.google.firebase.storage.storage
 import com.treasurehunt.R
 import com.treasurehunt.data.remote.model.UserDTO
 import com.treasurehunt.databinding.FragmentProfileBinding
+import com.treasurehunt.util.FILENAME_EXTENSION_PNG
 import com.treasurehunt.util.STORAGE_LOCATION_PROFILE_IMAGE
 import com.treasurehunt.util.showSnackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
-private const val STORAGE_LOCATION_USER_PROFILE_IMAGE = "%s/$STORAGE_LOCATION_PROFILE_IMAGE"
-private const val PATH_STRING_FILE_NAME = "%s.png"
 private const val NULL_STRING = "null"
 
 @AndroidEntryPoint
@@ -140,15 +139,10 @@ class ProfileFragment : Fragment() {
 
     private suspend fun uploadProfileImage(uri: Uri) {
         val uid = Firebase.auth.currentUser!!.uid
-        val storage = Firebase.storage
-        val storageRef = storage.getReference(
-            String.format(STORAGE_LOCATION_USER_PROFILE_IMAGE, uid)
-        )
-        val fileName = uri.toString().extractDigits()
-        val fileRef = storageRef.child(
-            String.format(PATH_STRING_FILE_NAME, fileName)
-        )
-        val uploadTask = fileRef.putFile(uri)
+        val filename = uri.toString().extractDigits()
+        val profileImageStorageRef = Firebase.storage.reference.child(uid).child(STORAGE_LOCATION_PROFILE_IMAGE)
+            .child("$filename$FILENAME_EXTENSION_PNG")
+        val uploadTask = profileImageStorageRef.putFile(uri)
         uploadTask.addOnSuccessListener { taskSnapshot ->
             viewModel.setProfileUri(taskSnapshot.storage.toString())
         }.addOnFailureListener {
