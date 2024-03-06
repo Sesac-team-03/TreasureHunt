@@ -202,12 +202,17 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
 
     private fun setPickImageButton() {
         binding.ibPickImage.setOnClickListener {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                requestPermissionLauncher.launch(android.Manifest.permission.READ_MEDIA_IMAGES)
-            } else {
-                requestPermissionLauncher.launch(android.Manifest.permission.READ_EXTERNAL_STORAGE)
-            }
+            requestAlbumAccessPermission()
         }
+    }
+
+    private fun requestAlbumAccessPermission() {
+        val permissionId = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            android.Manifest.permission.READ_MEDIA_IMAGES
+        } else {
+            android.Manifest.permission.READ_EXTERNAL_STORAGE
+        }
+        requestPermissionLauncher.launch(permissionId)
     }
 
     private fun setSaveButton() {

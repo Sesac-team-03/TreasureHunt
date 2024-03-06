@@ -51,11 +51,12 @@
     <string name="profile_tv_nickname">닉네임</string>
     <string name="profile_tv_account">abc@naver.com</string>
     <string name="profile_tv_cancel">취소</string>
-    <string name="profile_tv_completed">완료</string>
+    <string name="profile_tv_complete">완료</string>
     <string name="profile_tl_friend">친구</string>
     <string name="profile_tl_comment">댓글</string>
     <string name="profile_tl_tag">태그</string>
     <string name="profile_check_url">https://</string>
+    <string name="profile_guest">비회원</string>
 
     <!-- 프로필 화면 - 친구 -->
     <string name="profile_friend_tiet_search_friend_hint">이메일로 친구를 검색해 보세요</string>

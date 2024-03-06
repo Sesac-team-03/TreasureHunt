@@ -42,7 +42,7 @@
             app:shapeAppearance="@style/ProfileImage" />
 
         <ImageButton
-            android:id="@+id/ib_camera"
+            android:id="@+id/ib_edit_profile_image"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_marginTop="8dp"
@@ -72,6 +72,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:background="@drawable/button_record"
+            android:maxLength="10"
             android:paddingHorizontal="20dp"
             android:visibility="gone"
             app:layout_constraintStart_toEndOf="@id/iv_profile_image"
@@ -100,25 +101,34 @@
             app:layout_constraintEnd_toEndOf="@+id/view_container"
             app:layout_constraintTop_toTopOf="@+id/view_container" />
 
-        <TextView
-            android:id="@+id/tv_cancel"
+        <Button
+            android:id="@+id/btn_cancel"
             style="@style/Font.ProfileAccount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
+            android:background="@android:color/transparent"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:paddingHorizontal="24dp"
+            android:paddingVertical="0dp"
             android:text="@string/profile_tv_cancel"
             android:visibility="gone"
-            app:layout_constraintEnd_toStartOf="@+id/tv_completed"
-            app:layout_constraintTop_toTopOf="@+id/tv_completed" />
+            app:layout_constraintEnd_toStartOf="@+id/btn_complete"
+            app:layout_constraintTop_toTopOf="@+id/btn_complete" />
 
-        <TextView
-            android:id="@+id/tv_completed"
+        <Button
+            android:id="@+id/btn_complete"
             style="@style/Font.ProfileAccount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:text="@string/profile_tv_completed"
+            android:layout_marginEnd="24dp"
+            android:background="@android:color/transparent"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:padding="0dp"
+            android:paddingHorizontal="24dp"
+            android:paddingVertical="0dp"
+            android:text="@string/profile_tv_complete"
             android:textColor="@color/blue"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="@+id/view_container"
@@ -136,7 +146,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="gone"
-            app:constraint_referenced_ids="tv_cancel,tv_completed,ib_camera,et_nickname" />
+            app:constraint_referenced_ids="btn_cancel,btn_complete,ib_edit_profile_image,et_nickname" />
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tl_notification"

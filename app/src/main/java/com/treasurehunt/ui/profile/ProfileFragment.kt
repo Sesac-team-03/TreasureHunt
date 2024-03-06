@@ -1,6 +1,5 @@
 package com.treasurehunt.ui.profile
 
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,28 +7,19 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
 import com.google.firebase.storage.storage
 import com.treasurehunt.R
 import com.treasurehunt.data.remote.model.UserDTO
 import com.treasurehunt.databinding.FragmentProfileBinding
 import com.treasurehunt.ui.profile.adapter.ProfileViewPagerAdapter
-import com.treasurehunt.util.FILENAME_EXTENSION_PNG
-import com.treasurehunt.util.STORAGE_LOCATION_PROFILE_IMAGE
-import com.treasurehunt.util.extractDigits
-import com.treasurehunt.util.showSnackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
-
-private const val NULL_STRING = "null"
 
 @AndroidEntryPoint
 class ProfileFragment : Fragment() {
@@ -37,13 +27,13 @@ class ProfileFragment : Fragment() {
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
     private val viewModel: ProfileViewModel by viewModels()
-    private val imageLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            setImageLauncher(result)
-        }
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-            handleAccessAlbum(isGranted)
+            setAddImage(isGranted)
+        }
+    private val pickImagesLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            addImage(result)
         }
 
     override fun onCreateView(
@@ -57,10 +47,13 @@ class ProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initProfile()
-        syncProfile()
-        setAlbumPermission()
+        viewLifecycleOwner.lifecycleScope.launch {
+            syncProfile()
+        }
         setEditButton()
+        setCancelButton()
+        setCompleteButton()
+        setEditProfileImageButton()
         initTabLayout()
     }
 
@@ -69,27 +62,52 @@ class ProfileFragment : Fragment() {
         _binding = null
     }
 
-    private fun setImageLauncher(result: ActivityResult) {
-        if (result.data?.data != null) {
-            val uri = result.data?.data
-            viewModel.addImage(uri.toString())
-            viewModel.setProfileUri(uri.toString())
-            Glide.with(requireContext()).load(uri).into(binding.ivProfileImage)
-        }
-    }
-
-    private fun handleAccessAlbum(isGranted: Boolean) {
+    private fun setAddImage(isGranted: Boolean) {
         if (isGranted) {
-            imageLauncher.launch(viewModel.getImage())
+            pickImagesLauncher.launch(viewModel.getImagePick())
         }
     }
 
-    private fun setAlbumPermission() {
-        binding.ibCamera.setOnClickListener {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                requestPermissionLauncher.launch(android.Manifest.permission.READ_MEDIA_IMAGES)
-            } else {
-                requestPermissionLauncher.launch(android.Manifest.permission.READ_EXTERNAL_STORAGE)
+    private fun addImage(result: ActivityResult) {
+        val contentUri: String = result.data?.data?.toString() ?: return
+        viewModel.addImageContentUri(contentUri)
+        loadProfileImage(contentUri)
+    }
+
+    private fun loadProfileImage(contentUri: String) {
+        binding.ivProfileImage.run {
+            Glide.with(context)
+                .load(contentUri)
+                .into(this)
+        }
+    }
+
+    private suspend fun syncProfile() {
+        viewModel.uiState.collect {
+            updateProfile(it.user ?: return@collect)
+        }
+    }
+
+    private fun updateProfile(user: UserDTO) {
+        binding.tvAccount.text = user.email.orEmpty()
+
+        binding.tvNickname.text = user.nickname ?: getString(R.string.profile_guest)
+
+        loadProfileImage(user)
+    }
+
+    private fun loadProfileImage(user: UserDTO) {
+        binding.ivProfileImage.run {
+            try {
+                val profileImageStorageRef = user.profileImage?.let {
+                    Firebase.storage.getReferenceFromUrl(it)
+                }
+                Glide.with(context)
+                    .load(profileImageStorageRef)
+                    .placeholder(R.drawable.ic_no_profile_image)
+                    .into(this)
+            } catch (e: Exception) {
+                setImageResource(R.drawable.ic_no_profile_image)
             }
         }
     }
@@ -97,18 +115,6 @@ class ProfileFragment : Fragment() {
     private fun setEditButton() {
         binding.ibEdit.setOnClickListener {
             showEditView()
-        }
-        binding.tvCancel.setOnClickListener {
-            hideEditView()
-            syncProfile()
-        }
-        binding.tvCompleted.setOnClickListener {
-            if (binding.etNickname.text.isEmpty()) {
-                return@setOnClickListener
-            } else {
-                saveProfile()
-                hideEditView()
-            }
         }
     }
 
@@ -118,81 +124,40 @@ class ProfileFragment : Fragment() {
         binding.etNickname.setText(binding.tvNickname.text)
     }
 
+    private fun setCancelButton() {
+        binding.btnCancel.setOnClickListener {
+            hideEditView()
+            updateProfile(viewModel.uiState.value.user ?: return@setOnClickListener)
+        }
+    }
+
     private fun hideEditView() {
         binding.groupProfileBox.visibility = View.VISIBLE
         binding.groupEditProfileBox.visibility = View.GONE
     }
 
-    private fun initProfile() {
-        viewModel.getUserData()
-    }
-
-    private fun syncProfile() {
-        viewModel.userData.observe(viewLifecycleOwner) { userDTO ->
-            updateProfile(userDTO)
-        }
-    }
-
-    private suspend fun uploadProfileImage(uri: Uri) {
-        val uid = Firebase.auth.currentUser!!.uid
-        val filename = uri.toString().extractDigits()
-        val profileImageStorageRef =
-            Firebase.storage.reference.child(uid).child(STORAGE_LOCATION_PROFILE_IMAGE)
-                .child("$filename$FILENAME_EXTENSION_PNG")
-        val uploadTask = profileImageStorageRef.putFile(uri)
-        uploadTask.addOnSuccessListener { taskSnapshot ->
-            viewModel.setProfileUri(taskSnapshot.storage.toString())
-        }.addOnFailureListener {
-            binding.root.showSnackbar(R.string.savelog_sb_upload_failure)
-        }
-        uploadTask.await()
-    }
-
-    private fun saveProfile() {
-        lifecycleScope.launch {
-            val userData = viewModel.userData.value ?: return@launch
-            val email = userData.email ?: ""
-            val nickname = binding.etNickname.text.toString()
-            if (viewModel.imageUri.value.isNullOrEmpty()) {
-                viewModel.updateUserData(UserDTO(email, nickname, userData.profileImage.toString()))
-            } else {
-                uploadProfileImage(viewModel.imageUri.value!!.toUri())
-                viewModel.updateUserData(
-                    UserDTO(
-                        email,
-                        nickname,
-                        viewModel.profileUri.value.toString()
-                    )
-                )
+    private fun setCompleteButton() {
+        binding.btnComplete.setOnClickListener {
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewModel.saveProfile(nickname = binding.etNickname.text.toString())
             }
+            hideEditView()
         }
-
     }
 
-    private fun updateProfile(userDTO: UserDTO) {
-        if (userDTO.email != null) {
-            binding.tvAccount.text = userDTO.email
+    private fun setEditProfileImageButton() {
+        binding.ibEditProfileImage.setOnClickListener {
+            requestAlbumAccessPermission()
         }
-        if (userDTO.nickname.isNullOrEmpty()) {
-            binding.tvNickname.text = Firebase.auth.currentUser!!.uid.substring(0, 16)
-        } else {
-            binding.tvNickname.text = userDTO.nickname
-        }
-        loadProfileImage(userDTO)
     }
 
-    private fun loadProfileImage(userDTO: UserDTO) {
-        if (userDTO.profileImage.toString().contains(getString(R.string.profile_check_url))) {
-            Glide.with(requireContext()).load(userDTO.profileImage.toString())
-                .into(binding.ivProfileImage)
-        } else if (userDTO.profileImage.isNullOrEmpty() || userDTO.profileImage == NULL_STRING) {
-            Glide.with(requireContext()).load(R.drawable.ic_no_profile_image)
-                .into(binding.ivProfileImage)
+    private fun requestAlbumAccessPermission() {
+        val permissionId = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            android.Manifest.permission.READ_MEDIA_IMAGES
         } else {
-            val storageRef =
-                Firebase.storage.getReferenceFromUrl(userDTO.profileImage.toString())
-            Glide.with(requireContext()).load(storageRef).into(binding.ivProfileImage)
+            android.Manifest.permission.READ_EXTERNAL_STORAGE
         }
+        requestPermissionLauncher.launch(permissionId)
     }
 
     private fun initTabLayout() {
