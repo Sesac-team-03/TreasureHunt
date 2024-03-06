@@ -22,6 +22,7 @@ import com.treasurehunt.data.remote.model.UserDTO
 import com.treasurehunt.databinding.FragmentProfileBinding
 import com.treasurehunt.util.FILENAME_EXTENSION_PNG
 import com.treasurehunt.util.STORAGE_LOCATION_PROFILE_IMAGE
+import com.treasurehunt.util.extractDigits
 import com.treasurehunt.util.showSnackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -150,8 +151,6 @@ class ProfileFragment : Fragment() {
         }
         uploadTask.await()
     }
-
-    private fun String.extractDigits() = replace("[^0-9]".toRegex(), "")
 
     private fun saveProfile() {
         lifecycleScope.launch {

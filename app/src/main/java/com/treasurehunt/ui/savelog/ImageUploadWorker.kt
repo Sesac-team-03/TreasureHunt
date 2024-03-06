@@ -24,6 +24,7 @@ import com.treasurehunt.data.remote.model.LogDTO
 import com.treasurehunt.ui.home.UPLOAD_NOTIFICATION_CHANNEL_ID
 import com.treasurehunt.util.FILENAME_EXTENSION_PNG
 import com.treasurehunt.util.STORAGE_LOCATION_LOG_IMAGES
+import com.treasurehunt.util.extractDigits
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.tasks.await
@@ -140,8 +141,6 @@ class ImageUploadWorker @AssistedInject constructor(
             imagesStorageRef.child("$filename$FILENAME_EXTENSION_PNG")
         }
     }
-
-    private fun String.extractDigits() = replace("[^0-9]".toRegex(), "")
 
     private fun execUploadTasks(uris: List<Uri>, refs: List<StorageReference>): List<UploadTask> {
         return uris.mapIndexed { i, uri ->
