@@ -13,9 +13,11 @@ import com.treasurehunt.BuildConfig
 import com.treasurehunt.data.LogRepository
 import com.treasurehunt.data.PlaceRepository
 import com.treasurehunt.data.UserRepository
+import com.treasurehunt.data.remote.REMOTE_DATABASE_USERS
 import com.treasurehunt.data.remote.model.UserDTO
 import com.treasurehunt.data.remote.model.toUserModel
 import com.treasurehunt.ui.model.FriendUiState
+import com.treasurehunt.util.COMPILATION_WARNING_UNCHECKED_CAST
 import com.treasurehunt.util.ConnectivityRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
@@ -32,6 +34,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 private const val BASE_URL = BuildConfig.BASE_URL
+private val pathStringFriends = UserDTO::remoteFriendIds.name
 
 @HiltViewModel
 class FriendViewModel @Inject constructor(
@@ -55,9 +58,10 @@ class FriendViewModel @Inject constructor(
 
     private fun getFriendIdsFlow(): Flow<List<String>> = callbackFlow {
         val uid = Firebase.auth.currentUser!!.uid
-        val friendsRef = db.reference.child("users").child(uid).child("friends")
+        val friendsRef =
+            db.reference.child(REMOTE_DATABASE_USERS).child(uid).child(pathStringFriends)
         val callback = object : ValueEventListener {
-            @Suppress("UNCHECKED_CAST")
+            @Suppress(COMPILATION_WARNING_UNCHECKED_CAST)
             override fun onDataChange(snapshot: DataSnapshot) {
                 val friendIds = (snapshot.value as? Map<String, Boolean>
                     ?: emptyMap()).filter { it.value }.keys.toList()

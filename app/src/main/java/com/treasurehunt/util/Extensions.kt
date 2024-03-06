@@ -4,11 +4,7 @@ import android.view.View
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.serialization.json.Json
 
-private val json = Json {
-    isLenient = true
-    ignoreUnknownKeys = true
-    coerceInputValues = true
-}
+//******************** View ********************
 
 fun View.showSnackbar(resId: Int) {
     Snackbar.make(
@@ -26,8 +22,6 @@ fun View.showSnackbar(string: String) {
     ).show()
 }
 
-internal inline fun <reified R> String.convertToDataClass() = json.decodeFromString<R>(this)
-
 fun View.show() {
     visibility = View.VISIBLE
 }
@@ -35,3 +29,16 @@ fun View.show() {
 fun View.hide() {
     visibility = View.GONE
 }
+
+
+//******************** String ********************
+
+internal inline fun <reified R> String.convertToDataClass() = json.decodeFromString<R>(this)
+
+private val json = Json {
+    isLenient = true
+    ignoreUnknownKeys = true
+    coerceInputValues = true
+}
+
+internal fun String.extractDigits() = replace("[^0-9]".toRegex(), "")

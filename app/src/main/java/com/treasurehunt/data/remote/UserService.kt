@@ -9,24 +9,26 @@ import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
+internal const val REMOTE_DATABASE_USERS = "users"
+
 interface UserService {
 
-    @PUT("users/{id}.json")
+    @PUT("$REMOTE_DATABASE_USERS/{id}.json")
     suspend fun insert(
         @Path("id") id: String,
         @Body user: UserDTO
     )
 
-    @GET("users/{id}.json")
+    @GET("$REMOTE_DATABASE_USERS/{id}.json")
     suspend fun getRemoteUserById(@Path("id") id: String): UserDTO
 
-    @PATCH("users/{id}.json")
+    @PATCH("$REMOTE_DATABASE_USERS/{id}.json")
     suspend fun update(
         @Path("id") id: String,
         @Body user: UserDTO
     )
 
-    @GET("users.json")
+    @GET("$REMOTE_DATABASE_USERS.json")
     suspend fun search(
         @Query("orderBy") orderBy: String,
         @Query("startAt") startAt: String,

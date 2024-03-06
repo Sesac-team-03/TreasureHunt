@@ -1,6 +1,7 @@
 package com.treasurehunt.ui.profile
 
 import android.content.Intent
+import android.provider.MediaStore
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,6 +10,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.treasurehunt.data.UserRepository
 import com.treasurehunt.data.remote.model.UserDTO
+import com.treasurehunt.util.MIME_TYPE_IMAGE
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -29,10 +31,8 @@ class ProfileViewModel @Inject constructor(
         _profileUri.value = profileUri
     }
 
-    fun getImage(): Intent {
-        return Intent(Intent.ACTION_PICK).apply {
-            type = "image/"
-        }
+    fun getImage() = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).apply {
+        type = MIME_TYPE_IMAGE
     }
 
     fun addImage(image: String) {

@@ -7,6 +7,7 @@ import com.treasurehunt.data.ImageRepository
 import com.treasurehunt.data.remote.model.LogDTO
 import com.treasurehunt.ui.model.ImageModel
 import com.treasurehunt.ui.model.SaveLogUiState
+import com.treasurehunt.util.MIME_TYPE_IMAGE
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,7 +22,7 @@ class SaveLogViewModel @Inject constructor(private val imageRepo: ImageRepositor
 
     fun getImagePick() =
         Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).apply {
-            type = "image/*"
+            type = MIME_TYPE_IMAGE
             putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
         }
 

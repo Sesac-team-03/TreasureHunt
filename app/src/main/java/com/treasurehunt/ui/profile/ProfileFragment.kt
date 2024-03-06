@@ -20,10 +20,15 @@ import com.google.firebase.storage.storage
 import com.treasurehunt.R
 import com.treasurehunt.data.remote.model.UserDTO
 import com.treasurehunt.databinding.FragmentProfileBinding
+import com.treasurehunt.util.FILENAME_EXTENSION_PNG
+import com.treasurehunt.util.STORAGE_LOCATION_PROFILE_IMAGE
+import com.treasurehunt.util.extractDigits
 import com.treasurehunt.util.showSnackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+
+private const val NULL_STRING = "null"
 
 @AndroidEntryPoint
 class ProfileFragment : Fragment() {
@@ -129,11 +134,10 @@ class ProfileFragment : Fragment() {
 
     private suspend fun uploadProfileImage(uri: Uri) {
         val uid = Firebase.auth.currentUser!!.uid
-        val storage = Firebase.storage
-        val storageRef = storage.getReference("${uid}/profile_image")
-        val fileName = uri.toString().replace("[^0-9]".toRegex(), "")
-        val mountainsRef = storageRef.child("${fileName}.png")
-        val uploadTask = mountainsRef.putFile(uri)
+        val filename = uri.toString().extractDigits()
+        val profileImageStorageRef = Firebase.storage.reference.child(uid).child(STORAGE_LOCATION_PROFILE_IMAGE)
+            .child("$filename$FILENAME_EXTENSION_PNG")
+        val uploadTask = profileImageStorageRef.putFile(uri)
         uploadTask.addOnSuccessListener { taskSnapshot ->
             viewModel.setProfileUri(taskSnapshot.storage.toString())
         }.addOnFailureListener {
@@ -179,7 +183,7 @@ class ProfileFragment : Fragment() {
         if (userDTO.profileImage.toString().contains(getString(R.string.profile_check_url))) {
             Glide.with(requireContext()).load(userDTO.profileImage.toString())
                 .into(binding.ivProfileImage)
-        } else if (userDTO.profileImage.isNullOrEmpty() || userDTO.profileImage == "null") {
+        } else if (userDTO.profileImage.isNullOrEmpty() || userDTO.profileImage == NULL_STRING) {
             Glide.with(requireContext()).load(R.drawable.ic_no_profile_image)
                 .into(binding.ivProfileImage)
         } else {

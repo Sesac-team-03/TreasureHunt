@@ -13,13 +13,15 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.treasurehunt.R
 import com.treasurehunt.databinding.ActivityHomeBinding
-import com.treasurehunt.util.UPLOAD_NOTIFICATION_ID_STRING
 import dagger.hilt.android.AndroidEntryPoint
+
+internal const val UPLOAD_NOTIFICATION_CHANNEL_ID = "Upload"
 
 @AndroidEntryPoint
 class HomeActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityHomeBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
@@ -58,11 +60,11 @@ class HomeActivity : AppCompatActivity() {
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = getString(R.string.notification_channel)
-            val descriptionText = getString(R.string.notification_description)
             val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val description = getString(R.string.notification_description)
             val channel =
-                NotificationChannel(UPLOAD_NOTIFICATION_ID_STRING, name, importance).apply {
-                    description = descriptionText
+                NotificationChannel(UPLOAD_NOTIFICATION_CHANNEL_ID, name, importance).apply {
+                    this.description = description
                 }
             val notificationManager =
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

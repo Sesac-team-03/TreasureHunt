@@ -29,6 +29,11 @@ import kotlinx.coroutines.launch
 import java.io.IOException
 import javax.inject.Inject
 
+private const val VISIT_MARKER_WIDTH = 116
+private const val VISIT_MARKER_HEIGHT = 80
+private const val PLAN_MARKER_WIDTH = 96
+private const val PLAN_MARKER_HEIGHT = 80
+
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val logRepo: LogRepository,
@@ -103,7 +108,10 @@ class HomeViewModel @Inject constructor(
 
         fetchJob = viewModelScope.launch {
             try {
-                combine(placeRepo.getAllLocalVisits(), placeRepo.getAllLocalPlans()) { visits, plans ->
+                combine(
+                    placeRepo.getAllLocalVisits(),
+                    placeRepo.getAllLocalPlans()
+                ) { visits, plans ->
                     visits + plans
                 }
                     .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
@@ -134,16 +142,16 @@ class HomeViewModel @Inject constructor(
                 place.remoteId,
                 place.caption,
                 OverlayImage.fromResource(R.drawable.ic_chest_open),
-                116,
-                80
+                VISIT_MARKER_WIDTH,
+                VISIT_MARKER_HEIGHT
             )
         } else {
             Marker(LatLng(place.lat, place.lng)).from(
                 place.remoteId,
                 place.caption,
                 OverlayImage.fromResource(R.drawable.ic_chest_closed),
-                96,
-                80
+                PLAN_MARKER_WIDTH,
+                PLAN_MARKER_HEIGHT
             )
         }
     }

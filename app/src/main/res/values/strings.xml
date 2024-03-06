@@ -41,8 +41,11 @@
     <string name="savelog_image_upload_notification_fail">업로드 실패</string>
 
     <!-- 기록 상세 화면 -->
-    <string name="Logdetail_content">Check out Treasure Hunt: %s</string>
-    <string name="Logdetail_chooser_title">내용 공유하기</string>
+    <string name="logdetail_content">Check out Treasure Hunt: %s</string>
+    <string name="logdetail_chooser_title">내용 공유하기</string>
+    <string name="logdetail_log_still_loading_message">데이터를 불러오는 중입니다. 잠시 후 다시 시도해 주세요</string>
+    <string name="logdetail_log_deleted_message">기록이 삭제되었습니다</string>
+    <string name="logdetail_error_message">문제가 생겨 잠시 후 다시 시도해 주세요</string>
 
     <!-- 프로필 화면-->
     <string name="profile_tv_nickname">닉네임</string>
