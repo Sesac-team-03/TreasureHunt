@@ -1,4 +1,4 @@
-package com.treasurehunt.ui.profile
+package com.treasurehunt.ui.profile.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -10,6 +10,7 @@ import com.bumptech.glide.Glide
 import com.treasurehunt.R
 import com.treasurehunt.databinding.ItemSearchFriendBinding
 import com.treasurehunt.ui.model.UserModel
+import com.treasurehunt.ui.profile.FriendClickListener
 
 class SearchFriendAdapter(private val friendClickListener: FriendClickListener, private val isClickable: Boolean) :
     ListAdapter<UserModel, SearchFriendAdapter.ViewHolder>(diffUtil) {
