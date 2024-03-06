@@ -33,14 +33,11 @@ class FeedViewModel @Inject constructor(
     private val _isRefreshed = MutableStateFlow(true)
     val isRefreshed = _isRefreshed.asStateFlow()
 
-    var pagingLogs: Flow<PagingData<LogModel>>
-
-    init {
-        pagingLogs = getLogs()
-    }
+    private var _pagingLogs: Flow<PagingData<LogModel>> = getLogs()
+    val pagingLogs get() = _pagingLogs
 
     fun initLogs() {
-        pagingLogs = getLogs()
+        _pagingLogs = getLogs()
         _isRefreshed.update { false }
     }
 
