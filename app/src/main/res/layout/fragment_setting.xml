@@ -48,6 +48,15 @@
         app:layout_constraintStart_toEndOf="@+id/iv_login"
         app:layout_constraintTop_toTopOf="@+id/iv_login" />
 
+    <com.google.android.material.materialswitch.MaterialSwitch
+        android:id="@+id/st_auto_login"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_login"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tv_login" />
+
     <ImageView
         android:id="@+id/iv_logout"
         android:layout_width="wrap_content"

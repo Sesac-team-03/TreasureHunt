@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
@@ -12,11 +14,13 @@ import com.navercorp.nid.NaverIdLoginSDK
 import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentSettingBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class SettingFragment : Fragment() {
     private var _binding: FragmentSettingBinding? = null
     private val binding get() = _binding!!
+    private val viewModel: SettingViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -29,14 +33,22 @@ class SettingFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initViewModel()
         backProfile()
         setLogout()
         showDeleteDialog()
+        setSwitch()
+        updateSwitch()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun initViewModel() {
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.viewModel = viewModel
     }
 
     private fun backProfile() {
@@ -61,6 +73,28 @@ class SettingFragment : Fragment() {
     private fun showDeleteDialog() {
         binding.tvUserDelete.setOnClickListener {
             findNavController().navigate(R.id.action_settingFragment_to_deleteUserFragment)
+        }
+    }
+
+    private fun setSwitch() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.getSwitchState().collect {
+                binding.stAutoLogin.isChecked = it
+            }
+        }
+    }
+
+    private fun updateSwitch() {
+        binding.stAutoLogin.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                viewLifecycleOwner.lifecycleScope.launch {
+                    viewModel.updateSwitchState(isChecked)
+                }
+            } else {
+                viewLifecycleOwner.lifecycleScope.launch {
+                    viewModel.updateSwitchState(false)
+                }
+            }
         }
     }
 }
