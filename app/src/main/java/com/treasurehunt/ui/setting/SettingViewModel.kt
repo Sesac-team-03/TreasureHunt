@@ -80,7 +80,7 @@ class SettingViewModel @Inject constructor(
         userRepo.delete(userId)
     }
 
-    suspend fun getSwitchState(): Flow<Boolean> {
+    fun getSwitchState(): Flow<Boolean> {
         return loginRepo.getAutoLoginState
     }
 

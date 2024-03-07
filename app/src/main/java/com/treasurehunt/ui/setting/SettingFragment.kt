@@ -33,7 +33,6 @@ class SettingFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initViewModel()
         backProfile()
         setLogout()
         showDeleteDialog()
@@ -44,11 +43,6 @@ class SettingFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    private fun initViewModel() {
-        binding.lifecycleOwner = viewLifecycleOwner
-        binding.viewModel = viewModel
     }
 
     private fun backProfile() {
