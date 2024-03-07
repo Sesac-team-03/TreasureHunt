@@ -13,6 +13,7 @@ import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentSplashBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 private const val SPLASH_ANIMATION_DURATION = 2000L
@@ -23,6 +24,7 @@ class SplashFragment : PreloadFragment() {
     private var _binding: FragmentSplashBinding? = null
     private val binding get() = _binding!!
     override val viewModel: LoginViewModel by viewModels()
+    private var isInitialized = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -52,14 +54,17 @@ class SplashFragment : PreloadFragment() {
     }
 
     private fun handleAutoLogin() {
-        val currentUser = Firebase.auth.currentUser ?: return kotlin.run {
-            findNavController().navigate(R.id.action_splashFragment_to_logInFragment)
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.initLocalData(currentUser.uid)
-            preloadProfileImage(currentUser)
-            findNavController().navigate(R.id.action_splashFragment_to_homeFragment)
+        val currentUser = Firebase.auth.currentUser ?: return
+        val hasUser = Firebase.auth.currentUser != null
+        lifecycleScope.launch {
+            val isAutoLoginChecked = viewModel.getSwitchState().first()
+            if (isAutoLoginChecked && hasUser) {
+                viewModel.initLocalData(currentUser.uid)
+                preloadProfileImage(currentUser)
+                findNavController().navigate(R.id.action_splashFragment_to_homeFragment)
+            } else {
+                findNavController().navigate(R.id.action_splashFragment_to_logInFragment)
+            }
         }
     }
 }
