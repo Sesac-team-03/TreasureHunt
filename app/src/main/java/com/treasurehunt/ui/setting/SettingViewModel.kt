@@ -5,11 +5,13 @@ import com.google.firebase.Firebase
 import com.google.firebase.storage.storage
 import com.treasurehunt.data.ImageRepository
 import com.treasurehunt.data.LogRepository
+import com.treasurehunt.data.LoginRepository
 import com.treasurehunt.data.PlaceRepository
 import com.treasurehunt.data.UserRepository
 import com.treasurehunt.data.remote.model.toLogEntity
 import com.treasurehunt.data.remote.model.toPlaceEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 @HiltViewModel
@@ -17,12 +19,18 @@ class SettingViewModel @Inject constructor(
     private val placeRepo: PlaceRepository,
     private val logRepo: LogRepository,
     private val userRepo: UserRepository,
-    private val imageRepo: ImageRepository
+    private val imageRepo: ImageRepository,
+    private val loginRepo: LoginRepository
 ) : ViewModel() {
 
     suspend fun deleteAllData(userId: String) {
         val userDTO = userRepo.getRemoteUserById(userId)
-        userDTO.remoteLogIds.filterValues { it }.keys.forEach { logId -> deleteLogImages(logId, userId) }
+        userDTO.remoteLogIds.filterValues { it }.keys.forEach { logId ->
+            deleteLogImages(
+                logId,
+                userId
+            )
+        }
         deleteProfileImages(userId)
         userDTO.remoteLogIds.filterValues { it }.keys.forEach { logId -> deleteLog(logId) }
         userDTO.remotePlanIds.filterValues { it }.keys.forEach { planId -> deletePlan(planId) }
@@ -70,5 +78,13 @@ class SettingViewModel @Inject constructor(
 
     private suspend fun deleteUser(userId: String) {
         userRepo.delete(userId)
+    }
+
+    suspend fun getSwitchState(): Flow<Boolean> {
+        return loginRepo.getAutoLoginState
+    }
+
+    suspend fun updateSwitchState(isChecked: Boolean) {
+        loginRepo.updateAutoLoginSwitch(isChecked)
     }
 }

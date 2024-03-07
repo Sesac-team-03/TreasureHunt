@@ -4,6 +4,8 @@ import com.treasurehunt.data.ImageRepository
 import com.treasurehunt.data.ImageRepositoryImpl
 import com.treasurehunt.data.LogRepository
 import com.treasurehunt.data.LogRepositoryImpl
+import com.treasurehunt.data.LoginRepository
+import com.treasurehunt.data.LoginRepositoryImpl
 import com.treasurehunt.data.PlaceRepository
 import com.treasurehunt.data.PlaceRepositoryImpl
 import com.treasurehunt.data.UserRepository
@@ -28,4 +30,7 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindImageRepository(imageRepositoryImpl: ImageRepositoryImpl): ImageRepository
+
+    @Binds
+    abstract fun bindLoginRepository(loginRepositoryImpl: LoginRepositoryImpl) : LoginRepository
 }
