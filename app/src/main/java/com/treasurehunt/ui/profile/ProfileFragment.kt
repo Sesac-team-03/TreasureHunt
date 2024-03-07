@@ -207,6 +207,7 @@ class ProfileFragment : Fragment() {
 
     private fun showSetting() {
         binding.ibSetting.setOnClickListener {
+            findNavController().navigate(R.id.action_profileFragment_to_settingFragment)
         }
     }
 }
