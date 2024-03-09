@@ -18,7 +18,7 @@ data class LogModel(
 ) : Parcelable
 
 fun LogModel.asLogEntity(localId: Long = 0, remoteId: String? = null) =
-    LogEntity(remotePlaceId, text, theme, createdDate, remoteImageIds, localId, remoteId)
+    LogEntity(remotePlaceId, text, theme, createdDate, remoteImageIds, this.localId?:0, remoteId)
 
 fun LogModel.asLogDTO(localId: Long = 0) =
     LogDTO(remotePlaceId, text, theme, createdDate, remoteImageIds.associateWith { true }, localId)

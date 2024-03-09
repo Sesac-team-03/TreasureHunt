@@ -1,21 +1,33 @@
 package com.treasurehunt.ui.feed
 
+import android.accounts.NetworkErrorException
+import android.net.http.HttpException
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
+import com.google.android.material.snackbar.Snackbar
 import com.treasurehunt.data.ImageRepository
 import com.treasurehunt.data.LogRepository
 import com.treasurehunt.data.local.model.LogEntity
 import com.treasurehunt.data.local.model.toLogModel
+import com.treasurehunt.data.remote.model.toLogEntity
 import com.treasurehunt.ui.model.LogModel
+import com.treasurehunt.ui.model.asLogEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.retry
+import kotlinx.coroutines.flow.retryWhen
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import okio.IOException
 import javax.inject.Inject
 
 private const val INITIAL_LOAD_SIZE = 3
@@ -37,8 +49,20 @@ class FeedViewModel @Inject constructor(
     val pagingLogs get() = _pagingLogs
 
     fun initLogs() {
-        _pagingLogs = getLogs()
+        viewModelScope.launch {
+            _pagingLogs.collectLatest {
+                Log.d("12345", it.toString())
+            }
+        }
         _isRefreshed.update { false }
+    }
+
+    fun deleteLog(log: LogModel) {
+        val a = log.asLogEntity()
+        Log.d("12345", a.toString())
+        viewModelScope.launch {
+            logRepo.delete(a)
+        }
     }
 
     private fun getLogs(): Flow<PagingData<LogModel>> {

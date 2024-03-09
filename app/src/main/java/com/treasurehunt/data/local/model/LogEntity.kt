@@ -24,4 +24,4 @@ fun LogEntity.toLogDTO() =
     LogDTO(remotePlaceId, text, theme, createdDate, remoteImageIds.associateWith { true }, localId)
 
 fun LogEntity.toLogModel(imagesUrls: List<String>) =
-    LogModel(remotePlaceId, text, theme, createdDate, remoteImageIds, imagesUrls)
+    LogModel(remotePlaceId, text, theme, createdDate, remoteImageIds, imagesUrls,localId,remoteId)

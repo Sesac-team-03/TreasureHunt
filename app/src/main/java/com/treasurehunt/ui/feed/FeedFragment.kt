@@ -86,6 +86,7 @@ class FeedFragment : Fragment() {
     }
 
     private fun moveToDetail(log: LogModel) {
+        viewModel.deleteLog(log)
         val curDestination = findNavController().currentDestination?.id
         curDestination?.let {
             if (it == R.id.feedFragment) {
