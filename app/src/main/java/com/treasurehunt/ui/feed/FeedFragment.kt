@@ -56,8 +56,8 @@ class FeedFragment : Fragment() {
 
     private fun initSwipeRefresh() {
         binding.splLogs.setOnRefreshListener {
-            viewModel.initLogs()
-            binding.splLogs.isRefreshing = viewModel.isRefreshed.value
+            viewModel.refreshLocalData()
+            binding.splLogs.isRefreshing = false
         }
     }
 
@@ -100,9 +100,7 @@ class FeedFragment : Fragment() {
             viewModel.pagingLogs
                 .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
                 .collect { pagingLogs ->
-                    if (viewModel.isLogsDataUpdated.value) {
                         feedAdapter.submitData(pagingLogs)
-                    }
                 }
         }
     }
@@ -112,11 +110,8 @@ class FeedFragment : Fragment() {
             feedAdapter.loadStateFlow.collect { loadState ->
                 val isListEmpty =
                     loadState.refresh is LoadState.NotLoading && feedAdapter.itemCount == 0
-                val isNotListEmpty =
-                    loadState.refresh is LoadState.NotLoading && feedAdapter.itemCount > 0
-                binding.tvNoTreasure.isVisible = isListEmpty
+                binding.tvNoTreasure.isVisible = isListEmpty && viewModel.isRefreshing.value.not()
                 binding.cpiLoading.isVisible = loadState.source.refresh is LoadState.Loading
-                binding.rvLogs.isVisible = isNotListEmpty
             }
         }
     }
