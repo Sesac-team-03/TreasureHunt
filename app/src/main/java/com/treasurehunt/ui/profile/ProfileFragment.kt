@@ -55,6 +55,7 @@ class ProfileFragment : Fragment() {
         syncProfile()
         setEditButton()
         setEditProfileImageButton()
+        setEditProfileImage()
         setCancelButton()
         setCompleteButton()
         initTabLayout()
@@ -144,7 +145,9 @@ class ProfileFragment : Fragment() {
         binding.ibEditProfileImage.setOnClickListener {
             requestAlbumAccessPermission()
         }
+    }
 
+    private fun setEditProfileImage() {
         binding.ivProfileImage.setOnClickListener {
             requestAlbumAccessPermission()
         }
@@ -153,7 +156,7 @@ class ProfileFragment : Fragment() {
     private fun setCancelButton() {
         binding.btnCancel.setOnClickListener {
             hideEditView()
-            updateProfile(viewModel.uiState.value.user ?: return@setOnClickListener)
+            updateProfile(viewModel.uiState.value.user)
         }
     }
 
@@ -164,10 +167,19 @@ class ProfileFragment : Fragment() {
 
     private fun setCompleteButton() {
         binding.btnComplete.setOnClickListener {
-            viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.saveProfile(nickname = binding.etNickname.text.toString())
-            }
+            presetNickname()
+            saveProfile()
             hideEditView()
+        }
+    }
+
+    private fun presetNickname() {
+        binding.tvNickname.text = binding.etNickname.text
+    }
+
+    private fun saveProfile() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.saveProfile(nickname = binding.etNickname.text.toString())
         }
     }
 
