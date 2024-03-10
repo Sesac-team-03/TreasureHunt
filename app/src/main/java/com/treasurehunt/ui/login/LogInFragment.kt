@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -18,8 +17,8 @@ import com.navercorp.nid.profile.NidProfileCallback
 import com.navercorp.nid.profile.data.NidProfileResponse
 import com.treasurehunt.BuildConfig
 import com.treasurehunt.R
-import com.treasurehunt.ui.model.NaverUser
 import com.treasurehunt.databinding.FragmentLoginBinding
+import com.treasurehunt.ui.model.NaverUser
 import com.treasurehunt.util.showSnackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -29,11 +28,11 @@ private const val NAVER_LOGIN_CLIENT_SECRET = BuildConfig.NAVER_LOGIN_CLIENT_SEC
 private const val APP_NAME = BuildConfig.APP_NAME
 
 @AndroidEntryPoint
-class LogInFragment : Fragment() {
+class LogInFragment : PreloadFragment() {
 
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: LoginViewModel by viewModels()
+    override val viewModel: LoginViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -114,6 +113,7 @@ class LogInFragment : Fragment() {
                 if (task.isSuccessful) {
                     lifecycleScope.launch {
                         viewModel.initLocalData()
+                        preloadProfileImage(Firebase.auth.currentUser)
                         findNavController().navigate(R.id.action_logInFragment_to_homeFragment)
                     }
                 } else {
@@ -128,6 +128,7 @@ class LogInFragment : Fragment() {
                 if (task.isSuccessful) {
                     lifecycleScope.launch {
                         viewModel.insertNaverUser(naverUser)
+                        preloadProfileImage(Firebase.auth.currentUser)
                         findNavController().navigate(R.id.action_logInFragment_to_homeFragment)
                     }
                 } else {

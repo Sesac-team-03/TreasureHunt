@@ -4,12 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.bumptech.glide.Glide
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.treasurehunt.R
@@ -18,14 +15,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-
 @AndroidEntryPoint
-class SplashFragment : Fragment() {
+class SplashFragment : PreloadFragment() {
+
     private var _binding: FragmentSplashBinding? = null
     private val binding get() = _binding!!
-    private var isInitialized = false
-    private val viewModel: LoginViewModel by viewModels()
-
+    override val viewModel: LoginViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -34,16 +29,9 @@ class SplashFragment : Fragment() {
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        initSplashScreen()
-    }
-
     override fun onResume() {
         super.onResume()
-        if (isInitialized) {
-            handleAutoLogin()
-        }
+        initSplashScreen()
     }
 
     override fun onDestroyView() {
@@ -57,7 +45,6 @@ class SplashFragment : Fragment() {
 
         lifecycleScope.launch {
             delay(2000)
-            isInitialized = true
             handleAutoLogin()
         }
     }
@@ -67,18 +54,11 @@ class SplashFragment : Fragment() {
         if (currentUser == null) {
             findNavController().navigate(R.id.action_splashFragment_to_logInFragment)
         } else {
-            lifecycleScope.launch {
+            viewLifecycleOwner.lifecycleScope.launch {
                 viewModel.initLocalData()
                 preloadProfileImage(currentUser)
                 findNavController().navigate(R.id.action_splashFragment_to_homeFragment)
             }
         }
-    }
-
-    private suspend fun preloadProfileImage(currentUser: FirebaseUser) {
-        val profileImageStorageUrl = viewModel.getProfileImageStorageUrl(currentUser.uid) ?: return
-        Glide.with(requireContext())
-            .load(profileImageStorageUrl)
-            .preload()
     }
 }
