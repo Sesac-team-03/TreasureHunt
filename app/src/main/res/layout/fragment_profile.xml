@@ -43,11 +43,14 @@
 
         <ImageButton
             android:id="@+id/ib_edit_profile_image"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
-            android:background="@android:color/transparent"
+            android:background="@drawable/ic_circle_white"
+            android:paddingHorizontal="2dp"
+            android:paddingTop="1dp"
+            android:scaleType="fitCenter"
             android:src="@drawable/ic_camera"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="@+id/iv_profile_image"

@@ -124,6 +124,16 @@ class ProfileFragment : Fragment() {
         binding.etNickname.setText(binding.tvNickname.text)
     }
 
+    private fun setEditProfileImageButton() {
+        binding.ibEditProfileImage.setOnClickListener {
+            requestAlbumAccessPermission()
+        }
+
+        binding.ivProfileImage.setOnClickListener {
+            requestAlbumAccessPermission()
+        }
+    }
+
     private fun setCancelButton() {
         binding.btnCancel.setOnClickListener {
             hideEditView()
