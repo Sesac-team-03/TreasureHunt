@@ -8,6 +8,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.treasurehunt.R
@@ -26,8 +28,7 @@ class SplashFragment : Fragment() {
 
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = FragmentSplashBinding.inflate(inflater, container, false)
         return binding.root
@@ -62,13 +63,22 @@ class SplashFragment : Fragment() {
     }
 
     private fun handleAutoLogin() {
-        if (Firebase.auth.currentUser == null) {
+        val currentUser = Firebase.auth.currentUser
+        if (currentUser == null) {
             findNavController().navigate(R.id.action_splashFragment_to_logInFragment)
         } else {
             lifecycleScope.launch {
                 viewModel.initLocalData()
+                preloadProfileImage(currentUser)
                 findNavController().navigate(R.id.action_splashFragment_to_homeFragment)
             }
         }
+    }
+
+    private suspend fun preloadProfileImage(currentUser: FirebaseUser) {
+        val profileImageStorageUrl = viewModel.getProfileImageStorageUrl(currentUser.uid) ?: return
+        Glide.with(requireContext())
+            .load(profileImageStorageUrl)
+            .preload()
     }
 }

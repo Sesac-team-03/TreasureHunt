@@ -7,11 +7,11 @@ import com.google.firebase.auth.userProfileChangeRequest
 import com.google.firebase.ktx.Firebase
 import com.treasurehunt.data.LogRepository
 import com.treasurehunt.data.PlaceRepository
-import com.treasurehunt.ui.model.NaverUser
 import com.treasurehunt.data.UserRepository
 import com.treasurehunt.data.remote.model.UserDTO
 import com.treasurehunt.data.remote.model.toLogEntity
 import com.treasurehunt.data.remote.model.toPlaceEntity
+import com.treasurehunt.ui.model.NaverUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import javax.inject.Inject
@@ -74,5 +74,10 @@ class LoginViewModel @Inject constructor(
             val place = placeRepo.getRemotePlaceById(it.key)
             placeRepo.insert(place.toPlaceEntity(it.key))
         }
+    }
+
+    suspend fun getProfileImageStorageUrl(uid: String): String? {
+        val userDTO = userRepo.getRemoteUserById(uid)
+        return userDTO.profileImage
     }
 }
