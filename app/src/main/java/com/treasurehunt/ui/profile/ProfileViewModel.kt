@@ -43,6 +43,7 @@ private const val BASE_URL = BuildConfig.BASE_URL
 private val pathEmail = UserDTO::email.name
 private val pathNickname = UserDTO::nickname.name
 private val pathProfileImage = UserDTO::profileImage.name
+private const val IMAGE_FILENAME_PREFIX = "$STORAGE_LOCATION_PROFILE_IMAGE/"
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
@@ -133,11 +134,13 @@ class ProfileViewModel @Inject constructor(
     }
 
     suspend fun saveProfile(nickname: String) {
+        val uid = _uiState.value.uid ?: return
         val user = _uiState.value.user ?: return
         val imageContentUri = _uiState.value.imageContentUri
 
         imageContentUri?.let {
             uploadProfileImage(it.toUri())
+            deleteReplacedProfileImage(uid, user)
         }
 
         updateUser(
@@ -161,6 +164,13 @@ class ProfileViewModel @Inject constructor(
         } else {
             // TODO: handle fail
         }
+    }
+
+    private fun deleteReplacedProfileImage(uid: String, user: UserDTO) {
+        val imagesStorageRef =
+            Firebase.storage.reference.child(uid).child(STORAGE_LOCATION_PROFILE_IMAGE)
+        val imageFilename = user.profileImage?.substringAfter(IMAGE_FILENAME_PREFIX) ?: return
+        imagesStorageRef.child(imageFilename).delete()
     }
 
     private fun addImageStorageUrl(imageStorageUrl: String) {
