@@ -17,8 +17,13 @@ import com.google.firebase.storage.storage
 import com.treasurehunt.R
 import com.treasurehunt.data.remote.model.UserDTO
 import com.treasurehunt.databinding.FragmentProfileBinding
+import com.treasurehunt.ui.model.ProfileUiState
 import com.treasurehunt.ui.profile.adapter.ProfileViewPagerAdapter
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -47,13 +52,11 @@ class ProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewLifecycleOwner.lifecycleScope.launch {
-            syncProfile()
-        }
+        syncProfile()
         setEditButton()
+        setEditProfileImageButton()
         setCancelButton()
         setCompleteButton()
-        setEditProfileImageButton()
         initTabLayout()
     }
 
@@ -82,29 +85,42 @@ class ProfileFragment : Fragment() {
         }
     }
 
-    private suspend fun syncProfile() {
-        viewModel.uiState.collect {
-            updateProfile(it.user ?: return@collect)
+    private fun syncProfile() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.uiState
+                .filterDefaultState()
+                .filterUserUnrelatedStateChange()
+                .collect {
+                    updateProfile(it.user)
+                }
         }
     }
 
-    private fun updateProfile(user: UserDTO) {
-        binding.tvAccount.text = user.email.orEmpty()
+    private fun StateFlow<ProfileUiState>.filterDefaultState(): Flow<ProfileUiState> =
+        debounce(1500)
 
-        binding.tvNickname.text = user.nickname ?: getString(R.string.profile_guest)
+    private fun Flow<ProfileUiState>.filterUserUnrelatedStateChange(): Flow<ProfileUiState> =
+        distinctUntilChangedBy {
+            it.user
+        }
+
+    private fun updateProfile(user: UserDTO?) {
+        binding.tvAccount.text = user?.email.orEmpty()
+
+        binding.tvNickname.text = user?.nickname ?: getString(R.string.profile_guest)
 
         loadProfileImage(user)
     }
 
-    private fun loadProfileImage(user: UserDTO) {
+    private fun loadProfileImage(user: UserDTO?) {
         binding.ivProfileImage.run {
             try {
-                val profileImageStorageRef = user.profileImage?.let {
+                val profileImageStorageRef = user?.profileImage?.let {
                     Firebase.storage.getReferenceFromUrl(it)
                 }
                 Glide.with(context)
                     .load(profileImageStorageRef)
-                    .placeholder(R.drawable.ic_no_profile_image)
+                    .error(R.drawable.ic_no_profile_image)
                     .into(this)
             } catch (e: Exception) {
                 setImageResource(R.drawable.ic_no_profile_image)
@@ -152,12 +168,6 @@ class ProfileFragment : Fragment() {
                 viewModel.saveProfile(nickname = binding.etNickname.text.toString())
             }
             hideEditView()
-        }
-    }
-
-    private fun setEditProfileImageButton() {
-        binding.ibEditProfileImage.setOnClickListener {
-            requestAlbumAccessPermission()
         }
     }
 

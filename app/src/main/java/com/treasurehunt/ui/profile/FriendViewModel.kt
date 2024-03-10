@@ -47,7 +47,6 @@ class FriendViewModel @Inject constructor(
 
     private val _uiState: MutableStateFlow<FriendUiState> = MutableStateFlow(FriendUiState(false))
     val uiState: StateFlow<FriendUiState> = _uiState.asStateFlow()
-    private val db = FirebaseDatabase.getInstance(BASE_URL)
     private val friendIds: Flow<List<String>> = getFriendIdsFlow()
 
     init {
@@ -58,6 +57,7 @@ class FriendViewModel @Inject constructor(
     }
 
     private fun getFriendIdsFlow(): Flow<List<String>> = callbackFlow {
+        val db = FirebaseDatabase.getInstance(BASE_URL)
         val uid = Firebase.auth.currentUser!!.uid
         val friendsRef =
             db.reference.child(REMOTE_DATABASE_USERS).child(uid).child(pathStringFriends)
