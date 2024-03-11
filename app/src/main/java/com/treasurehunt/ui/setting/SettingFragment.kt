@@ -33,7 +33,7 @@ class SettingFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        backProfile()
+        setBackButton()
         setLogout()
         showDeleteDialog()
         setSwitch()
@@ -45,7 +45,7 @@ class SettingFragment : Fragment() {
         _binding = null
     }
 
-    private fun backProfile() {
+    private fun setBackButton() {
         binding.ibBack.setOnClickListener {
             findNavController().navigateUp()
         }
@@ -53,8 +53,8 @@ class SettingFragment : Fragment() {
 
     private fun setLogout() {
         binding.tvLogout.setOnClickListener {
-            val naverToken = NaverIdLoginSDK.getAccessToken() ?: ""
-            if (naverToken.isNotEmpty()) {
+            val naverToken = NaverIdLoginSDK.getAccessToken()
+            if (naverToken.isNullOrEmpty()) {
                 NaverIdLoginSDK.logout()
                 findNavController().navigate(R.id.action_settingFragment_to_logInFragment)
             } else {
