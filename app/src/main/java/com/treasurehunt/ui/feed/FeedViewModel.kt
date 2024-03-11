@@ -32,46 +32,11 @@ private const val PAGE_SIZE = 3
 
 @HiltViewModel
 class FeedViewModel @Inject constructor(
-    private val userRepo: UserRepository,
     private val logRepo: LogRepository,
-    private val placeRepo: PlaceRepository,
     private val imageRepo: ImageRepository
 ) : ViewModel() {
 
-    private val _isRefreshing = MutableStateFlow(false)
-    val isRefreshing = _isRefreshing.asStateFlow()
-
     val pagingLogs = getLogs()
-
-    fun refreshLocalData() {
-        _isRefreshing.update { true }
-        initLocalData()
-    }
-
-    private fun initLocalData() {
-        val curUserUid = Firebase.auth.currentUser!!.uid
-        viewModelScope.launch {
-            val userDTO = userRepo.getRemoteUserById(curUserUid)
-            initLocalLogs(userDTO)
-            initLocalPlaces(userDTO)
-        }
-    }
-
-    private suspend fun initLocalLogs(userDTO: UserDTO) {
-        logRepo.deleteAllLocalLogs()
-        userDTO.remoteLogIds.filterValues { it }.map {
-            val log = logRepo.getRemoteLogById(it.key)
-            logRepo.insert(log.toLogEntity(it.key))
-        }
-    }
-
-    private suspend fun initLocalPlaces(userDTO: UserDTO)  {
-        placeRepo.deleteAllLocalPlaces()
-        (userDTO.remoteVisitIds + userDTO.remotePlanIds).filterValues { it }.map {
-            val place = placeRepo.getRemotePlaceById(it.key)
-            placeRepo.insert(place.toPlaceEntity(it.key))
-        }
-    }
 
     private fun getLogs(): Flow<PagingData<LogModel>> {
         return logRepo.getPagingLogs(PAGE_SIZE, INITIAL_LOAD_SIZE)

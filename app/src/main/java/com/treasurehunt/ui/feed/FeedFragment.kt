@@ -56,7 +56,7 @@ class FeedFragment : Fragment() {
 
     private fun initSwipeRefresh() {
         binding.splLogs.setOnRefreshListener {
-            viewModel.refreshLocalData()
+            feedAdapter.refresh()
             binding.splLogs.isRefreshing = false
         }
     }
@@ -110,7 +110,7 @@ class FeedFragment : Fragment() {
             feedAdapter.loadStateFlow.collect { loadState ->
                 val isListEmpty =
                     loadState.refresh is LoadState.NotLoading && feedAdapter.itemCount == 0
-                binding.tvNoTreasure.isVisible = isListEmpty && viewModel.isRefreshing.value.not()
+                binding.tvNoTreasure.isVisible = isListEmpty
                 binding.cpiLoading.isVisible = loadState.source.refresh is LoadState.Loading
             }
         }
