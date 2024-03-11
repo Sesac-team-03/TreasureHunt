@@ -5,7 +5,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.treasurehunt.data.LogRepository
-import com.treasurehunt.data.LoginRepository
+import com.treasurehunt.data.UserPreferencesRepository
 import com.treasurehunt.data.PlaceRepository
 import com.treasurehunt.data.UserRepository
 import com.treasurehunt.data.remote.model.UserDTO
@@ -29,7 +29,7 @@ class LoginViewModel @Inject constructor(
     private val userRepo: UserRepository,
     private val logRepo: LogRepository,
     private val placeRepo: PlaceRepository,
-    private val loginRepo: LoginRepository
+    private val loginRepo: UserPreferencesRepository
 ) : ViewModel() {
 
     suspend fun insertNaverUser(naverUser: NaverUser, currentUser: FirebaseUser) {

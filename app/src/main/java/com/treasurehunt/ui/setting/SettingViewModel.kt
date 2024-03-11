@@ -5,7 +5,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.storage.storage
 import com.treasurehunt.data.ImageRepository
 import com.treasurehunt.data.LogRepository
-import com.treasurehunt.data.LoginRepository
+import com.treasurehunt.data.UserPreferencesRepository
 import com.treasurehunt.data.PlaceRepository
 import com.treasurehunt.data.UserRepository
 import com.treasurehunt.data.remote.model.toLogEntity
@@ -20,7 +20,7 @@ class SettingViewModel @Inject constructor(
     private val logRepo: LogRepository,
     private val userRepo: UserRepository,
     private val imageRepo: ImageRepository,
-    private val loginRepo: LoginRepository
+    private val loginRepo: UserPreferencesRepository
 ) : ViewModel() {
 
     suspend fun deleteAllUserData(userId: String) {

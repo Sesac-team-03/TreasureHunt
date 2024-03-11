@@ -2,7 +2,7 @@ package com.treasurehunt.data
 
 import kotlinx.coroutines.flow.Flow
 
-interface LoginRepository {
+interface UserPreferencesRepository {
 
     val getAutoLoginState: Flow<Boolean>
 

@@ -11,9 +11,9 @@ import kotlinx.coroutines.flow.map
 import java.io.IOException
 import javax.inject.Inject
 
-class LoginRepositoryImpl @Inject constructor(
+class UserPreferencesRepositoryImpl @Inject constructor(
     private val loginDataStore: DataStore<Preferences>
-) : LoginRepository {
+) : UserPreferencesRepository {
 
     private object PreferencesKeys {
         val AUTO_LOGIN_KEY = booleanPreferencesKey("auto_login_check")
