@@ -29,6 +29,7 @@ class SettingViewModel @Inject constructor(
             deleteLogImages(logId, userId)
             deleteLog(logId)
         }
+        logRepo.deleteAllLocalLogs()
         deleteProfileImages(userId)
         userDTO.remotePlanIds.filterValues { it }.keys.forEach { planId -> deletePlan(planId) }
         userDTO.remoteVisitIds.filterValues { it }.keys.forEach { visitId -> deleteVisit(visitId) }
@@ -56,8 +57,6 @@ class SettingViewModel @Inject constructor(
 
     private suspend fun deleteLog(logId: String) {
         val remoteLog = logRepo.getRemoteLogById(logId)
-        val localLog = remoteLog.toLogEntity(logId)
-        logRepo.delete(localLog)
         logRepo.delete(logId)
     }
 
