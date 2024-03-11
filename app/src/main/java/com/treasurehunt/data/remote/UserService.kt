@@ -29,12 +29,8 @@ interface UserService {
         @Body user: UserDTO
     )
 
-    @GET("$REMOTE_DATABASE_USERS.json")
-
-    @DELETE("users/{id}.json")
+    @DELETE("$REMOTE_DATABASE_USERS/{id}.json")
     suspend fun delete(@Path("id") id: String)
-
-    @GET("users.json")
 
     suspend fun search(
         @Query("orderBy") orderBy: String,

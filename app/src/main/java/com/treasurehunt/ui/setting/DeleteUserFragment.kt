@@ -19,6 +19,7 @@ import com.google.firebase.auth.auth
 import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentDeleteUserBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -73,7 +74,7 @@ class DeleteUserFragment : DialogFragment() {
         binding.btnDelete.setOnClickListener {
             if (userId != null) {
                 viewLifecycleOwner.lifecycleScope.launch {
-                    viewModel.deleteAllData(userId)
+                    async { viewModel.deleteAllData(userId) }.await()
                     user?.delete()
                     findNavController().navigate(R.id.action_deleteUserFragment_to_logInFragment)
                 }
