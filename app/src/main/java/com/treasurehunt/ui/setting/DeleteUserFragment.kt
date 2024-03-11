@@ -61,9 +61,17 @@ class DeleteUserFragment : DialogFragment() {
     }
 
     private fun setBackButton() {
+        setCloseButton()
+        setCancelButton()
+    }
+
+    private fun setCloseButton() {
         binding.ibClose.setOnClickListener {
             findNavController().navigateUp()
         }
+    }
+
+    private fun setCancelButton() {
         binding.btnCancel.setOnClickListener {
             findNavController().navigateUp()
         }
