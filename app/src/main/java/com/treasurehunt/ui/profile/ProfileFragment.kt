@@ -60,7 +60,7 @@ class ProfileFragment : Fragment() {
         setCancelButton()
         setCompleteButton()
         initTabLayout()
-        showSetting()
+        showSettingButton()
     }
 
     override fun onDestroyView() {
@@ -205,7 +205,7 @@ class ProfileFragment : Fragment() {
         }
     }
 
-    private fun showSetting() {
+    private fun showSettingButton() {
         binding.ibSetting.setOnClickListener {
             findNavController().navigate(R.id.action_profileFragment_to_settingFragment)
         }
