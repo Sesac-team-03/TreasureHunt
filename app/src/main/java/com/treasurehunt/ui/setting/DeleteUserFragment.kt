@@ -85,7 +85,7 @@ class DeleteUserFragment : DialogFragment() {
             }
 
             viewLifecycleOwner.lifecycleScope.launch {
-                async { viewModel.deleteAllData(user.uid) }.await()
+                async { viewModel.deleteAllUserData(user.uid) }.await()
                 user.delete()
                 findNavController().navigate(R.id.action_deleteUserFragment_to_logInFragment)
             }

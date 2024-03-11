@@ -23,16 +23,13 @@ class SettingViewModel @Inject constructor(
     private val loginRepo: LoginRepository
 ) : ViewModel() {
 
-    suspend fun deleteAllData(userId: String) {
+    suspend fun deleteAllUserData(userId: String) {
         val userDTO = userRepo.getRemoteUserById(userId)
         userDTO.remoteLogIds.filterValues { it }.keys.forEach { logId ->
-            deleteLogImages(
-                logId,
-                userId
-            )
+            deleteLogImages(logId, userId)
+            deleteLog(logId)
         }
         deleteProfileImages(userId)
-        userDTO.remoteLogIds.filterValues { it }.keys.forEach { logId -> deleteLog(logId) }
         userDTO.remotePlanIds.filterValues { it }.keys.forEach { planId -> deletePlan(planId) }
         userDTO.remoteVisitIds.filterValues { it }.keys.forEach { visitId -> deleteVisit(visitId) }
         deleteUser(userId)
@@ -65,14 +62,14 @@ class SettingViewModel @Inject constructor(
     }
 
     private suspend fun deletePlan(planId: String) {
-        val plan = placeRepo.getRemotePlaceById(planId).toPlaceEntity(planId)
-        placeRepo.delete(plan)
+        val localPlan = placeRepo.getRemotePlaceById(planId).toPlaceEntity(planId)
+        placeRepo.delete(localPlan)
         placeRepo.delete(planId)
     }
 
     private suspend fun deleteVisit(visitId: String) {
-        val visit = placeRepo.getRemotePlaceById(visitId).toPlaceEntity(visitId)
-        placeRepo.delete(visit)
+        val localVisit = placeRepo.getRemotePlaceById(visitId).toPlaceEntity(visitId)
+        placeRepo.delete(localVisit)
         placeRepo.delete(visitId)
     }
 
