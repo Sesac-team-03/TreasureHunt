@@ -73,21 +73,15 @@ class SettingFragment : Fragment() {
     private fun setSwitch() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.getSwitchState().collect {
-                binding.stAutoLogin.isChecked = it
+                binding.swAutoLogin.isChecked = it
             }
         }
     }
 
     private fun updateSwitch() {
-        binding.stAutoLogin.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                viewLifecycleOwner.lifecycleScope.launch {
-                    viewModel.updateSwitchState(isChecked)
-                }
-            } else {
-                viewLifecycleOwner.lifecycleScope.launch {
-                    viewModel.updateSwitchState(false)
-                }
+        binding.swAutoLogin.setOnCheckedChangeListener { _, isChecked ->
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewModel.updateSwitchState(isChecked)
             }
         }
     }
