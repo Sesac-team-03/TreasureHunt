@@ -34,18 +34,19 @@ class DeleteUserFragment : DialogFragment() {
         return AlertDialog.Builder(requireActivity())
             .setView(binding.root)
             .create()
+            .apply {
+                window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+                window?.requestFeature(Window.FEATURE_NO_TITLE)
+                setCanceledOnTouchOutside(false)
+            }
     }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_delete_user, container, false)
-        dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog?.window?.requestFeature(Window.FEATURE_NO_TITLE)
-        dialog?.setCancelable(false)
-        return view
+    ): View {
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
