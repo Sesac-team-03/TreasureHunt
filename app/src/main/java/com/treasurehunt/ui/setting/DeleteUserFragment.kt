@@ -52,7 +52,7 @@ class DeleteUserFragment : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setBackButton()
-        setDeleteUserInfo()
+        setDeleteButton()
     }
 
     override fun onDestroyView() {
@@ -77,7 +77,7 @@ class DeleteUserFragment : DialogFragment() {
         }
     }
 
-    private fun setDeleteUserInfo() {
+    private fun setDeleteButton() {
         val userId = Firebase.auth.currentUser?.uid
         val user = Firebase.auth.currentUser
         binding.btnDelete.setOnClickListener {
