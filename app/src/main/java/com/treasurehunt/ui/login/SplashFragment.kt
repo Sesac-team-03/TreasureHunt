@@ -58,7 +58,7 @@ class SplashFragment : PreloadFragment() {
         val hasUser = Firebase.auth.currentUser != null
         lifecycleScope.launch {
             val isAutoLoginChecked = viewModel.getSwitchState().first()
-            if (isAutoLoginChecked && hasUser) {
+            if (hasUser && isAutoLoginChecked) {
                 viewModel.initLocalData(currentUser.uid)
                 preloadProfileImage(currentUser)
                 findNavController().navigate(R.id.action_splashFragment_to_homeFragment)
