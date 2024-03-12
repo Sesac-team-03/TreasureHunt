@@ -1,31 +1,37 @@
 package com.treasurehunt.data.remote.model
 
+import com.treasurehunt.ui.model.MapPlaceModel
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 @Serializable
-data class MapPlaceSearchResultDTO (
+data class MapPlaceSearchResultDTO(
     val lastBuildDate: String,
     val total: Long,
     val start: Long,
     val display: Long,
-    val items: List<MapPlace>
+    val items: List<MapPlaceDTO>
 )
 
 fun MapPlaceSearchResultDTO.toJsonString() = Json.encodeToString(this)
 
-fun MapPlaceSearchResultDTO.fromJsonString(string: String) = Json.decodeFromString<MapPlaceSearchResultDTO>(string)
+fun MapPlaceSearchResultDTO.fromJsonString(string: String) =
+    Json.decodeFromString<MapPlaceSearchResultDTO>(string)
 
 @Serializable
-data class MapPlace (
+data class MapPlaceDTO(
     val title: String,
-    val link: String,
-    val category: String,
-    val description: String,
-    val telephone: String,
-    val address: String,
-    val roadAddress: String,
-    val mapx: String,
-    val mapy: String
+    val link: String? = null,
+    val category: String? = null,
+    val description: String? = null,
+    val telephone: String? = null,
+    val address: String? = null,
+    val roadAddress: String? = null,
+    val mapx: String? = null,
+    val mapy: String? = null
+)
+
+fun MapPlaceDTO.toMapPlaceModel() = MapPlaceModel(
+    title, link, category, description, telephone, address, roadAddress, mapx, mapy
 )
