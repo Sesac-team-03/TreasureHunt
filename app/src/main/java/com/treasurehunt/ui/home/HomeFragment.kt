@@ -16,6 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.LocationTrackingMode
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
@@ -44,7 +45,11 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         registerForActivityResult(RequestPermission()) { isGranted ->
             setLocationTrackingMode(isGranted)
         }
+<<<<<<< HEAD
     private val args: HomeFragmentArgs by navArgs()
+=======
+    private lateinit var latlng: LatLng
+>>>>>>> cd26046 (임시커밋)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -57,7 +62,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         super.onViewCreated(view, savedInstanceState)
         initSegmentedButton()
         loadMap()
-        setSearchBar()
     }
 
     override fun onDestroyView() {
@@ -90,8 +94,10 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         initMap(naverMap)
         handleLocationAccessPermission()
         setLocationOverlay()
-        showMarkers()
+        setCurrentPosition()
+        setSearchBar()
         setSymbolClick()
+        showMarkers()
     }
 
     private fun initMap(naverMap: NaverMap) {
@@ -123,6 +129,24 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         locationOverlay.icon =
             OverlayImage.fromResource(R.drawable.ic_launcher_foreground)
         locationOverlay.anchor = PointF(0.5f, 1f)
+    }
+
+    private fun setCurrentPosition() {
+        latlng = map.locationOverlay.position
+
+        map.addOnLocationChangeListener { position ->
+            latlng = LatLng(position.latitude, position.longitude)
+        }
+    }
+
+    private fun setSearchBar() {
+        binding.tietSearchFriend.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                val action =
+                    HomeFragmentDirections.actionHomeFragmentToSearchMapPlaceFragment(latlng)
+                findNavController().navigate(action)
+            }
+        }
     }
 
     private fun setSymbolClick() {
@@ -211,17 +235,5 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
             }
             true
         }
-    }
-
-    private fun setSearchBar() {
-        binding.tietSearchFriend.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) {
-                findNavController().navigate(R.id.action_homeFragment_to_searchMapPlaceFragment)
-            }
-        }
-    }
-
-    companion object {
-        private const val LOCATION_PERMISSION_REQUEST_CODE = 1000
     }
 }

@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentSearchMapPlaceBinding
 import com.treasurehunt.ui.searchmapplace.adapter.SearchMapPlaceAdapter
@@ -21,6 +22,7 @@ class SearchMapPlaceFragment : Fragment() {
     private val binding get() = _binding!!
     private val viewModel: SearchMapPlaceViewModel by viewModels()
     private lateinit var adapter: SearchMapPlaceAdapter
+    private val args: SearchMapPlaceFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -53,7 +55,7 @@ class SearchMapPlaceFragment : Fragment() {
             findNavController().navigate(R.id.action_searchMapPlaceFragment_to_homeFragment)
             // TODO: 좌표 전달받아 지도에서 그리로 이동
         }
-        adapter = SearchMapPlaceAdapter(clickListener)
+        adapter = SearchMapPlaceAdapter(args.latlng, clickListener)
         binding.rvSearchResult.adapter = adapter
     }
 }
