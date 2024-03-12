@@ -9,11 +9,9 @@ import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
 import com.treasurehunt.R
 import com.treasurehunt.data.LogRepository
-import com.treasurehunt.data.MapPlaceSearchRepository
 import com.treasurehunt.data.PlaceRepository
 import com.treasurehunt.data.UserRepository
 import com.treasurehunt.data.local.model.PlaceEntity
-import com.treasurehunt.data.remote.model.MapPlaceSearchResultDTO
 import com.treasurehunt.data.remote.model.PlaceDTO
 import com.treasurehunt.data.remote.model.UserDTO
 import com.treasurehunt.ui.model.HomeMapUiState
@@ -42,7 +40,6 @@ class HomeViewModel @Inject constructor(
     private val logRepo: LogRepository,
     private val placeRepo: PlaceRepository,
     private val userRepo: UserRepository,
-    private val mapPlaceSearchRepo: MapPlaceSearchRepository,
     private val connectivityRepo: ConnectivityRepository
 ) :
     ViewModel() {
@@ -172,9 +169,5 @@ class HomeViewModel @Inject constructor(
         this.icon = icon
         this.width = width
         this.height = height
-    }
-
-    suspend fun search(keyword: String): MapPlaceSearchResultDTO {
-        return mapPlaceSearchRepo.getMapPlaceByKeyword(keyword)
     }
 }

@@ -57,6 +57,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         super.onViewCreated(view, savedInstanceState)
         initSegmentedButton()
         loadMap()
+        setSearchBar()
     }
 
     override fun onDestroyView() {
@@ -91,15 +92,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         setLocationOverlay()
         showMarkers()
         setSymbolClick()
-
-        binding.tietSearchFriend.setOnEditorActionListener { _, _, _ ->
-            viewLifecycleOwner.lifecycleScope.launch {
-                val keyword = binding.tietSearchFriend.text.toString()
-                val result = viewModel.search(keyword)
-                // TODO: show result
-            }
-            true
-        }
     }
 
     private fun initMap(naverMap: NaverMap) {
@@ -219,5 +211,17 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
             }
             true
         }
+    }
+
+    private fun setSearchBar() {
+        binding.tietSearchFriend.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                findNavController().navigate(R.id.action_homeFragment_to_searchMapPlaceFragment)
+            }
+        }
+    }
+
+    companion object {
+        private const val LOCATION_PERMISSION_REQUEST_CODE = 1000
     }
 }

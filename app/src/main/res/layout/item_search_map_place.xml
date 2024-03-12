@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/iv_location"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="15dp"
+        android:src="@drawable/ic_location"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:fontFamily="@font/pretendard"
+        android:maxWidth="260dp"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@id/iv_location"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="탐앤탐스 대한항공서소문점" />
+
+    <TextView
+        android:id="@+id/tv_road_address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:fontFamily="@font/pretendard"
+        android:maxWidth="260dp"
+        android:maxLines="1"
+        android:scrollHorizontally="true"
+        android:textColor="@color/gray_200"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="@id/tv_title"
+        app:layout_constraintTop_toBottomOf="@id/tv_title"
+        tools:text="서울특별시 중구 서소문로 117 대한항공빌딩 1층" />
+
+    <TextView
+        android:id="@+id/tv_category"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="20dp"
+        android:fontFamily="@font/pretendard"
+        android:maxWidth="60dp"
+        android:textColor="@color/gray_100"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="카페" />
+
+    <TextView
+        android:id="@+id/tv_distance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:fontFamily="@font/pretendard"
+        android:textColor="@color/gray_100"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="@id/tv_category"
+        app:layout_constraintTop_toBottomOf="@id/tv_category"
+        tools:text="110m" />
+
+    <View
+        android:id="@+id/v_btm_separator"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginHorizontal="15dp"
+        android:layout_marginTop="15dp"
+        android:background="@color/gray_300"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_road_address" />
+</androidx.constraintlayout.widget.ConstraintLayout>
