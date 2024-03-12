@@ -1,9 +1,9 @@
 package com.treasurehunt.ui.login
 
-import android.net.Uri
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.userProfileChangeRequest
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import com.treasurehunt.data.LogRepository
 import com.treasurehunt.data.PlaceRepository
 import com.treasurehunt.data.UserRepository
@@ -11,8 +11,16 @@ import com.treasurehunt.data.remote.model.UserDTO
 import com.treasurehunt.data.remote.model.toLogEntity
 import com.treasurehunt.data.remote.model.toPlaceEntity
 import com.treasurehunt.ui.model.NaverUser
+import com.treasurehunt.util.FILENAME_EXTENSION_PNG
+import com.treasurehunt.util.STORAGE_LOCATION_PROFILE_IMAGE
+import com.treasurehunt.util.extractDigits
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
+import java.net.URL
 import javax.inject.Inject
+
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
@@ -22,14 +30,36 @@ class LoginViewModel @Inject constructor(
 ) : ViewModel() {
 
     suspend fun insertNaverUser(naverUser: NaverUser, currentUser: FirebaseUser) {
-        updateProfile(naverUser, currentUser)
-
+        val profileImageStorageUrl = uploadProfileImage(naverUser.profileImage, currentUser)
         val user = UserDTO(
             email = naverUser.email,
             nickname = naverUser.nickname,
-            profileImage = naverUser.profileImage
+            profileImage = profileImageStorageUrl
         )
         userRepo.insert(currentUser.uid, user)
+    }
+
+    private suspend fun uploadProfileImage(
+        profileImageUrl: String?,
+        currentUser: FirebaseUser
+    ): String? {
+        if (profileImageUrl == null) return null
+
+        val filename = profileImageUrl.extractDigits()
+        val profileImageStorageRef =
+            Firebase.storage.reference.child(currentUser.uid).child(STORAGE_LOCATION_PROFILE_IMAGE)
+                .child("$filename$FILENAME_EXTENSION_PNG")
+        val input = withContext(Dispatchers.IO) {
+            URL(profileImageUrl).openStream()
+        }
+        val uploadTask = profileImageStorageRef.putStream(input)
+        uploadTask.await()
+
+        return if (uploadTask.isSuccessful) {
+            uploadTask.snapshot.storage.toString()
+        } else {
+            null
+        }
     }
 
     suspend fun insertGuestUser(uid: String) {
@@ -37,14 +67,6 @@ class LoginViewModel @Inject constructor(
             email = ""
         )
         userRepo.insert(uid, user)
-    }
-
-    private fun updateProfile(naverUser: NaverUser, currentUser: FirebaseUser) {
-        val profileUpdate = userProfileChangeRequest {
-            displayName = naverUser.nickname
-            photoUri = Uri.parse(naverUser.profileImage)
-        }
-        currentUser.updateProfile(profileUpdate)
     }
 
     suspend fun initLocalData(uid: String) {
