@@ -8,6 +8,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.auth
 import com.navercorp.nid.NaverIdLoginSDK
 import com.navercorp.nid.oauth.NidOAuthBehavior
@@ -37,17 +38,12 @@ class LogInFragment : PreloadFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         NaverIdLoginSDK.initialize(
-            requireContext(),
-            NAVER_LOGIN_CLIENT_ID,
-            NAVER_LOGIN_CLIENT_SECRET,
-            APP_NAME
+            requireContext(), NAVER_LOGIN_CLIENT_ID, NAVER_LOGIN_CLIENT_SECRET, APP_NAME
         )
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = FragmentLoginBinding.inflate(layoutInflater)
         return binding.root
@@ -86,7 +82,9 @@ class LogInFragment : PreloadFragment() {
     private fun fetchNaverAccount() {
         NidOAuthLogin().callProfileApi(object : NidProfileCallback<NidProfileResponse> {
             override fun onSuccess(result: NidProfileResponse) {
-                val naverProfile = result.profile!!
+                val naverProfile = result.profile ?: return kotlin.run {
+                    showErrorMessage(LoginError.NAVER_LOGIN_FAIL)
+                }
                 val naverUser = NaverUser(
                     naverProfile.id!!,
                     naverProfile.email!!,
@@ -108,12 +106,17 @@ class LogInFragment : PreloadFragment() {
     }
 
     private fun loginAccount(naverUser: NaverUser) {
-        Firebase.auth.signInWithEmailAndPassword(naverUser.email!!, naverUser.id)
+        if (naverUser.email == null) {
+            showErrorMessage(LoginError.NAVER_LOGIN_FAIL)
+            return
+        }
+
+        Firebase.auth.signInWithEmailAndPassword(naverUser.email, naverUser.id)
             .addOnCompleteListener(requireActivity()) { task ->
                 if (task.isSuccessful) {
-                    lifecycleScope.launch {
-                        viewModel.initLocalData()
-                        preloadProfileImage(Firebase.auth.currentUser)
+                    launchIfUserExistsElseShowErrorMessage(LoginError.NAVER_LOGIN_FAIL) { currentUser ->
+                        viewModel.initLocalData(currentUser.uid)
+                        preloadProfileImage(currentUser)
                         findNavController().navigate(R.id.action_logInFragment_to_homeFragment)
                     }
                 } else {
@@ -123,33 +126,66 @@ class LogInFragment : PreloadFragment() {
     }
 
     private fun createAccount(naverUser: NaverUser) {
-        Firebase.auth.createUserWithEmailAndPassword(naverUser.email!!, naverUser.id)
+        if (naverUser.email == null) {
+            showErrorMessage(LoginError.NAVER_LOGIN_FAIL)
+            return
+        }
+
+        Firebase.auth.createUserWithEmailAndPassword(naverUser.email, naverUser.id)
             .addOnCompleteListener(requireActivity()) { task ->
                 if (task.isSuccessful) {
-                    lifecycleScope.launch {
-                        viewModel.insertNaverUser(naverUser)
-                        preloadProfileImage(Firebase.auth.currentUser)
+                    launchIfUserExistsElseShowErrorMessage(LoginError.NAVER_LOGIN_FAIL) { currentUser ->
+                        viewModel.insertNaverUser(naverUser, currentUser)
+                        preloadProfileImage(currentUser)
                         findNavController().navigate(R.id.action_logInFragment_to_homeFragment)
                     }
                 } else {
-                    binding.root.showSnackbar(R.string.login_create_account_error)
+                    showErrorMessage(LoginError.NAVER_LOGIN_FAIL)
                 }
             }
     }
 
     private fun setGuestLogin() {
         binding.btnGuestLogin.setOnClickListener {
-            Firebase.auth.signInAnonymously()
-                .addOnCompleteListener(requireActivity()) { task ->
-                    if (task.isSuccessful) {
-                        lifecycleScope.launch {
-                            viewModel.insertGuestUser()
-                            findNavController().navigate(R.id.action_logInFragment_to_homeFragment)
-                        }
-                    } else {
-                        binding.root.showSnackbar(R.string.login_guest_login_error)
+            Firebase.auth.signInAnonymously().addOnCompleteListener(requireActivity()) { task ->
+                if (task.isSuccessful) {
+                    launchIfUserExistsElseShowErrorMessage(LoginError.GUEST_LOGIN_FAIL) { currentUser ->
+                        viewModel.insertGuestUser(currentUser.uid)
+                        findNavController().navigate(R.id.action_logInFragment_to_homeFragment)
                     }
+                } else {
+                    showErrorMessage(LoginError.GUEST_LOGIN_FAIL)
                 }
+            }
         }
+    }
+
+    private fun launchIfUserExistsElseShowErrorMessage(
+        error: LoginError, block: suspend (currentUser: FirebaseUser) -> Unit
+    ) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val currentUser = Firebase.auth.currentUser ?: return@launch kotlin.run {
+                showErrorMessage(error)
+            }
+
+            block(currentUser)
+        }
+    }
+
+    private fun showErrorMessage(error: LoginError) {
+        val errorMessage = when (error) {
+            LoginError.NAVER_LOGIN_FAIL -> {
+                R.string.login_naver_login_error
+            }
+
+            LoginError.GUEST_LOGIN_FAIL -> {
+                R.string.login_guest_login_error
+            }
+        }
+        binding.root.showSnackbar(errorMessage)
+    }
+
+    enum class LoginError {
+        NAVER_LOGIN_FAIL, GUEST_LOGIN_FAIL
     }
 }

@@ -15,6 +15,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+private const val SPLASH_ANIMATION_DURATION = 2000L
+
 @AndroidEntryPoint
 class SplashFragment : PreloadFragment() {
 
@@ -44,21 +46,20 @@ class SplashFragment : PreloadFragment() {
         binding.animationView.playAnimation()
 
         lifecycleScope.launch {
-            delay(2000)
+            delay(SPLASH_ANIMATION_DURATION)
             handleAutoLogin()
         }
     }
 
     private fun handleAutoLogin() {
-        val currentUser = Firebase.auth.currentUser
-        if (currentUser == null) {
+        val currentUser = Firebase.auth.currentUser ?: return kotlin.run {
             findNavController().navigate(R.id.action_splashFragment_to_logInFragment)
-        } else {
-            viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.initLocalData()
-                preloadProfileImage(currentUser)
-                findNavController().navigate(R.id.action_splashFragment_to_homeFragment)
-            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.initLocalData(currentUser.uid)
+            preloadProfileImage(currentUser)
+            findNavController().navigate(R.id.action_splashFragment_to_homeFragment)
         }
     }
 }
