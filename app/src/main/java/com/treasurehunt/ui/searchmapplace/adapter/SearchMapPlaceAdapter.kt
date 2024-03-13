@@ -11,8 +11,7 @@ import com.treasurehunt.R
 import com.treasurehunt.databinding.ItemSearchMapPlaceBinding
 import com.treasurehunt.ui.model.MapPlaceModel
 import com.treasurehunt.ui.searchmapplace.MapPlaceClickListener
-import com.treasurehunt.util.convertMapXYToLatLng
-import com.treasurehunt.util.formatDistance
+import com.treasurehunt.util.getDistance
 
 private const val CATEGORY_SEPARATOR = '>'
 
@@ -50,12 +49,6 @@ class SearchMapPlaceAdapter(
                 }
             }
         }
-
-        private fun getDistance(xy: Pair<String?, String?>, other: LatLng) =
-            convertMapXYToLatLng(xy)
-                ?.distanceTo(other)
-                ?.toLong()
-                ?.let(::formatDistance)
 
         companion object {
             fun from(parent: ViewGroup): ViewHolder {

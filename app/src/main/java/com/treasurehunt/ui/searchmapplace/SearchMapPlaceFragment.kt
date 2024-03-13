@@ -9,9 +9,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentSearchMapPlaceBinding
 import com.treasurehunt.ui.searchmapplace.adapter.SearchMapPlaceAdapter
+import com.treasurehunt.util.convertMapXYToLatLng
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -51,11 +51,15 @@ class SearchMapPlaceFragment : Fragment() {
     }
 
     private fun initAdapter() {
-        val clickListener = MapPlaceClickListener {
-            findNavController().navigate(R.id.action_searchMapPlaceFragment_to_homeFragment)
-            // TODO: 좌표 전달받아 지도에서 그리로 이동
+        val clickListener = MapPlaceClickListener { mapPlace ->
+            val mapPlacePosition = convertMapXYToLatLng(mapPlace.mapx to mapPlace.mapy)
+            val action =
+                SearchMapPlaceFragmentDirections.actionSearchMapPlaceFragmentToHomeFragment(
+                    mapPlacePosition
+                )
+            findNavController().navigate(action)
         }
-        adapter = SearchMapPlaceAdapter(args.latlng, clickListener)
+        adapter = SearchMapPlaceAdapter(args.userPosition, clickListener)
         binding.rvSearchResult.adapter = adapter
     }
 }

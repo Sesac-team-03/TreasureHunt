@@ -61,6 +61,11 @@
             android:defaultValue="@null"
             app:argType="string"
             app:nullable="true" />
+        <argument
+            android:name="mapPlacePosition"
+            android:defaultValue="@null"
+            app:argType="com.naver.maps.geometry.LatLng"
+            app:nullable="true" />
     </fragment>
 
     <fragment
@@ -181,7 +186,7 @@
             android:id="@+id/action_searchMapPlaceFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
         <argument
-            android:name="latlng"
+            android:name="userPosition"
             app:argType="com.naver.maps.geometry.LatLng" />
     </fragment>
 </navigation>

@@ -17,6 +17,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.naver.maps.geometry.LatLng
+import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.LocationTrackingMode
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
@@ -45,8 +46,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         registerForActivityResult(RequestPermission()) { isGranted ->
             setLocationTrackingMode(isGranted)
         }
+    private lateinit var userPosition: LatLng
     private val args: HomeFragmentArgs by navArgs()
-    private lateinit var latlng: LatLng
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -92,6 +93,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         handleLocationAccessPermission()
         setLocationOverlay()
         setCurrentPosition()
+        scrollToSelectedMapPlace(naverMap, args.mapPlacePosition)
         setSearchBar()
         setSymbolClick()
         showMarkers()
@@ -129,18 +131,31 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun setCurrentPosition() {
-        latlng = map.locationOverlay.position
+        userPosition = map.locationOverlay.position
 
         map.addOnLocationChangeListener { position ->
-            latlng = LatLng(position.latitude, position.longitude)
+            userPosition = LatLng(position.latitude, position.longitude)
         }
+    }
+
+    private fun scrollToSelectedMapPlace(map: NaverMap, mapPlacePosition: LatLng?) {
+        if (mapPlacePosition == null) return
+
+        disableAutoTracking()
+
+        val cameraUpdate = CameraUpdate.scrollTo(mapPlacePosition)
+        map.moveCamera(cameraUpdate)
+    }
+
+    private fun disableAutoTracking() {
+        map.locationTrackingMode = LocationTrackingMode.NoFollow
     }
 
     private fun setSearchBar() {
         binding.tietSearchFriend.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 val action =
-                    HomeFragmentDirections.actionHomeFragmentToSearchMapPlaceFragment(latlng)
+                    HomeFragmentDirections.actionHomeFragmentToSearchMapPlaceFragment(userPosition)
                 findNavController().navigate(action)
             }
         }
@@ -204,7 +219,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         val remotePlaceId = tag.toString()
 
         setOnClickListener {
-            val action = HomeFragmentDirections.actionHomeFragmentToLogDetailFragment(null, remotePlaceId)
+            val action =
+                HomeFragmentDirections.actionHomeFragmentToLogDetailFragment(null, remotePlaceId)
             findNavController().navigate(action)
             true
         }

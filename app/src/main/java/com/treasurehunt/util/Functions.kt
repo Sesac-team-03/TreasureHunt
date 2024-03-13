@@ -56,6 +56,12 @@ fun convertMapXYToLatLng(xy: Pair<String?, String?>): LatLng? {
 
 /* ----------- 거리 ----------- */
 
+fun getDistance(xy: Pair<String?, String?>, other: LatLng) =
+    convertMapXYToLatLng(xy)
+        ?.distanceTo(other)
+        ?.toLong()
+        ?.let(::formatDistance)
+
 private const val KILOMETER_BREAKPOINT = 1000.0
 private const val UNIT_METER = "m"
 private const val UNIT_KILOMETER = "km"
