@@ -46,7 +46,7 @@ class FeedFragment : Fragment() {
         initSegmentedButton()
         bindLogs()
         showFeed()
-        refreshLogs()
+        initSwipeRefresh()
     }
 
     override fun onDestroyView() {
@@ -54,7 +54,7 @@ class FeedFragment : Fragment() {
         _binding = null
     }
 
-    private fun refreshLogs() {
+    private fun initSwipeRefresh() {
         binding.splLogs.setOnRefreshListener {
             viewModel.initLogs()
             binding.splLogs.isRefreshing = viewModel.isRefreshed.value
@@ -86,6 +86,7 @@ class FeedFragment : Fragment() {
     }
 
     private fun moveToDetail(log: LogModel) {
+        //        viewModel.deleteLog(log)
         val curDestination = findNavController().currentDestination?.id
         curDestination?.let {
             if (it == R.id.feedFragment) {
