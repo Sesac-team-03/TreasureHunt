@@ -5,10 +5,9 @@ import com.google.firebase.Firebase
 import com.google.firebase.storage.storage
 import com.treasurehunt.data.ImageRepository
 import com.treasurehunt.data.LogRepository
-import com.treasurehunt.data.UserPreferencesRepository
 import com.treasurehunt.data.PlaceRepository
+import com.treasurehunt.data.UserPreferencesRepository
 import com.treasurehunt.data.UserRepository
-import com.treasurehunt.data.remote.model.toLogEntity
 import com.treasurehunt.data.remote.model.toPlaceEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -30,7 +29,7 @@ class SettingViewModel @Inject constructor(
             deleteLog(logId)
         }
         logRepo.deleteAllLocalLogs()
-        deleteProfileImages(userId)
+        deleteProfileImage(userId)
         userDTO.remotePlanIds.filterValues { it }.keys.forEach { planId -> deletePlan(planId) }
         userDTO.remoteVisitIds.filterValues { it }.keys.forEach { visitId -> deleteVisit(visitId) }
         deleteUser(userId)
@@ -46,17 +45,14 @@ class SettingViewModel @Inject constructor(
         }
     }
 
-    private fun deleteProfileImages(userId: String) {
-        val folderRef = Firebase.storage.reference.child("${userId}/profile_image")
-        folderRef.listAll().addOnSuccessListener { result ->
-            result.items.forEach { item ->
-                item.delete()
-            }
-        }
+    private suspend fun deleteProfileImage(userId: String) {
+        val remoteUser = userRepo.getRemoteUserById(userId)
+        val storageRef = Firebase.storage.reference.child("${userId}/profile_image")
+        val profileImage = remoteUser.profileImage?.substringAfter("profile_image/")
+        storageRef.child("/$profileImage").delete()
     }
 
     private suspend fun deleteLog(logId: String) {
-        val remoteLog = logRepo.getRemoteLogById(logId)
         logRepo.delete(logId)
     }
 

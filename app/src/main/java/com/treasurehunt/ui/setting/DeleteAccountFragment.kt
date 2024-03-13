@@ -20,7 +20,6 @@ import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentDeleteUserBinding
 import com.treasurehunt.util.showSnackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -81,7 +80,7 @@ class DeleteAccountFragment : DialogFragment() {
             }
 
             viewLifecycleOwner.lifecycleScope.launch {
-                async { viewModel.deleteAllUserData(user.uid) }.await()
+                viewModel.deleteAllUserData(user.uid)
                 user.delete()
                 findNavController().navigate(R.id.action_deleteUserFragment_to_logInFragment)
             }
