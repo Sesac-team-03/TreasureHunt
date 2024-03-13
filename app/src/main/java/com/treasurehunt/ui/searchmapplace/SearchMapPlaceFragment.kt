@@ -59,7 +59,7 @@ class SearchMapPlaceFragment : Fragment() {
     private fun getClickListener() = MapPlaceClickListener { mapPlace ->
         val mapPlacePosition = convertMapXYToLatLng(mapPlace.mapx to mapPlace.mapy)
         val action = SearchMapPlaceFragmentDirections.actionSearchMapPlaceFragmentToHomeFragment(
-            mapPlacePosition
+            mapPlacePosition = mapPlacePosition
         )
         findNavController().navigate(action)
     }

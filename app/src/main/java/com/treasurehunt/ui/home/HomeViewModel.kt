@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.ktx.storage
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
@@ -16,6 +18,7 @@ import com.treasurehunt.data.remote.model.PlaceDTO
 import com.treasurehunt.data.remote.model.UserDTO
 import com.treasurehunt.ui.model.HomeMapUiState
 import com.treasurehunt.util.ConnectivityRepository
+import com.treasurehunt.util.STORAGE_LOCATION_PROFILE_IMAGE
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -27,6 +30,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import java.io.IOException
 import javax.inject.Inject
 
@@ -78,6 +82,13 @@ class HomeViewModel @Inject constructor(
     }
 
     suspend fun getRemoteUser(uid: String): UserDTO = userRepo.getRemoteUserById(uid)
+
+    suspend fun getUserProfileImageStorageRef(uid: String): StorageReference? =
+        Firebase.storage.reference.child(uid).child(STORAGE_LOCATION_PROFILE_IMAGE)
+            .list(1)
+            .await()
+            .items
+            .singleOrNull()
 
     suspend fun updateUser(uid: String, user: UserDTO) {
         userRepo.update(uid, user)

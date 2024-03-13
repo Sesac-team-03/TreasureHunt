@@ -2,6 +2,7 @@ package com.treasurehunt.ui.home
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.PointF
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -16,12 +17,22 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.Target
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.StorageReference
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.LocationTrackingMode
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
+import com.naver.maps.map.overlay.LocationOverlay
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.util.FusedLocationSource
@@ -30,6 +41,7 @@ import com.treasurehunt.databinding.FragmentHomeBinding
 import com.treasurehunt.ui.model.MapSymbol
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+
 
 private const val LOCATION_PERMISSION_REQUEST_CODE = 1000
 
@@ -124,11 +136,64 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     private fun setLocationOverlay() {
         val locationOverlay = map.locationOverlay
         locationOverlay.isVisible = true
-        // TODO: 사용자의 프로필 이미지를 파라미터로 전달
-        locationOverlay.icon =
-            OverlayImage.fromResource(R.drawable.ic_launcher_foreground)
         locationOverlay.anchor = PointF(0.5f, 1f)
+
+        setLocationOverlayIcon(Firebase.auth.currentUser?.uid, locationOverlay)
     }
+
+    private fun setLocationOverlayIcon(uid: String?, locationOverlay: LocationOverlay) {
+        if (uid == null) return
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            val storageRef = viewModel.getUserProfileImageStorageRef(uid)
+            val defaultAction = {
+                locationOverlay.icon = OverlayImage.fromResource(R.drawable.ic_launcher_foreground)
+            }
+            val callback = { bitmap: Bitmap ->
+                locationOverlay.icon = OverlayImage.fromBitmap(bitmap)
+            }
+            loadBitmapFromStorageRefOrDefault(storageRef, defaultAction, callback)
+        }
+    }
+
+    private fun loadBitmapFromStorageRefOrDefault(
+        ref: StorageReference?,
+        default: () -> Unit,
+        callback: (bitmap: Bitmap) -> Unit
+    ) {
+        Glide.with(requireContext())
+            .asBitmap()
+            .load(ref)
+            .placeholder(R.drawable.ic_launcher_foreground)
+            .apply(RequestOptions().override(158, 158))
+            .circleCrop()
+            .listener(getCallbackListener(default, callback))
+            .preload()
+    }
+
+    private fun getCallbackListener(default: () -> Unit, callback: (bitmap: Bitmap) -> Unit) =
+        object : RequestListener<Bitmap> {
+            override fun onLoadFailed(
+                e: GlideException?,
+                model: Any?,
+                target: Target<Bitmap>,
+                isFirstResource: Boolean
+            ): Boolean {
+                default()
+                return false
+            }
+
+            override fun onResourceReady(
+                resource: Bitmap,
+                model: Any,
+                target: Target<Bitmap>?,
+                dataSource: DataSource,
+                isFirstResource: Boolean
+            ): Boolean {
+                callback(resource)
+                return false
+            }
+        }
 
     private fun setCurrentPosition() {
         userPosition = map.locationOverlay.position
