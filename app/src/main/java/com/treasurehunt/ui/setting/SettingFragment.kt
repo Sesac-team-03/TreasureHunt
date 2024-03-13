@@ -34,8 +34,8 @@ class SettingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setBackButton()
-        setLogout()
-        showDeleteDialog()
+        setLogoutButton()
+        setDeleteUserButton()
         setSwitch()
         updateSwitch()
     }
@@ -51,8 +51,8 @@ class SettingFragment : Fragment() {
         }
     }
 
-    private fun setLogout() {
-        binding.tvLogout.setOnClickListener {
+    private fun setLogoutButton() {
+        binding.btnLogout.setOnClickListener {
             val naverToken = NaverIdLoginSDK.getAccessToken()
             if (naverToken.isNullOrEmpty()) {
                 NaverIdLoginSDK.logout()
@@ -64,8 +64,8 @@ class SettingFragment : Fragment() {
         }
     }
 
-    private fun showDeleteDialog() {
-        binding.tvUserDelete.setOnClickListener {
+    private fun setDeleteUserButton() {
+        binding.btnUserDelete.setOnClickListener {
             findNavController().navigate(R.id.action_settingFragment_to_deleteUserFragment)
         }
     }

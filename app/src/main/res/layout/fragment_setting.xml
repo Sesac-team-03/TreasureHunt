@@ -67,15 +67,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/iv_login" />
 
-    <TextView
-        android:id="@+id/tv_logout"
+    <Button
+        android:id="@+id/btn_logout"
         style="@style/Font.SettingLogin"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="18dp"
+        android:background="@android:color/transparent"
         android:fontFamily="@font/pretendard"
+        android:padding="0dp"
         android:text="@string/setting_tv_logout"
+        android:textAlignment="textStart"
         app:layout_constraintBottom_toBottomOf="@+id/iv_logout"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/iv_logout"
         app:layout_constraintTop_toTopOf="@+id/iv_logout" />
 
@@ -89,15 +93,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/iv_logout" />
 
-    <TextView
-        android:id="@+id/tv_user_delete"
+    <Button
+        android:id="@+id/btn_user_delete"
         style="@style/Font.SettingLogin"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="18dp"
+        android:background="@android:color/transparent"
         android:fontFamily="@font/pretendard"
+        android:padding="0dp"
         android:text="@string/setting_tv_user_delete"
+        android:textAlignment="textStart"
         app:layout_constraintBottom_toBottomOf="@+id/iv_user_delete"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/iv_user_delete"
         app:layout_constraintTop_toTopOf="@+id/iv_user_delete" />
 
