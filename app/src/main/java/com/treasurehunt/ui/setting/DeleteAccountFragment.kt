@@ -24,7 +24,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class DeleteUserFragment : DialogFragment() {
+class DeleteAccountFragment : DialogFragment() {
     private var _binding: FragmentDeleteUserBinding? = null
     private val binding get() = _binding!!
     private val viewModel: SettingViewModel by viewModels()
