@@ -13,6 +13,7 @@ import com.google.firebase.auth.auth
 import com.navercorp.nid.NaverIdLoginSDK
 import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentSettingBinding
+import com.treasurehunt.util.showSnackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -38,6 +39,7 @@ class SettingFragment : Fragment() {
         setDeleteUserButton()
         setSwitchState()
         updateSwitchState()
+        setSwitchMessage()
     }
 
     override fun onDestroyView() {
@@ -82,6 +84,16 @@ class SettingFragment : Fragment() {
         binding.swAutoLogin.setOnCheckedChangeListener { _, isChecked ->
             viewLifecycleOwner.lifecycleScope.launch {
                 viewModel.updateSwitchState(isChecked)
+            }
+        }
+    }
+
+    private fun setSwitchMessage() {
+        binding.swAutoLogin.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                binding.swAutoLogin.showSnackbar(R.string.setting_sb_auto_login_checked)
+            } else {
+                binding.swAutoLogin.showSnackbar(R.string.setting_sb_auto_login_unchecked)
             }
         }
     }
