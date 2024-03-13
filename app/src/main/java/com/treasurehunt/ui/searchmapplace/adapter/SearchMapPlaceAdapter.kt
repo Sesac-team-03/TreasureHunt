@@ -11,7 +11,8 @@ import com.treasurehunt.R
 import com.treasurehunt.databinding.ItemSearchMapPlaceBinding
 import com.treasurehunt.ui.model.MapPlaceModel
 import com.treasurehunt.ui.searchmapplace.MapPlaceClickListener
-import com.treasurehunt.util.convertNaverLocalSearchMapXYToLatLng
+import com.treasurehunt.util.convertMapXYToLatLng
+import com.treasurehunt.util.formatDistance
 
 private const val CATEGORY_SEPARATOR = '>'
 
@@ -41,9 +42,8 @@ class SearchMapPlaceAdapter(
                 tvTitle.text = HtmlCompat.fromHtml(mapPlace.title, HtmlCompat.FROM_HTML_MODE_LEGACY)
                 tvRoadAddress.text = mapPlace.roadAddress
                 tvCategory.text = mapPlace.category?.substringAfter(CATEGORY_SEPARATOR)
-                tvDistance.text =
-                    getDistance(mapPlace.mapx, mapPlace.mapy, userPosition)
-                        ?: itemView.context.getString(R.string.search_map_place_unknown)
+                tvDistance.text = getDistance(mapPlace.mapx to mapPlace.mapy, userPosition)
+                    ?: itemView.context.getString(R.string.search_map_place_unknown)
 
                 root.setOnClickListener {
                     clickListener.onClick(mapPlace)
@@ -51,10 +51,11 @@ class SearchMapPlaceAdapter(
             }
         }
 
-        private fun getDistance(x: String?, y: String?, other: LatLng) =
-            convertNaverLocalSearchMapXYToLatLng(x, y)
+        private fun getDistance(xy: Pair<String?, String?>, other: LatLng) =
+            convertMapXYToLatLng(xy)
                 ?.distanceTo(other)
-                ?.toString()
+                ?.toLong()
+                ?.let(::formatDistance)
 
         companion object {
             fun from(parent: ViewGroup): ViewHolder {
@@ -81,7 +82,6 @@ class SearchMapPlaceAdapter(
             ): Boolean {
                 return oldItem == newItem
             }
-
         }
     }
 }

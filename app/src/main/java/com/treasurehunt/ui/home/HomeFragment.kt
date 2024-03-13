@@ -45,11 +45,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         registerForActivityResult(RequestPermission()) { isGranted ->
             setLocationTrackingMode(isGranted)
         }
-<<<<<<< HEAD
     private val args: HomeFragmentArgs by navArgs()
-=======
     private lateinit var latlng: LatLng
->>>>>>> cd26046 (임시커밋)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
