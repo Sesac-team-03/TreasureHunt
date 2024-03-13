@@ -152,12 +152,10 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun setSearchBar() {
-        binding.tietSearchFriend.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) {
-                val action =
-                    HomeFragmentDirections.actionHomeFragmentToSearchMapPlaceFragment(userPosition)
-                findNavController().navigate(action)
-            }
+        binding.btnSearchBar.setOnClickListener {
+            val action =
+                HomeFragmentDirections.actionHomeFragmentToSearchMapPlaceFragment(userPosition)
+            findNavController().navigate(action)
         }
     }
 

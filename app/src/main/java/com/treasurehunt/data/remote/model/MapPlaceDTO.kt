@@ -7,11 +7,11 @@ import kotlinx.serialization.json.Json
 
 @Serializable
 data class MapPlaceSearchResultDTO(
-    val lastBuildDate: String,
-    val total: Long,
-    val start: Long,
-    val display: Long,
-    val items: List<MapPlaceDTO>
+    val lastBuildDate: String = "",
+    val total: Long = 0,
+    val start: Long = 0,
+    val display: Long = 0,
+    val items: List<MapPlaceDTO> = emptyList()
 )
 
 fun MapPlaceSearchResultDTO.toJsonString() = Json.encodeToString(this)

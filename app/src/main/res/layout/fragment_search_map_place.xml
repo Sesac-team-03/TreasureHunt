@@ -18,7 +18,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/til_search_map_place"
+        android:id="@+id/til_search_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:boxStrokeWidth="0dp"
@@ -28,9 +28,10 @@
         app:layout_constraintTop_toTopOf="@id/ib_back">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/tiet_search_map_place"
+            android:id="@+id/tiet_search_bar"
             android:layout_width="250dp"
             android:layout_height="40dp"
+            android:textSize="16dp"
             android:fontFamily="@font/pretendard"
             android:hint="@string/home_map_tiet_search_place_hint"
             android:imeOptions="actionSearch"
@@ -47,7 +48,7 @@
         android:background="@android:color/transparent"
         android:src="@drawable/icon_cancel"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/til_search_map_place" />
+        app:layout_constraintTop_toTopOf="@id/til_search_bar" />
 
     <View
         android:id="@+id/v_top_separator"
@@ -58,7 +59,7 @@
         android:background="@color/gray_100"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/til_search_map_place" />
+        app:layout_constraintTop_toBottomOf="@id/til_search_bar" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_search_result"
