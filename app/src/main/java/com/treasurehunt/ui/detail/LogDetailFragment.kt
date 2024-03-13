@@ -99,10 +99,13 @@ class LogDetailFragment : BottomSheetDialogFragment() {
                         setEditLog()
                         true
                     }
-
+                    // TODO: 피드 화면에서 상세 화면으로 진입한 경우는 구분해서 처리
                     LogDetailMenuAction.DELETE -> {
-                        setDeleteLog()
-                        // TODO: 피드 화면에서 상세 화면으로 진입한 경우는 구분해서 처리
+                        if (viewModel.args.fromFeed) {
+                            viewModel.args.log?.let { deleteFeed(it) }
+                        } else {
+                            setDeleteLog()
+                        }
                         true
                     }
                 }
@@ -143,6 +146,26 @@ class LogDetailFragment : BottomSheetDialogFragment() {
                 } ?: run {
                     showToast(R.string.logdetail_error_message)
                 }
+                val action = LogDetailFragmentDirections.actionLogDetailFragmentToHomeFragment(
+                    viewModel.args.remotePlaceId
+                )
+                findNavController().navigate(action)
+            }
+        } else {
+            showToast(R.string.logdetail_error_message)
+        }
+    }
+
+    private fun deleteFeed(log: LogModel) {
+        val placeId = log.remotePlaceId
+        val logId = log.localId.toString()
+        val userId = Firebase.auth.currentUser?.uid
+
+        if (placeId.isNotEmpty() && userId != null) {
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewModel.deleteLogAndAssociatedData(logId, placeId, userId)
+                showToast(R.string.logdetail_log_deleted_message)
+                dismiss()
                 val action = LogDetailFragmentDirections.actionLogDetailFragmentToHomeFragment(
                     viewModel.args.remotePlaceId
                 )
