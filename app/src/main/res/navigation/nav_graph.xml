@@ -106,6 +106,10 @@
             android:name="remotePlaceId"
             android:defaultValue=""
             app:argType="string" />
+        <argument
+            android:name="fromFeed"
+            app:argType="boolean"
+            android:defaultValue="false" />
     </dialog>
 
     <fragment
