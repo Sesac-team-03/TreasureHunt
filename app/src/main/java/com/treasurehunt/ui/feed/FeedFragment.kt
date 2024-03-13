@@ -108,9 +108,9 @@ class FeedFragment : Fragment() {
     private fun showFeed() {
         viewLifecycleOwner.lifecycleScope.launch {
             feedAdapter.loadStateFlow.collect { loadState ->
-                val isListEmpty =
+                val isEmptyListLoaded =
                     loadState.refresh is LoadState.NotLoading && feedAdapter.itemCount == 0
-                binding.tvNoTreasure.isVisible = isListEmpty
+                binding.tvNoTreasure.isVisible = isEmptyListLoaded
                 binding.cpiLoading.isVisible = loadState.source.refresh is LoadState.Loading
             }
         }
