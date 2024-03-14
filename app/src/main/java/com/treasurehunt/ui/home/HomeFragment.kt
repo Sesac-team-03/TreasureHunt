@@ -32,6 +32,7 @@ import com.naver.maps.map.LocationTrackingMode
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
+import com.naver.maps.map.Symbol
 import com.naver.maps.map.overlay.LocationOverlay
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
@@ -105,7 +106,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         handleLocationAccessPermission()
         setLocationOverlay()
         setCurrentPosition()
-        scrollToSelectedMapPlace(naverMap, args.mapPlacePosition)
+        scrollToSelectedMapPlaceIfExists(naverMap, args.mapPlacePosition)
         setSearchBar()
         setSymbolClick()
         showMarkers()
@@ -203,17 +204,23 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun scrollToSelectedMapPlace(map: NaverMap, mapPlacePosition: LatLng?) {
+    private fun scrollToSelectedMapPlaceIfExists(map: NaverMap, mapPlacePosition: LatLng?) {
         if (mapPlacePosition == null) return
 
         disableAutoTracking()
 
         val cameraUpdate = CameraUpdate.scrollTo(mapPlacePosition)
         map.moveCamera(cameraUpdate)
+
+        showPin(mapPlacePosition)
     }
 
     private fun disableAutoTracking() {
         map.locationTrackingMode = LocationTrackingMode.NoFollow
+    }
+
+    private fun showPin(mapPlacePosition: LatLng) {
+        viewModel.getPin(mapPlacePosition).show()
     }
 
     private fun setSearchBar() {
@@ -230,17 +237,30 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                 return@setOnSymbolClickListener false
             }
 
-            val mapSymbol = MapSymbol(
-                symbol.position.latitude,
-                symbol.position.longitude,
-                false,
-                symbol.caption
-            )
-            val action = HomeFragmentDirections.actionHomeFragmentToMapDialogFragment(mapSymbol)
-            findNavController().navigate(action)
+            removeSearchResultPinIfExists()
+
+            showMapDialog(symbol)
 
             true
         }
+    }
+
+    private fun removeSearchResultPinIfExists() {
+        if (viewModel.searchResultPins.isEmpty()) return
+
+        viewModel.searchResultPins.last().hide()
+        viewModel.removePin()
+    }
+
+    private fun showMapDialog(symbol: Symbol) {
+        val mapSymbol = MapSymbol(
+            symbol.position.latitude,
+            symbol.position.longitude,
+            false,
+            symbol.caption
+        )
+        val action = HomeFragmentDirections.actionHomeFragmentToMapDialogFragment(mapSymbol)
+        findNavController().navigate(action)
     }
 
     private fun showMarkers() {

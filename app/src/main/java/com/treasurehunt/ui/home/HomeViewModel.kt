@@ -34,6 +34,8 @@ import kotlinx.coroutines.tasks.await
 import java.io.IOException
 import javax.inject.Inject
 
+private const val SELECTED_SEARCH_RESULT_PIN_WIDTH = 160
+private const val SELECTED_SEARCH_RESULT_PIN_HEIGHT = 160
 private const val VISIT_MARKER_WIDTH = 116
 private const val VISIT_MARKER_HEIGHT = 80
 private const val PLAN_MARKER_WIDTH = 96
@@ -51,6 +53,8 @@ class HomeViewModel @Inject constructor(
     private val _uiState: MutableStateFlow<HomeMapUiState> = MutableStateFlow(HomeMapUiState())
     val uiState: StateFlow<HomeMapUiState> = _uiState.asStateFlow()
     private var fetchJob: Job? = null
+    private val _searchResultPins: MutableList<Marker> = mutableListOf()
+    val searchResultPins: List<Marker> get() = _searchResultPins.toList()
 
     init {
         initUser()
@@ -113,6 +117,20 @@ class HomeViewModel @Inject constructor(
 
     suspend fun updatePlace(id: String, place: PlaceDTO) {
         placeRepo.update(id, place)
+    }
+
+    fun getPin(position: LatLng): Marker {
+        _searchResultPins += Marker(position).apply {
+            icon = OverlayImage.fromResource(R.drawable.ic_pin)
+            width = SELECTED_SEARCH_RESULT_PIN_WIDTH
+            height = SELECTED_SEARCH_RESULT_PIN_HEIGHT
+        }
+
+        return searchResultPins.last()
+    }
+
+    fun removePin() {
+        _searchResultPins.removeLastOrNull()
     }
 
     private fun getAllMarkers() {
