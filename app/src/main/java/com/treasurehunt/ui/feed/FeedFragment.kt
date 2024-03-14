@@ -46,7 +46,7 @@ class FeedFragment : Fragment() {
         initSegmentedButton()
         bindLogs()
         showFeed()
-        refreshLogs()
+        initSwipeRefresh()
     }
 
     override fun onDestroyView() {
@@ -54,10 +54,10 @@ class FeedFragment : Fragment() {
         _binding = null
     }
 
-    private fun refreshLogs() {
+    private fun initSwipeRefresh() {
         binding.splLogs.setOnRefreshListener {
-            viewModel.initLogs()
-            binding.splLogs.isRefreshing = viewModel.isRefreshed.value
+            feedAdapter.refresh()
+            binding.splLogs.isRefreshing = false
         }
     }
 
@@ -100,9 +100,7 @@ class FeedFragment : Fragment() {
             viewModel.pagingLogs
                 .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
                 .collect { pagingLogs ->
-                    if (viewModel.isLogsDataUpdated.value) {
                         feedAdapter.submitData(pagingLogs)
-                    }
                 }
         }
     }
@@ -110,13 +108,10 @@ class FeedFragment : Fragment() {
     private fun showFeed() {
         viewLifecycleOwner.lifecycleScope.launch {
             feedAdapter.loadStateFlow.collect { loadState ->
-                val isListEmpty =
+                val isEmptyListLoaded =
                     loadState.refresh is LoadState.NotLoading && feedAdapter.itemCount == 0
-                val isNotListEmpty =
-                    loadState.refresh is LoadState.NotLoading && feedAdapter.itemCount > 0
-                binding.tvNoTreasure.isVisible = isListEmpty
+                binding.tvNoTreasure.isVisible = isEmptyListLoaded
                 binding.cpiLoading.isVisible = loadState.source.refresh is LoadState.Loading
-                binding.rvLogs.isVisible = isNotListEmpty
             }
         }
     }
