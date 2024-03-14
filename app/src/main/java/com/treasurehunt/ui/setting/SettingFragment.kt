@@ -39,7 +39,6 @@ class SettingFragment : Fragment() {
         setDeleteUserButton()
         setSwitchState()
         updateSwitchState()
-        setSwitchMessage()
     }
 
     override fun onDestroyView() {
@@ -82,18 +81,16 @@ class SettingFragment : Fragment() {
 
     private fun updateSwitchState() {
         binding.swAutoLogin.setOnCheckedChangeListener { _, isChecked ->
-            viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.updateSwitchState(isChecked)
-            }
-        }
-    }
-
-    private fun setSwitchMessage() {
-        binding.swAutoLogin.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                binding.swAutoLogin.showSnackbar(R.string.setting_sb_auto_login_checked)
+                viewLifecycleOwner.lifecycleScope.launch {
+                    viewModel.updateSwitchState(isChecked)
+                    binding.swAutoLogin.showSnackbar(R.string.setting_sb_auto_login_checked)
+                }
             } else {
-                binding.swAutoLogin.showSnackbar(R.string.setting_sb_auto_login_unchecked)
+                viewLifecycleOwner.lifecycleScope.launch {
+                    viewModel.updateSwitchState(isChecked)
+                    binding.swAutoLogin.showSnackbar(R.string.setting_sb_auto_login_unchecked)
+                }
             }
         }
     }

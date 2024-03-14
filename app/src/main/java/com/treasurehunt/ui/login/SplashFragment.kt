@@ -24,7 +24,6 @@ class SplashFragment : PreloadFragment() {
     private var _binding: FragmentSplashBinding? = null
     private val binding get() = _binding!!
     override val viewModel: LoginViewModel by viewModels()
-    private var isInitialized = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -54,11 +53,10 @@ class SplashFragment : PreloadFragment() {
     }
 
     private fun handleAutoLogin() {
-        val currentUser = Firebase.auth.currentUser ?: return
-        val hasUser = Firebase.auth.currentUser != null
-        lifecycleScope.launch {
+        val currentUser = Firebase.auth.currentUser
+        viewLifecycleOwner.lifecycleScope.launch {
             val isAutoLoginOn = viewModel.getSwitchState().first()
-            if (hasUser && isAutoLoginOn) {
+            if (currentUser != null && isAutoLoginOn) {
                 viewModel.initLocalData(currentUser.uid)
                 preloadProfileImage(currentUser)
                 findNavController().navigate(R.id.action_splashFragment_to_homeFragment)
