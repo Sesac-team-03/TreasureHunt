@@ -23,6 +23,7 @@ private const val HEADER_CLIENT_SECRET = "X-Naver-Client-Secret"
 private const val CLIENT_SECRET = BuildConfig.X_NAVER_CLIENT_SECRET
 private const val BASE_URL = BuildConfig.NAVER_SEARCH_API_BASE_URL
 private val contentType = "application/json".toMediaType()
+private const val CLIENT_QUALIFIER_MAP_PLACE_SEARCH = "MapPlaceSearch"
 
 @OptIn(ExperimentalSerializationApi::class)
 private val json = Json {
@@ -37,7 +38,7 @@ object MapPlaceSearchModule {
 
     @Singleton
     @Provides
-    @Named("MapPlaceSearch")
+    @Named(CLIENT_QUALIFIER_MAP_PLACE_SEARCH)
     fun provideClient(): OkHttpClient {
         return OkHttpClient.Builder()
             .addNetworkInterceptor { chain ->
@@ -51,8 +52,10 @@ object MapPlaceSearchModule {
 
     @Singleton
     @Provides
-    @Named("MapPlaceSearch")
-    fun provideRemoteBuilder(@Named("MapPlaceSearch") okHttpClient: OkHttpClient): Retrofit {
+    @Named(CLIENT_QUALIFIER_MAP_PLACE_SEARCH)
+    fun provideRemoteBuilder(
+        @Named(CLIENT_QUALIFIER_MAP_PLACE_SEARCH) okHttpClient: OkHttpClient
+    ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(okHttpClient)
@@ -61,6 +64,8 @@ object MapPlaceSearchModule {
     }
 
     @Provides
-    fun provideMapSearchService(@Named("MapPlaceSearch") remoteBuilder: Retrofit): MapPlaceSearchService =
+    fun provideMapSearchService(
+        @Named(CLIENT_QUALIFIER_MAP_PLACE_SEARCH) remoteBuilder: Retrofit
+    ): MapPlaceSearchService =
         remoteBuilder.create(MapPlaceSearchService::class.java)
 }

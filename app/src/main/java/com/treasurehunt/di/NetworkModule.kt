@@ -21,6 +21,7 @@ private const val HEADER_USER_AGENT = "User-Agent"
 private const val APP_NAME = "TreasureHunt"
 private const val BASE_URL = BuildConfig.BASE_URL
 private val contentType = "application/json".toMediaType()
+private const val CLIENT_QUALIFIER_REMOTE_DATABASE = "RemoteDatabase"
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -28,7 +29,7 @@ object NetworkModule {
 
     @Singleton
     @Provides
-    @Named("RemoteDatabase")
+    @Named(CLIENT_QUALIFIER_REMOTE_DATABASE)
     fun provideClient(): OkHttpClient {
         return OkHttpClient.Builder()
             .addNetworkInterceptor { chain ->
@@ -40,8 +41,10 @@ object NetworkModule {
 
     @Singleton
     @Provides
-    @Named("RemoteDatabase")
-    fun provideRemoteBuilder(@Named("RemoteDatabase") okHttpClient: OkHttpClient): Retrofit {
+    @Named(CLIENT_QUALIFIER_REMOTE_DATABASE)
+    fun provideRemoteBuilder(
+        @Named(CLIENT_QUALIFIER_REMOTE_DATABASE) okHttpClient: OkHttpClient
+    ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(okHttpClient)
@@ -50,18 +53,26 @@ object NetworkModule {
     }
 
     @Provides
-    fun provideUserService(@Named("RemoteDatabase") remoteBuilder: Retrofit): UserService =
+    fun provideUserService(
+        @Named(CLIENT_QUALIFIER_REMOTE_DATABASE) remoteBuilder: Retrofit
+    ): UserService =
         remoteBuilder.create(UserService::class.java)
 
     @Provides
-    fun provideLogService(@Named("RemoteDatabase") remoteBuilder: Retrofit): LogService =
+    fun provideLogService(
+        @Named(CLIENT_QUALIFIER_REMOTE_DATABASE) remoteBuilder: Retrofit
+    ): LogService =
         remoteBuilder.create(LogService::class.java)
 
     @Provides
-    fun providePlaceService(@Named("RemoteDatabase") remoteBuilder: Retrofit): PlaceService =
+    fun providePlaceService(
+        @Named(CLIENT_QUALIFIER_REMOTE_DATABASE) remoteBuilder: Retrofit
+    ): PlaceService =
         remoteBuilder.create(PlaceService::class.java)
 
     @Provides
-    fun provideImageService(@Named("RemoteDatabase") remoteBuilder: Retrofit): ImageService =
+    fun provideImageService(
+        @Named(CLIENT_QUALIFIER_REMOTE_DATABASE) remoteBuilder: Retrofit
+    ): ImageService =
         remoteBuilder.create(ImageService::class.java)
 }
