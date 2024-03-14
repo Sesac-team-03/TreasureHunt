@@ -26,13 +26,18 @@ class SettingViewModel @Inject constructor(
         val userDTO = userRepo.getRemoteUserById(userId)
         userDTO.remoteLogIds.filterValues { it }.keys.forEach { logId ->
             deleteLogImages(logId, userId)
-            deleteLog(logId)
+            deleteRemoteLog(logId)
         }
-        logRepo.deleteAllLocalLogs()
+        deleteAllLocalLog()
         deleteProfileImage(userId)
-        userDTO.remotePlanIds.filterValues { it }.keys.forEach { planId -> deletePlan(planId) }
-        userDTO.remoteVisitIds.filterValues { it }.keys.forEach { visitId -> deleteVisit(visitId) }
-        deleteUser(userId)
+        userDTO.remotePlanIds.filterValues { it }.keys.forEach { planId -> deleteAllPlan(planId) }
+        userDTO.remoteVisitIds.filterValues { it }.keys.forEach { visitId -> deleteAllVisit(visitId) }
+        deleteRemoteUser(userId)
+    }
+
+    suspend fun deleteLogoutLocalData() {
+        deleteAllLocalLog()
+        deleteAllLocalPlace()
     }
 
     private suspend fun deleteLogImages(logId: String, userId: String) {
@@ -52,23 +57,31 @@ class SettingViewModel @Inject constructor(
         storageRef.child("/$profileImage").delete()
     }
 
-    private suspend fun deleteLog(logId: String) {
+    private suspend fun deleteRemoteLog(logId: String) {
         logRepo.delete(logId)
     }
 
-    private suspend fun deletePlan(planId: String) {
+    private suspend fun deleteAllLocalLog() {
+        logRepo.deleteAllLocalLogs()
+    }
+
+    private suspend fun deleteAllLocalPlace() {
+        placeRepo.deleteAllLocalPlaces()
+    }
+
+    private suspend fun deleteAllPlan(planId: String) {
         val localPlan = placeRepo.getRemotePlaceById(planId).toPlaceEntity(planId)
         placeRepo.delete(localPlan)
         placeRepo.delete(planId)
     }
 
-    private suspend fun deleteVisit(visitId: String) {
+    private suspend fun deleteAllVisit(visitId: String) {
         val localVisit = placeRepo.getRemotePlaceById(visitId).toPlaceEntity(visitId)
         placeRepo.delete(localVisit)
         placeRepo.delete(visitId)
     }
 
-    private suspend fun deleteUser(userId: String) {
+    private suspend fun deleteRemoteUser(userId: String) {
         userRepo.delete(userId)
     }
 

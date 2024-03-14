@@ -56,11 +56,18 @@ class SettingFragment : Fragment() {
         binding.btnLogout.setOnClickListener {
             val naverToken = NaverIdLoginSDK.getAccessToken()
             if (naverToken.isNullOrEmpty()) {
-                NaverIdLoginSDK.logout()
-                findNavController().navigate(R.id.action_settingFragment_to_logInFragment)
+                viewLifecycleOwner.lifecycleScope.launch {
+                    viewModel.deleteLogoutLocalData()
+                    NaverIdLoginSDK.logout()
+                    Firebase.auth.signOut()
+                    findNavController().navigate(R.id.action_settingFragment_to_logInFragment)
+                }
             } else {
-                Firebase.auth.signOut()
-                findNavController().navigate(R.id.action_settingFragment_to_logInFragment)
+                viewLifecycleOwner.lifecycleScope.launch {
+                    viewModel.deleteLogoutLocalData()
+                    Firebase.auth.signOut()
+                    findNavController().navigate(R.id.action_settingFragment_to_logInFragment)
+                }
             }
         }
     }
