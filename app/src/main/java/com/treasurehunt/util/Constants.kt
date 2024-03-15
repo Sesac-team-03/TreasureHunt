@@ -9,3 +9,5 @@ internal const val STORAGE_LOCATION_PROFILE_IMAGE = "profile_image"
 internal const val FILENAME_EXTENSION_PNG = ".png"
 
 internal const val MIME_TYPE_IMAGE = "image/*"
+
+internal const val MAP_PLACE_CATEGORY_SEPARATOR = '>'

@@ -62,9 +62,9 @@
             app:argType="string"
             app:nullable="true" />
         <argument
-            android:name="mapPlacePosition"
+            android:name="mapPlace"
             android:defaultValue="@null"
-            app:argType="com.naver.maps.geometry.LatLng"
+            app:argType="com.treasurehunt.ui.model.MapPlaceModel"
             app:nullable="true" />
     </fragment>
 

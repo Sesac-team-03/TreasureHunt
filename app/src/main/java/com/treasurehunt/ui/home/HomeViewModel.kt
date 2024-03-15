@@ -34,7 +34,7 @@ import kotlinx.coroutines.tasks.await
 import java.io.IOException
 import javax.inject.Inject
 
-private const val SELECTED_SEARCH_RESULT_PIN_WIDTH = 160
+private const val SELECTED_SEARCH_RESULT_PIN_WIDTH = 120
 private const val SELECTED_SEARCH_RESULT_PIN_HEIGHT = 160
 private const val VISIT_MARKER_WIDTH = 116
 private const val VISIT_MARKER_HEIGHT = 80

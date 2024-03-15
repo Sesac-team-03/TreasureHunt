@@ -16,6 +16,7 @@ import com.treasurehunt.databinding.FragmentSearchMapPlaceBinding
 import com.treasurehunt.ui.model.MapPlaceModel
 import com.treasurehunt.ui.searchmapplace.adapter.SearchMapPlaceAdapter
 import com.treasurehunt.util.convertMapXYToLatLng
+import com.treasurehunt.util.getDistance
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -58,8 +59,12 @@ class SearchMapPlaceFragment : Fragment() {
 
     private fun getClickListener() = MapPlaceClickListener { mapPlace ->
         val mapPlacePosition = convertMapXYToLatLng(mapPlace.mapx to mapPlace.mapy)
+        val distance = getDistance(mapPlace.mapx to mapPlace.mapy, args.userPosition)
         val action = SearchMapPlaceFragmentDirections.actionSearchMapPlaceFragmentToHomeFragment(
-            mapPlacePosition = mapPlacePosition
+            mapPlace = mapPlace.copy(
+                position = mapPlacePosition,
+                distance = distance
+            )
         )
         findNavController().navigate(action)
     }

@@ -1,6 +1,7 @@
 package com.treasurehunt.ui.home
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.PointF
@@ -8,8 +9,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.core.content.ContextCompat
+import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -33,13 +36,17 @@ import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.Symbol
+import com.naver.maps.map.overlay.InfoWindow
 import com.naver.maps.map.overlay.LocationOverlay
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.util.FusedLocationSource
 import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentHomeBinding
+import com.treasurehunt.databinding.ViewInfoWindowSelectedSearchResultBinding
+import com.treasurehunt.ui.model.MapPlaceModel
 import com.treasurehunt.ui.model.MapSymbol
+import com.treasurehunt.util.MAP_PLACE_CATEGORY_SEPARATOR
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -106,7 +113,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         handleLocationAccessPermission()
         setLocationOverlay()
         setCurrentPosition()
-        scrollToSelectedMapPlaceIfExists(naverMap, args.mapPlacePosition)
+        scrollToSelectedMapPlaceIfExists(naverMap, args.mapPlace)
         setSearchBar()
         setSymbolClick()
         showMarkers()
@@ -204,23 +211,61 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun scrollToSelectedMapPlaceIfExists(map: NaverMap, mapPlacePosition: LatLng?) {
-        if (mapPlacePosition == null) return
+    private fun scrollToSelectedMapPlaceIfExists(map: NaverMap, mapPlace: MapPlaceModel?) {
+        if (mapPlace?.position == null) return
 
         disableAutoTracking()
 
-        val cameraUpdate = CameraUpdate.scrollTo(mapPlacePosition)
+        val cameraUpdate = CameraUpdate.scrollTo(mapPlace.position)
         map.moveCamera(cameraUpdate)
 
-        showPin(mapPlacePosition)
+        showSearchResultPin(mapPlace)
     }
 
     private fun disableAutoTracking() {
         map.locationTrackingMode = LocationTrackingMode.NoFollow
     }
 
-    private fun showPin(mapPlacePosition: LatLng) {
-        viewModel.getPin(mapPlacePosition).show()
+    private fun showSearchResultPin(mapPlace: MapPlaceModel) {
+        if (mapPlace.position == null) return
+
+        val pin = viewModel.getPin(mapPlace.position)
+
+        pin.show()
+
+        showInfoWindow(mapPlace, pin)
+    }
+
+    private fun showInfoWindow(mapPlace: MapPlaceModel, marker: Marker) {
+        getInfoWindow(requireContext(), mapPlace)
+            .open(marker)
+    }
+
+    private fun getInfoWindow(context: Context, mapPlace: MapPlaceModel): InfoWindow {
+        return InfoWindow().apply {
+            adapter = object : InfoWindow.ViewAdapter() {
+                override fun getView(p0: InfoWindow): View {
+                    val binding = ViewInfoWindowSelectedSearchResultBinding.inflate(
+                        LayoutInflater.from(context)
+                    ).apply {
+                        tvTitle.text =
+                            HtmlCompat.fromHtml(mapPlace.title, HtmlCompat.FROM_HTML_MODE_LEGACY)
+                        tvRoadAddress.text = mapPlace.roadAddress
+                        tvCategory.text = mapPlace.category?.substringAfter(
+                            MAP_PLACE_CATEGORY_SEPARATOR
+                        )
+                        tvDistance.text = mapPlace.distance
+                            ?: context.getString(R.string.search_map_place_unknown)
+
+                        test(ivTest, mapPlace)
+                    }
+                    return binding.root
+                }
+            }
+        }
+    }
+
+    private fun test(imageView: ImageView, mapPlace: MapPlaceModel) {
     }
 
     private fun setSearchBar() {

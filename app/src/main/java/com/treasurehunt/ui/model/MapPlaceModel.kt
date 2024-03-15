@@ -1,5 +1,10 @@
 package com.treasurehunt.ui.model
 
+import android.os.Parcelable
+import com.naver.maps.geometry.LatLng
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class MapPlaceModel(
     val title: String,
     val link: String? = null,
@@ -9,5 +14,7 @@ data class MapPlaceModel(
     val address: String? = null,
     val roadAddress: String? = null,
     val mapx: String? = null,
-    val mapy: String? = null
-)
+    val mapy: String? = null,
+    val position: LatLng? = null,
+    val distance: String? = null
+) : Parcelable

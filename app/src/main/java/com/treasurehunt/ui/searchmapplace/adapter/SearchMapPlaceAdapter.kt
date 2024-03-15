@@ -11,9 +11,8 @@ import com.treasurehunt.R
 import com.treasurehunt.databinding.ItemSearchMapPlaceBinding
 import com.treasurehunt.ui.model.MapPlaceModel
 import com.treasurehunt.ui.searchmapplace.MapPlaceClickListener
+import com.treasurehunt.util.MAP_PLACE_CATEGORY_SEPARATOR
 import com.treasurehunt.util.getDistance
-
-private const val CATEGORY_SEPARATOR = '>'
 
 class SearchMapPlaceAdapter(
     private val userPosition: LatLng,
@@ -40,7 +39,7 @@ class SearchMapPlaceAdapter(
             with(binding) {
                 tvTitle.text = HtmlCompat.fromHtml(mapPlace.title, HtmlCompat.FROM_HTML_MODE_LEGACY)
                 tvRoadAddress.text = mapPlace.roadAddress
-                tvCategory.text = mapPlace.category?.substringAfter(CATEGORY_SEPARATOR)
+                tvCategory.text = mapPlace.category?.substringAfter(MAP_PLACE_CATEGORY_SEPARATOR)
                 tvDistance.text = getDistance(mapPlace.mapx to mapPlace.mapy, userPosition)
                     ?: itemView.context.getString(R.string.search_map_place_unknown)
 
