@@ -22,5 +22,7 @@ interface UserRepository {
 
     suspend fun delete(vararg users: UserEntity): Int
 
+    suspend fun delete(id: String)
+
     suspend fun search(startAt: String, limit: Int = 10): Map<String, UserDTO>
 }

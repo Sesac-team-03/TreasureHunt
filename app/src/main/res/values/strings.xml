@@ -74,4 +74,17 @@
     <string name="notification_channel">Upload</string>
     <string name="notification_description">데이터 업로드가 완료될 때, 알림을 보냅니다</string>
 
+    <!-- 설정 화면 -->
+    <string name="setting_tv_setting">설정</string>
+    <string name="setting_tv_login">자동로그인</string>
+    <string name="setting_tv_logout">로그아웃</string>
+    <string name="setting_tv_user_delete">회원탈퇴</string>
+    <string name="setting_sb_auto_login_checked">자동로그인이 설정 되었습니다</string>
+    <string name="setting_sb_auto_login_unchecked">자동로그인이 설정 해제 되었습니다</string>
+
+    <!-- 회원 탈퇴 다이얼로그 -->
+    <string name="delete_user_tv_warning_title">정말 회원 탈퇴 하시겠습니까?</string>
+    <string name="delete_user_btn_cancel">아니요</string>
+    <string name="delete_user_btn_delete">네, 삭제할래요</string>
+    <string name="delete_user_sb_delete_user_error">회원탈퇴 할 수 없습니다. 로그인 후 다시 시도해 주세요.</string>
 </resources>

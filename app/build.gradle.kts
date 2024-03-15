@@ -122,6 +122,8 @@ dependencies {
     ksp("androidx.hilt:hilt-compiler:1.2.0-beta01")
 
     implementation(kotlin("reflect"))
+
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
 }
 
 kapt {

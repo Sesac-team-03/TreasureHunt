@@ -31,5 +31,9 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun delete(vararg users: UserEntity) = userDao.delete(*users)
 
+    override suspend fun delete(id: String) {
+        userRemoteDataSource.delete(id)
+    }
+
     override suspend fun search(startAt: String, limit: Int) = userRemoteDataSource.search(startAt, limit)
 }

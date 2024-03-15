@@ -5,6 +5,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.treasurehunt.data.LogRepository
+import com.treasurehunt.data.UserPreferencesRepository
 import com.treasurehunt.data.PlaceRepository
 import com.treasurehunt.data.UserRepository
 import com.treasurehunt.data.remote.model.UserDTO
@@ -16,6 +17,7 @@ import com.treasurehunt.util.STORAGE_LOCATION_PROFILE_IMAGE
 import com.treasurehunt.util.extractDigits
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.net.URL
@@ -26,7 +28,8 @@ import javax.inject.Inject
 class LoginViewModel @Inject constructor(
     private val userRepo: UserRepository,
     private val logRepo: LogRepository,
-    private val placeRepo: PlaceRepository
+    private val placeRepo: PlaceRepository,
+    private val loginRepo: UserPreferencesRepository
 ) : ViewModel() {
 
     suspend fun insertNaverUser(naverUser: NaverUser, currentUser: FirebaseUser) {
@@ -91,8 +94,13 @@ class LoginViewModel @Inject constructor(
         }
     }
 
+
     suspend fun getProfileImageStorageUrl(uid: String): String? {
         val user = userRepo.getRemoteUserById(uid)
         return user.profileImage
+    }
+
+    fun getSwitchState(): Flow<Boolean> {
+        return loginRepo.getAutoLoginState
     }
 }

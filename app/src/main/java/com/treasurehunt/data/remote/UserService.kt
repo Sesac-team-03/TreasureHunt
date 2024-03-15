@@ -3,6 +3,7 @@ package com.treasurehunt.data.remote
 import com.treasurehunt.data.remote.model.UserDTO
 import kotlinx.serialization.json.JsonObject
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.PUT
@@ -28,7 +29,9 @@ interface UserService {
         @Body user: UserDTO
     )
 
-    @GET("$REMOTE_DATABASE_USERS.json")
+    @DELETE("$REMOTE_DATABASE_USERS/{id}.json")
+    suspend fun delete(@Path("id") id: String)
+
     suspend fun search(
         @Query("orderBy") orderBy: String,
         @Query("startAt") startAt: String,

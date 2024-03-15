@@ -112,7 +112,11 @@
         android:id="@+id/profileFragment"
         android:name="com.treasurehunt.ui.profile.ProfileFragment"
         android:label="ProfileFragment"
-        tools:layout="@layout/fragment_profile" />
+        tools:layout="@layout/fragment_profile">
+        <action
+            android:id="@+id/action_profileFragment_to_settingFragment"
+            app:destination="@id/settingFragment" />
+    </fragment>
 
     <dialog
         android:id="@+id/mapDialogFragment"
@@ -132,7 +136,8 @@
     <fragment
         android:id="@+id/feedFragment"
         android:name="com.treasurehunt.ui.feed.FeedFragment"
-        android:label="FeedFragment">
+        android:label="FeedFragment"
+        tools:layout="@layout/fragment_feed">
         <action
             android:id="@+id/action_feedFragment_to_logDetailFragment"
             app:destination="@id/logDetailFragment" />
@@ -142,4 +147,26 @@
             app:popUpTo="@id/feedFragment"
             app:popUpToInclusive="true" />
     </fragment>
+
+    <fragment
+        android:id="@+id/settingFragment"
+        android:name="com.treasurehunt.ui.setting.SettingFragment"
+        android:label="SettingFragment"
+        tools:layout="@layout/fragment_setting">
+        <action
+            android:id="@+id/action_settingFragment_to_logInFragment"
+            app:destination="@id/logInFragment" />
+        <action
+            android:id="@+id/action_settingFragment_to_deleteUserFragment"
+            app:destination="@id/deleteUserFragment" />
+    </fragment>
+    <dialog
+        android:id="@+id/deleteUserFragment"
+        android:name="com.treasurehunt.ui.setting.DeleteAccountFragment"
+        android:label="DeleteUserFragment"
+        tools:layout="@layout/fragment_delete_user" >
+        <action
+            android:id="@+id/action_deleteUserFragment_to_logInFragment"
+            app:destination="@id/logInFragment" />
+    </dialog>
 </navigation>

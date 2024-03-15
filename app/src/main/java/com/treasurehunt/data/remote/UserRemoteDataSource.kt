@@ -16,6 +16,10 @@ class UserRemoteDataSource @Inject constructor(private val userService: UserServ
         userService.update(id, user)
     }
 
+    suspend fun delete(id: String) {
+        userService.delete(id)
+    }
+
     suspend fun search(startAt: String, limit: Int = 10): Map<String, UserDTO> {
         return try {
             userService.search(
