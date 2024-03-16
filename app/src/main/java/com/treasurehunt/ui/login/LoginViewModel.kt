@@ -1,5 +1,6 @@
 package com.treasurehunt.ui.login
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.ktx.Firebase
@@ -49,8 +50,9 @@ class LoginViewModel @Inject constructor(
         if (profileImageUrl == null) return null
 
         val filename = profileImageUrl.extractDigits()
-        val profileImageStorageRef =
-            Firebase.storage.reference.child(currentUser.uid).child(STORAGE_LOCATION_PROFILE_IMAGE)
+        val profileImageStorageRef = Firebase.storage.reference
+                .child(currentUser.uid)
+                .child(STORAGE_LOCATION_PROFILE_IMAGE)
                 .child("$filename$FILENAME_EXTENSION_PNG")
         val input = withContext(Dispatchers.IO) {
             URL(profileImageUrl).openStream()
@@ -95,7 +97,9 @@ class LoginViewModel @Inject constructor(
     }
 
 
-    suspend fun getProfileImageStorageUrl(uid: String): String? {
+    suspend fun getProfileImageStorageUrl(uid: String?): String? {
+        if (uid == null) return null
+
         val user = userRepo.getRemoteUserById(uid)
         return user.profileImage
     }

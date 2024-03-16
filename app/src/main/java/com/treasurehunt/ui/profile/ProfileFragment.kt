@@ -1,7 +1,9 @@
 package com.treasurehunt.ui.profile
 
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +14,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.firebase.Firebase
 import com.google.firebase.storage.storage
@@ -77,10 +82,10 @@ class ProfileFragment : Fragment() {
     private fun addImage(result: ActivityResult) {
         val contentUri: String = result.data?.data?.toString() ?: return
         viewModel.addImageContentUri(contentUri)
-        loadProfileImage(contentUri)
+        loadProfileImagePreview(contentUri)
     }
 
-    private fun loadProfileImage(contentUri: String) {
+    private fun loadProfileImagePreview(contentUri: String) {
         binding.ivProfileImage.run {
             Glide.with(context)
                 .load(contentUri)
@@ -118,11 +123,11 @@ class ProfileFragment : Fragment() {
     private fun loadProfileImage(user: UserDTO?) {
         binding.ivProfileImage.run {
             try {
-                val profileImageStorageRef = user?.profileImage?.let {
-                    Firebase.storage.getReferenceFromUrl(it)
-                }
+                val storageUrl = user?.profileImage ?: return
+                val storageRef = Firebase.storage.getReferenceFromUrl(storageUrl)
+
                 Glide.with(context)
-                    .load(profileImageStorageRef)
+                    .load(storageRef)
                     .error(R.drawable.ic_no_profile_image)
                     .into(this)
             } catch (e: Exception) {
