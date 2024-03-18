@@ -102,7 +102,7 @@ class LogDetailFragment : BottomSheetDialogFragment() {
                     // TODO: 피드 화면에서 상세 화면으로 진입한 경우는 구분해서 처리
                     LogDetailMenuAction.DELETE -> {
                         if (viewModel.args.fromFeed) {
-                            viewModel.args.log?.let { deleteFeed(it) }
+                            viewModel.args.log?.let { setDeleteFeedLog(it) }
                         } else {
                             setDeleteLog()
                         }
@@ -156,7 +156,7 @@ class LogDetailFragment : BottomSheetDialogFragment() {
         }
     }
 
-    private fun deleteFeed(log: LogModel) {
+    private fun setDeleteFeedLog(log: LogModel) {
         val placeId = log.remotePlaceId
         val logId = log.localId.toString()
         val userId = Firebase.auth.currentUser?.uid
