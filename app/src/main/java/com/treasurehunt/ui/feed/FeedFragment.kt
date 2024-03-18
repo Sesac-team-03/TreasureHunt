@@ -85,8 +85,12 @@ class FeedFragment : Fragment() {
         }
     }
 
+//    override fun onResume() {
+//        super.onResume()
+//        viewModel.refreshLogs()
+//    }
+
     private fun moveToDetail(log: LogModel) {
-        //        viewModel.deleteLog(log)
         val curDestination = findNavController().currentDestination?.id
         curDestination?.let {
             if (it == R.id.feedFragment) {
