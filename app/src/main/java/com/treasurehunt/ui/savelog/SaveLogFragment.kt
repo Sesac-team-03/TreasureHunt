@@ -265,12 +265,15 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
     private fun getImageUploadInputData(): Data {
         val uid = Firebase.auth.currentUser!!.uid
         val images = viewModel.uiState.value.images
-        val (contentUris, storageUrls) = if (args.log == null) {
+
+        val (contentUris, storageUrls) = if (images.isNotEmpty() && args.log == null) {
             images.mapToContentUriArray() to emptyArray()
-        } else {
+        } else if (images.isNotEmpty()) {
             images.partitionIntoContentAndStorageImages().run {
                 first.mapToContentUriArray() to second.mapToStorageUriArray()
             }
+        } else {
+            emptyArray<String>() to emptyArray<String>()
         }
 
         return Data.Builder()
@@ -280,8 +283,9 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
             .apply {
                 args.log?.let { log ->
                     // TODO: check Feed
-                    requireNotNull(log.remoteId)
-                    putString(WORK_DATA_REMOTE_LOG_ID, log.remoteId)
+                    log.remoteId?.let { remoteId ->
+                        putString(WORK_DATA_REMOTE_LOG_ID, remoteId)
+                    }
                 }
             }
             .build()
@@ -315,13 +319,16 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
             .putString(WORK_DATA_PLAN_ID, planId)
             .apply {
                 args.log?.let { log ->
-                    // TODO: check Feed
-                    requireNotNull(log.localId)
-                    requireNotNull(log.remoteId)
-                    requireNotNull(log.remotePlaceId)
-                    putLong(WORK_DATA_LOCAL_LOG_ID, log.localId)
-                    putString(WORK_DATA_REMOTE_LOG_ID, log.remoteId)
-                    putString(WORK_DATA_REMOTE_PLACE_ID, log.remotePlaceId)
+                    // ToDo: check Feed
+                    log.localId?.let { localId ->
+                        putLong(WORK_DATA_LOCAL_LOG_ID, localId)
+                    }
+                    log.remoteId?.let { remoteId ->
+                        putString(WORK_DATA_REMOTE_LOG_ID, remoteId)
+                    }
+                    log.remotePlaceId?.let { remotePlaceId ->
+                        putString(WORK_DATA_REMOTE_PLACE_ID, remotePlaceId)
+                    }
                 }
             }
             .build()
