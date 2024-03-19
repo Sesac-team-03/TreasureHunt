@@ -16,6 +16,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import com.navercorp.nid.oauth.NidOAuthLogin
+import com.navercorp.nid.oauth.OAuthLoginCallback
 import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentDeleteUserBinding
 import com.treasurehunt.util.showSnackbar
@@ -81,9 +83,22 @@ class DeleteAccountFragment : DialogFragment() {
 
             viewLifecycleOwner.lifecycleScope.launch {
                 viewModel.deleteAllUserData(user.uid)
+                deleteNaverToken()
                 user.delete()
                 findNavController().navigate(R.id.action_deleteUserFragment_to_logInFragment)
             }
         }
+    }
+
+    private fun deleteNaverToken() {
+        NidOAuthLogin().callDeleteTokenApi(object : OAuthLoginCallback {
+            override fun onSuccess() {}
+
+            override fun onFailure(httpStatus: Int, message: String) {}
+
+            override fun onError(errorCode: Int, message: String) {
+                onFailure(errorCode, message)
+            }
+        })
     }
 }
