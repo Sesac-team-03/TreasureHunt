@@ -39,6 +39,7 @@ class SettingFragment : Fragment() {
         setDeleteUserButton()
         setSwitchState()
         updateSwitchState()
+        showConversionAccount()
     }
 
     override fun onDestroyView() {
@@ -98,6 +99,17 @@ class SettingFragment : Fragment() {
                     viewModel.updateSwitchState(isChecked)
                     binding.swAutoLogin.showSnackbar(R.string.setting_sb_auto_login_unchecked)
                 }
+            }
+        }
+    }
+
+    private fun showConversionAccount() {
+        val currentUser = Firebase.auth.currentUser
+        binding.btnMemberConversion.setOnClickListener {
+            if (currentUser != null && currentUser.isAnonymous) {
+                findNavController().navigate(R.id.action_settingFragment_to_conversionAccountFragment)
+            } else {
+                binding.btnMemberConversion.showSnackbar(R.string.setting_sb_not_conversion_account)
             }
         }
     }

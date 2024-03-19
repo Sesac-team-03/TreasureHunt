@@ -141,6 +141,7 @@
             android:name="mapSymbol"
             app:argType="com.treasurehunt.ui.model.MapSymbol" />
     </dialog>
+
     <fragment
         android:id="@+id/feedFragment"
         android:name="com.treasurehunt.ui.feed.FeedFragment"
@@ -167,7 +168,11 @@
         <action
             android:id="@+id/action_settingFragment_to_deleteUserFragment"
             app:destination="@id/deleteUserFragment" />
+        <action
+            android:id="@+id/action_settingFragment_to_conversionAccountFragment"
+            app:destination="@id/conversionAccountFragment" />
     </fragment>
+
     <dialog
         android:id="@+id/deleteUserFragment"
         android:name="com.treasurehunt.ui.setting.DeleteAccountFragment"
@@ -177,6 +182,7 @@
             android:id="@+id/action_deleteUserFragment_to_logInFragment"
             app:destination="@id/logInFragment" />
     </dialog>
+
     <fragment
         android:id="@+id/searchMapPlaceFragment"
         android:name="com.treasurehunt.ui.searchmapplace.SearchMapPlaceFragment"
@@ -189,4 +195,10 @@
             android:name="userPosition"
             app:argType="com.naver.maps.geometry.LatLng" />
     </fragment>
+
+    <dialog
+        android:id="@+id/conversionAccountFragment"
+        android:name="com.treasurehunt.ui.setting.ConversionAccountFragment"
+        android:label="ConversionAccountFragment"
+        tools:layout="@layout/fragment_conversion_account" />
 </navigation>
