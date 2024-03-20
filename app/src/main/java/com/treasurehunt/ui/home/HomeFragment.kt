@@ -50,8 +50,9 @@ import com.treasurehunt.util.MAP_PLACE_CATEGORY_SEPARATOR
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
-
 private const val LOCATION_PERMISSION_REQUEST_CODE = 1000
+private const val CAMERA_MAX_ZOOM_LEVEL = 21.0
+private const val CAMERA_ZOOM_LEVEL_AT_SELECTED_MAP_PLACE = CAMERA_MAX_ZOOM_LEVEL - 3
 
 @AndroidEntryPoint
 class HomeFragment : Fragment(), OnMapReadyCallback {
@@ -216,7 +217,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
         disableAutoTracking()
 
-        val cameraUpdate = CameraUpdate.scrollTo(mapPlace.position)
+        val cameraUpdate =
+            CameraUpdate.scrollAndZoomTo(mapPlace.position, CAMERA_ZOOM_LEVEL_AT_SELECTED_MAP_PLACE)
         map.moveCamera(cameraUpdate)
 
         showSearchResultPin(mapPlace)
