@@ -46,6 +46,13 @@ internal inline fun <reified R> String.convertToDataClass() = json.decodeFromStr
 
 /* ----------- Double ----------- */
 
-fun Double.roundOff(): Double = DecimalFormat("#.##").apply {
-    roundingMode = RoundingMode.CEILING
-}.format(this).toDouble()
+private const val DECIMAL_PLACEHOLDER = "#"
+
+fun Double.roundOff(decimalPlaceCount: Int = 2): Double {
+    require(decimalPlaceCount > 0)
+
+    // Default Format: #.##
+    return DecimalFormat("$DECIMAL_PLACEHOLDER.${DECIMAL_PLACEHOLDER.repeat(decimalPlaceCount)}").apply {
+        roundingMode = RoundingMode.CEILING
+    }.format(this).toDouble()
+}

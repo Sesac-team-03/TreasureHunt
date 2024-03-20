@@ -9,7 +9,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
@@ -217,8 +216,10 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
         disableAutoTracking()
 
-        val cameraUpdate =
-            CameraUpdate.scrollAndZoomTo(mapPlace.position, CAMERA_ZOOM_LEVEL_AT_SELECTED_MAP_PLACE)
+        val cameraUpdate = CameraUpdate.scrollAndZoomTo(
+            mapPlace.position,
+            CAMERA_ZOOM_LEVEL_AT_SELECTED_MAP_PLACE
+        )
         map.moveCamera(cameraUpdate)
 
         showSearchResultPin(mapPlace)
@@ -249,25 +250,26 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                 override fun getView(p0: InfoWindow): View {
                     val binding = ViewInfoWindowSelectedSearchResultBinding.inflate(
                         LayoutInflater.from(context)
-                    ).apply {
-                        tvTitle.text =
-                            HtmlCompat.fromHtml(mapPlace.title, HtmlCompat.FROM_HTML_MODE_LEGACY)
-                        tvRoadAddress.text = mapPlace.roadAddress
-                        tvCategory.text = mapPlace.category?.substringAfter(
-                            MAP_PLACE_CATEGORY_SEPARATOR
-                        )
-                        tvDistance.text = mapPlace.distance
-                            ?: context.getString(R.string.search_map_place_unknown)
-
-                        test(ivTest, mapPlace)
-                    }
+                    )
+                        .bind(mapPlace, context)
                     return binding.root
                 }
             }
         }
     }
 
-    private fun test(imageView: ImageView, mapPlace: MapPlaceModel) {
+    private fun ViewInfoWindowSelectedSearchResultBinding.bind(
+        mapPlace: MapPlaceModel,
+        context: Context
+    ) = apply {
+        tvTitle.text =
+            HtmlCompat.fromHtml(mapPlace.title, HtmlCompat.FROM_HTML_MODE_LEGACY)
+        tvRoadAddress.text = mapPlace.roadAddress
+        tvCategory.text = mapPlace.category?.substringAfter(
+            MAP_PLACE_CATEGORY_SEPARATOR
+        )
+        tvDistance.text = mapPlace.distance
+            ?: context.getString(R.string.search_map_place_unknown)
     }
 
     private fun setSearchBar() {
