@@ -24,8 +24,7 @@
             android:name="androidx.startup.InitializationProvider"
             android:authorities="com.treasurehunt.androidx-startup"
             android:exported="false"
-            tools:node="remove">
-        </provider>
+            tools:node="remove"></provider>
 
         <meta-data
             android:name="com.naver.maps.map.CLIENT_ID"

@@ -3,8 +3,10 @@ package com.treasurehunt.util
 import android.view.View
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.serialization.json.Json
+import java.math.RoundingMode
+import java.text.DecimalFormat
 
-//******************** View ********************
+/* ----------- View ----------- */
 
 fun View.showSnackbar(resId: Int) {
     Snackbar.make(
@@ -30,10 +32,9 @@ fun View.hide() {
     visibility = View.GONE
 }
 
+/* ----------- String ----------- */
 
-//******************** String ********************
-
-internal inline fun <reified R> String.convertToDataClass() = json.decodeFromString<R>(this)
+internal fun String.extractDigits() = replace("[^0-9]".toRegex(), "")
 
 private val json = Json {
     isLenient = true
@@ -41,4 +42,17 @@ private val json = Json {
     coerceInputValues = true
 }
 
-internal fun String.extractDigits() = replace("[^0-9]".toRegex(), "")
+internal inline fun <reified R> String.convertToDataClass() = json.decodeFromString<R>(this)
+
+/* ----------- Double ----------- */
+
+private const val DECIMAL_PLACEHOLDER = "#"
+
+fun Double.roundOff(decimalPlaceCount: Int = 2): Double {
+    require(decimalPlaceCount > 0)
+
+    // Default Format: #.##
+    return DecimalFormat("$DECIMAL_PLACEHOLDER.${DECIMAL_PLACEHOLDER.repeat(decimalPlaceCount)}").apply {
+        roundingMode = RoundingMode.CEILING
+    }.format(this).toDouble()
+}

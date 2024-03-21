@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.ktx.storage
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
@@ -16,6 +18,7 @@ import com.treasurehunt.data.remote.model.PlaceDTO
 import com.treasurehunt.data.remote.model.UserDTO
 import com.treasurehunt.ui.model.HomeMapUiState
 import com.treasurehunt.util.ConnectivityRepository
+import com.treasurehunt.util.STORAGE_LOCATION_PROFILE_IMAGE
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -27,9 +30,12 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import java.io.IOException
 import javax.inject.Inject
 
+private const val SELECTED_SEARCH_RESULT_PIN_WIDTH = 120
+private const val SELECTED_SEARCH_RESULT_PIN_HEIGHT = 160
 private const val VISIT_MARKER_WIDTH = 116
 private const val VISIT_MARKER_HEIGHT = 80
 private const val PLAN_MARKER_WIDTH = 96
@@ -47,6 +53,8 @@ class HomeViewModel @Inject constructor(
     private val _uiState: MutableStateFlow<HomeMapUiState> = MutableStateFlow(HomeMapUiState())
     val uiState: StateFlow<HomeMapUiState> = _uiState.asStateFlow()
     private var fetchJob: Job? = null
+    private val _searchResultPins: MutableList<Marker> = mutableListOf()
+    val searchResultPins: List<Marker> get() = _searchResultPins.toList()
 
     init {
         initUser()
@@ -79,6 +87,13 @@ class HomeViewModel @Inject constructor(
 
     suspend fun getRemoteUser(uid: String): UserDTO = userRepo.getRemoteUserById(uid)
 
+    suspend fun getUserProfileImageStorageRef(uid: String): StorageReference? =
+        Firebase.storage.reference.child(uid).child(STORAGE_LOCATION_PROFILE_IMAGE)
+            .list(1)
+            .await()
+            .items
+            .singleOrNull()
+
     suspend fun updateUser(uid: String, user: UserDTO) {
         userRepo.update(uid, user)
     }
@@ -102,6 +117,20 @@ class HomeViewModel @Inject constructor(
 
     suspend fun updatePlace(id: String, place: PlaceDTO) {
         placeRepo.update(id, place)
+    }
+
+    fun getPin(position: LatLng): Marker {
+        _searchResultPins += Marker(position).apply {
+            icon = OverlayImage.fromResource(R.drawable.ic_pin)
+            width = SELECTED_SEARCH_RESULT_PIN_WIDTH
+            height = SELECTED_SEARCH_RESULT_PIN_HEIGHT
+        }
+
+        return searchResultPins.last()
+    }
+
+    fun removePin() {
+        _searchResultPins.removeLastOrNull()
     }
 
     private fun getAllMarkers() {

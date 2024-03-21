@@ -53,10 +53,18 @@
             app:destination="@id/feedFragment"
             app:popUpTo="@id/homeFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_homeFragment_to_searchMapPlaceFragment"
+            app:destination="@id/searchMapPlaceFragment" />
         <argument
             android:name="remotePlaceId"
             android:defaultValue="@null"
             app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="mapPlace"
+            android:defaultValue="@null"
+            app:argType="com.treasurehunt.ui.model.MapPlaceModel"
             app:nullable="true" />
     </fragment>
 
@@ -164,9 +172,21 @@
         android:id="@+id/deleteUserFragment"
         android:name="com.treasurehunt.ui.setting.DeleteAccountFragment"
         android:label="DeleteUserFragment"
-        tools:layout="@layout/fragment_delete_user" >
+        tools:layout="@layout/fragment_delete_user">
         <action
             android:id="@+id/action_deleteUserFragment_to_logInFragment"
             app:destination="@id/logInFragment" />
     </dialog>
+    <fragment
+        android:id="@+id/searchMapPlaceFragment"
+        android:name="com.treasurehunt.ui.searchmapplace.SearchMapPlaceFragment"
+        android:label="fragment_search_map_place"
+        tools:layout="@layout/fragment_search_map_place">
+        <action
+            android:id="@+id/action_searchMapPlaceFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+        <argument
+            android:name="userPosition"
+            app:argType="com.naver.maps.geometry.LatLng" />
+    </fragment>
 </navigation>

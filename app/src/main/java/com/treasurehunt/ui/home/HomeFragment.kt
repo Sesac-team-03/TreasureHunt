@@ -1,7 +1,9 @@
 package com.treasurehunt.ui.home
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.PointF
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.core.content.ContextCompat
+import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -16,20 +19,39 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.Target
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.StorageReference
+import com.naver.maps.geometry.LatLng
+import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.LocationTrackingMode
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
+import com.naver.maps.map.Symbol
+import com.naver.maps.map.overlay.InfoWindow
+import com.naver.maps.map.overlay.LocationOverlay
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.util.FusedLocationSource
 import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentHomeBinding
+import com.treasurehunt.databinding.ViewInfoWindowSelectedSearchResultBinding
+import com.treasurehunt.ui.model.MapPlaceModel
 import com.treasurehunt.ui.model.MapSymbol
+import com.treasurehunt.util.MAP_PLACE_CATEGORY_SEPARATOR
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 private const val LOCATION_PERMISSION_REQUEST_CODE = 1000
+private const val CAMERA_MAX_ZOOM_LEVEL = 21.0
+private const val CAMERA_ZOOM_LEVEL_AT_SELECTED_MAP_PLACE = CAMERA_MAX_ZOOM_LEVEL - 3
 
 @AndroidEntryPoint
 class HomeFragment : Fragment(), OnMapReadyCallback {
@@ -44,6 +66,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         registerForActivityResult(RequestPermission()) { isGranted ->
             setLocationTrackingMode(isGranted)
         }
+    private lateinit var userPosition: LatLng
     private val args: HomeFragmentArgs by navArgs()
 
     override fun onCreateView(
@@ -89,8 +112,11 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         initMap(naverMap)
         handleLocationAccessPermission()
         setLocationOverlay()
-        showMarkers()
+        setCurrentPosition()
+        scrollToSelectedMapPlaceIfExists(naverMap, args.mapPlace)
+        setSearchBar()
         setSymbolClick()
+        showMarkers()
     }
 
     private fun initMap(naverMap: NaverMap) {
@@ -118,10 +144,140 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     private fun setLocationOverlay() {
         val locationOverlay = map.locationOverlay
         locationOverlay.isVisible = true
-        // TODO: 사용자의 프로필 이미지를 파라미터로 전달
-        locationOverlay.icon =
-            OverlayImage.fromResource(R.drawable.ic_launcher_foreground)
         locationOverlay.anchor = PointF(0.5f, 1f)
+
+        setLocationOverlayIcon(Firebase.auth.currentUser?.uid, locationOverlay)
+    }
+
+    private fun setLocationOverlayIcon(uid: String?, locationOverlay: LocationOverlay) {
+        if (uid == null) return
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            val storageRef = viewModel.getUserProfileImageStorageRef(uid)
+            val defaultAction = {
+                locationOverlay.icon = OverlayImage.fromResource(R.drawable.ic_launcher_foreground)
+            }
+            val callback = { bitmap: Bitmap ->
+                locationOverlay.icon = OverlayImage.fromBitmap(bitmap)
+            }
+            loadBitmapFromStorageRefOrDefault(storageRef, defaultAction, callback)
+        }
+    }
+
+    private fun loadBitmapFromStorageRefOrDefault(
+        ref: StorageReference?,
+        default: () -> Unit,
+        callback: (bitmap: Bitmap) -> Unit
+    ) {
+        Glide.with(requireContext())
+            .asBitmap()
+            .load(ref)
+            .placeholder(R.drawable.ic_launcher_foreground)
+            .apply(RequestOptions().override(158, 158))
+            .circleCrop()
+            .listener(getCallbackListener(default, callback))
+            .preload()
+    }
+
+    private fun getCallbackListener(default: () -> Unit, callback: (bitmap: Bitmap) -> Unit) =
+        object : RequestListener<Bitmap> {
+            override fun onLoadFailed(
+                e: GlideException?,
+                model: Any?,
+                target: Target<Bitmap>,
+                isFirstResource: Boolean
+            ): Boolean {
+                default()
+                return false
+            }
+
+            override fun onResourceReady(
+                resource: Bitmap,
+                model: Any,
+                target: Target<Bitmap>?,
+                dataSource: DataSource,
+                isFirstResource: Boolean
+            ): Boolean {
+                callback(resource)
+                return false
+            }
+        }
+
+    private fun setCurrentPosition() {
+        userPosition = map.locationOverlay.position
+
+        map.addOnLocationChangeListener { position ->
+            userPosition = LatLng(position.latitude, position.longitude)
+        }
+    }
+
+    private fun scrollToSelectedMapPlaceIfExists(map: NaverMap, mapPlace: MapPlaceModel?) {
+        if (mapPlace?.position == null) return
+
+        disableAutoTracking()
+
+        val cameraUpdate = CameraUpdate.scrollAndZoomTo(
+            mapPlace.position,
+            CAMERA_ZOOM_LEVEL_AT_SELECTED_MAP_PLACE
+        )
+        map.moveCamera(cameraUpdate)
+
+        showSearchResultPin(mapPlace)
+    }
+
+    private fun disableAutoTracking() {
+        map.locationTrackingMode = LocationTrackingMode.NoFollow
+    }
+
+    private fun showSearchResultPin(mapPlace: MapPlaceModel) {
+        if (mapPlace.position == null) return
+
+        val pin = viewModel.getPin(mapPlace.position)
+
+        pin.show()
+
+        showInfoWindow(mapPlace, pin)
+    }
+
+    private fun showInfoWindow(mapPlace: MapPlaceModel, marker: Marker) {
+        getInfoWindow(requireContext(), mapPlace)
+            .open(marker)
+    }
+
+    private fun getInfoWindow(context: Context, mapPlace: MapPlaceModel): InfoWindow {
+        return InfoWindow().apply {
+            adapter = object : InfoWindow.ViewAdapter() {
+                override fun getView(p0: InfoWindow): View {
+                    val binding = ViewInfoWindowSelectedSearchResultBinding.inflate(
+                        LayoutInflater.from(context)
+                    )
+                        .bind(mapPlace, context)
+                    return binding.root
+                }
+            }
+        }
+    }
+
+    private fun ViewInfoWindowSelectedSearchResultBinding.bind(
+        mapPlace: MapPlaceModel,
+        context: Context
+    ) = apply {
+        tvTitle.text =
+            HtmlCompat.fromHtml(mapPlace.title, HtmlCompat.FROM_HTML_MODE_LEGACY)
+        tvRoadAddress.text = mapPlace.roadAddress
+        tvCategory.text = mapPlace.category?.substringAfter(
+            MAP_PLACE_CATEGORY_SEPARATOR
+        )
+        tvDistance.text = mapPlace.distance
+            ?: context.getString(R.string.search_map_place_unknown)
+    }
+
+    private fun setSearchBar() {
+        binding.btnSearchBar.setOnClickListener {
+            val action =
+                HomeFragmentDirections.actionHomeFragmentToSearchMapPlaceFragment(userPosition)
+            findNavController().navigate(action)
+        }
     }
 
     private fun setSymbolClick() {
@@ -130,17 +286,30 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                 return@setOnSymbolClickListener false
             }
 
-            val mapSymbol = MapSymbol(
-                symbol.position.latitude,
-                symbol.position.longitude,
-                false,
-                symbol.caption
-            )
-            val action = HomeFragmentDirections.actionHomeFragmentToMapDialogFragment(mapSymbol)
-            findNavController().navigate(action)
+            removeSearchResultPinIfExists()
+
+            showMapDialog(symbol)
 
             true
         }
+    }
+
+    private fun removeSearchResultPinIfExists() {
+        if (viewModel.searchResultPins.isEmpty()) return
+
+        viewModel.searchResultPins.last().hide()
+        viewModel.removePin()
+    }
+
+    private fun showMapDialog(symbol: Symbol) {
+        val mapSymbol = MapSymbol(
+            symbol.position.latitude,
+            symbol.position.longitude,
+            false,
+            symbol.caption
+        )
+        val action = HomeFragmentDirections.actionHomeFragmentToMapDialogFragment(mapSymbol)
+        findNavController().navigate(action)
     }
 
     private fun showMarkers() {
@@ -182,7 +351,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         val remotePlaceId = tag.toString()
 
         setOnClickListener {
-            val action = HomeFragmentDirections.actionHomeFragmentToLogDetailFragment(null, remotePlaceId)
+            val action =
+                HomeFragmentDirections.actionHomeFragmentToLogDetailFragment(null, remotePlaceId)
             findNavController().navigate(action)
             true
         }

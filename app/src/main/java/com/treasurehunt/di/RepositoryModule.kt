@@ -6,6 +6,8 @@ import com.treasurehunt.data.LogRepository
 import com.treasurehunt.data.LogRepositoryImpl
 import com.treasurehunt.data.UserPreferencesRepository
 import com.treasurehunt.data.UserPreferencesRepositoryImpl
+import com.treasurehunt.data.MapPlaceSearchRepository
+import com.treasurehunt.data.MapPlaceSearchRepositoryImpl
 import com.treasurehunt.data.PlaceRepository
 import com.treasurehunt.data.PlaceRepositoryImpl
 import com.treasurehunt.data.UserRepository
@@ -33,4 +35,7 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindLoginRepository(userPreferencesRepositoryImpl: UserPreferencesRepositoryImpl) : UserPreferencesRepository
+
+    @Binds
+    abstract fun bindMapPlaceSearchRepository(mapPlaceSearchRepositoryImpl: MapPlaceSearchRepositoryImpl): MapPlaceSearchRepository
 }
