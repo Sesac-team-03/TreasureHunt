@@ -51,7 +51,7 @@ class LogDetailViewModel @Inject constructor(
     private fun initLog() {
         viewModelScope.launch {
             val placeId = LogDetailFragmentArgs.fromSavedStateHandle(savedStateHandle).remotePlaceId
-            val logResult = if (placeId.isNotEmpty()) {
+            val logResult = if (placeId != null) {
                 getSafeLogByRemotePlaceId(placeId)
             } else {
                 getSafeLogByRemoteLogId(args.log?.remoteId)
@@ -111,8 +111,8 @@ class LogDetailViewModel @Inject constructor(
         return logDTO.toLogModel(imageUrls, logDTO.localId, logId)
     }
 
-    suspend fun getMapSymbol(log: LogModel? = null, remotePlaceId: String = ""): MapSymbol {
-        val placeId = remotePlaceId.ifEmpty { log!!.remotePlaceId }
+    suspend fun getMapSymbol(log: LogModel? = null, remotePlaceId: String? = null): MapSymbol {
+        val placeId = remotePlaceId ?: log!!.remotePlaceId
         val placeDTO = placeRepo.getRemotePlaceById(placeId)
         return placeDTO.toMapSymbol()
     }

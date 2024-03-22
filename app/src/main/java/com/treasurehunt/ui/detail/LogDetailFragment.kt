@@ -160,7 +160,7 @@ class LogDetailFragment : BottomSheetDialogFragment() {
             val placeId = viewModel.args.remotePlaceId
             val log = viewModel.args.log
 
-            if (placeId.isNotEmpty()) {
+            if (placeId != null) {
                 handleDeleteFromHome(placeId, userId)
             } else if (log != null) {
                 handleDeleteFromFeed(log, userId)
