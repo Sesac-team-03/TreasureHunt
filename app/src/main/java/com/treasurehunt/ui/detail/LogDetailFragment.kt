@@ -62,15 +62,24 @@ class LogDetailFragment : BottomSheetDialogFragment() {
 
     private fun loadLog() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.log.collect { log ->
-                if (log == null) {
-                    showLoadingBar()
-                    return@collect
-                }
+            viewModel.logResult.collect { logResult ->
 
-                hideLoadingBar()
-                setTextAndImages(log)
-                setDotsIndicator()
+                when (logResult) {
+                    is LogResult.LogLoaded -> {
+                        hideLoadingBar()
+                        setTextAndImages(logResult.value)
+                        setDotsIndicator()
+                    }
+
+                    is LogResult.LogLoading -> {
+                        showLoadingBar()
+                    }
+
+                    is LogResult.LogNotLoaded -> {
+                        hideLoadingBar()
+                        showLoadFailMessage()
+                    }
+                }
             }
         }
     }
@@ -81,6 +90,10 @@ class LogDetailFragment : BottomSheetDialogFragment() {
 
     private fun hideLoadingBar() {
         binding.cpiLoading.isVisible = false
+    }
+
+    private fun showLoadFailMessage() {
+        binding.tvLoadFail.isVisible = true
     }
 
     private fun setTextAndImages(log: LogModel) {
@@ -125,8 +138,8 @@ class LogDetailFragment : BottomSheetDialogFragment() {
 
     private fun setEditLog() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.log.collect { log ->
-                if (log == null) {
+            viewModel.logResult.collect { logResult ->
+                if (logResult !is LogResult.LogLoaded) {
                     showToast(R.string.logdetail_log_still_loading_message)
                     return@collect
                 }
@@ -135,7 +148,7 @@ class LogDetailFragment : BottomSheetDialogFragment() {
                     getMapSymbol(args.log, args.remotePlaceId)
                 }
                 val action = LogDetailFragmentDirections.actionLogDetailFragmentToSaveLogFragment(
-                    mapSymbol, log
+                    mapSymbol, logResult.value
                 )
                 findNavController().navigate(action)
             }

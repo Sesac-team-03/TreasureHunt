@@ -29,6 +29,7 @@ import javax.inject.Inject
 
 private const val STORAGE_LOCATION_USER_IMAGES = "%s/$STORAGE_LOCATION_LOG_IMAGES"
 private const val IMAGE_FILE_NAME_PREFIX = "$STORAGE_LOCATION_LOG_IMAGES/"
+private const val REMOTE_DATABASE_READ_REQUEST_ITERATION_COUNT = 20
 
 @HiltViewModel
 class LogDetailViewModel @Inject constructor(
@@ -40,8 +41,8 @@ class LogDetailViewModel @Inject constructor(
 ) : ViewModel() {
 
     val args = LogDetailFragmentArgs.fromSavedStateHandle(savedStateHandle)
-    private val _log: MutableStateFlow<LogModel?> = MutableStateFlow(null)
-    val log: StateFlow<LogModel?> = _log.asStateFlow()
+    private val _logResult: MutableStateFlow<LogResult> = MutableStateFlow(LogResult.LogLoading)
+    val logResult: StateFlow<LogResult> = _logResult.asStateFlow()
 
     init {
         initLog()
@@ -50,18 +51,19 @@ class LogDetailViewModel @Inject constructor(
     private fun initLog() {
         viewModelScope.launch {
             val placeId = LogDetailFragmentArgs.fromSavedStateHandle(savedStateHandle).remotePlaceId
-            val log = if (placeId.isNotEmpty()) {
+            val logResult = if (placeId.isNotEmpty()) {
                 getSafeLogByRemotePlaceId(placeId)
             } else {
                 getSafeLogByRemoteLogId(args.log?.remoteId)
             }
-            _log.update { log }
+            _logResult.update { logResult }
         }
     }
 
-    private suspend fun getSafeLogByRemotePlaceId(placeId: String): LogModel? {
-        var field: LogModel?
-        while (true) {
+    private suspend fun getSafeLogByRemotePlaceId(placeId: String): LogResult {
+        var field: LogModel? = null
+
+        for (i in 0..<REMOTE_DATABASE_READ_REQUEST_ITERATION_COUNT) {
             try {
                 field = getLogByRemotePlaceId(placeId)
                 break
@@ -69,7 +71,7 @@ class LogDetailViewModel @Inject constructor(
                 continue
             }
         }
-        return field
+        return if (field == null) LogResult.LogNotLoaded else LogResult.LogLoaded(field)
     }
 
     private suspend fun getLogByRemotePlaceId(placeId: String): LogModel? {
@@ -84,11 +86,12 @@ class LogDetailViewModel @Inject constructor(
     }
 
 
-    private suspend fun getSafeLogByRemoteLogId(logId: String?): LogModel? {
-        if (logId == null) return null
+    private suspend fun getSafeLogByRemoteLogId(logId: String?): LogResult {
+        if (logId == null) return LogResult.LogNotLoaded
 
-        var field: LogModel?
-        while (true) {
+        var field: LogModel? = null
+
+        for (i in 0..<REMOTE_DATABASE_READ_REQUEST_ITERATION_COUNT) {
             try {
                 field = getLogByRemoteLogId(logId)
                 break
@@ -96,7 +99,7 @@ class LogDetailViewModel @Inject constructor(
                 continue
             }
         }
-        return field
+        return if (field == null) LogResult.LogNotLoaded else LogResult.LogLoaded(field)
     }
 
     private suspend fun getLogByRemoteLogId(logId: String): LogModel {
