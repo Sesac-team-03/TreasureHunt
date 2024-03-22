@@ -1,9 +1,7 @@
 package com.treasurehunt.ui.profile
 
-import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,9 +12,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.firebase.Firebase
 import com.google.firebase.storage.storage
@@ -61,7 +56,6 @@ class ProfileFragment : Fragment() {
         syncProfile()
         setEditButton()
         setEditProfileImageButton()
-        setEditProfileImage()
         setCancelButton()
         setCompleteButton()
         initTabLayout()
@@ -104,6 +98,7 @@ class ProfileFragment : Fragment() {
         }
     }
 
+    @OptIn(kotlinx.coroutines.FlowPreview::class)
     private fun StateFlow<ProfileUiState>.filterDefaultState(): Flow<ProfileUiState> =
         debounce(1500)
 
@@ -123,8 +118,10 @@ class ProfileFragment : Fragment() {
     private fun loadProfileImage(user: UserDTO?) {
         binding.ivProfileImage.run {
             try {
-                val storageUrl = user?.profileImage ?: return
-                val storageRef = Firebase.storage.getReferenceFromUrl(storageUrl)
+                val storageUrl = user?.profileImage
+                val storageRef = storageUrl?.let {
+                    Firebase.storage.getReferenceFromUrl(it)
+                }
 
                 Glide.with(context)
                     .load(storageRef)
@@ -144,18 +141,28 @@ class ProfileFragment : Fragment() {
 
     private fun showEditView() {
         binding.groupProfileBox.visibility = View.GONE
+        setEditProfileImage()
         binding.groupEditProfileBox.visibility = View.VISIBLE
         binding.etNickname.setText(binding.tvNickname.text)
     }
 
-    private fun setEditProfileImageButton() {
-        binding.ibEditProfileImage.setOnClickListener {
+    private fun setEditProfileImage() {
+        binding.ivProfileImage.setOnClickListener {
             requestAlbumAccessPermission()
         }
     }
 
-    private fun setEditProfileImage() {
-        binding.ivProfileImage.setOnClickListener {
+    private fun requestAlbumAccessPermission() {
+        val permissionId = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            android.Manifest.permission.READ_MEDIA_IMAGES
+        } else {
+            android.Manifest.permission.READ_EXTERNAL_STORAGE
+        }
+        requestPermissionLauncher.launch(permissionId)
+    }
+
+    private fun setEditProfileImageButton() {
+        binding.ibEditProfileImage.setOnClickListener {
             requestAlbumAccessPermission()
         }
     }
@@ -170,6 +177,11 @@ class ProfileFragment : Fragment() {
     private fun hideEditView() {
         binding.groupProfileBox.visibility = View.VISIBLE
         binding.groupEditProfileBox.visibility = View.GONE
+        resetEditProfileImage()
+    }
+
+    private fun resetEditProfileImage() {
+        binding.ivProfileImage.isClickable = false
     }
 
     private fun setCompleteButton() {
@@ -188,15 +200,6 @@ class ProfileFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.saveProfile(nickname = binding.etNickname.text.toString())
         }
-    }
-
-    private fun requestAlbumAccessPermission() {
-        val permissionId = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            android.Manifest.permission.READ_MEDIA_IMAGES
-        } else {
-            android.Manifest.permission.READ_EXTERNAL_STORAGE
-        }
-        requestPermissionLauncher.launch(permissionId)
     }
 
     private fun initTabLayout() {

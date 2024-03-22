@@ -198,5 +198,6 @@ class HomeViewModel @Inject constructor(
         this.icon = icon
         this.width = width
         this.height = height
+        isHideCollidedSymbols = true
     }
 }
