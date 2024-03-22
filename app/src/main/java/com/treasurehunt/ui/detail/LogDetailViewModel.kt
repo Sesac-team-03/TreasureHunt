@@ -53,7 +53,7 @@ class LogDetailViewModel @Inject constructor(
             val log = if (placeId.isNotEmpty()) {
                 getSafeLogByRemotePlaceId(placeId)
             } else {
-                args.log
+                getSafeLogByRemoteLogId(args.log?.remoteId)
             }
             _log.update { log }
         }
@@ -72,12 +72,6 @@ class LogDetailViewModel @Inject constructor(
         return field
     }
 
-    suspend fun getMapSymbol(log: LogModel? = null, remotePlaceId: String = ""): MapSymbol {
-        val placeId = remotePlaceId.ifEmpty { log!!.remotePlaceId }
-        val placeDTO = placeRepo.getRemotePlaceById(placeId)
-        return placeDTO.toMapSymbol()
-    }
-
     private suspend fun getLogByRemotePlaceId(placeId: String): LogModel? {
         val placeDTO: PlaceDTO = placeRepo.getRemotePlaceById(placeId)
         val logId = placeDTO.remoteLogId ?: return null
@@ -87,6 +81,37 @@ class LogDetailViewModel @Inject constructor(
         }
 
         return logDTO.toLogModel(imageUrls, logDTO.localId, logId)
+    }
+
+
+    private suspend fun getSafeLogByRemoteLogId(logId: String?): LogModel? {
+        if (logId == null) return null
+
+        var field: LogModel?
+        while (true) {
+            try {
+                field = getLogByRemoteLogId(logId)
+                break
+            } catch (e: SerializationException) {
+                continue
+            }
+        }
+        return field
+    }
+
+    private suspend fun getLogByRemoteLogId(logId: String): LogModel {
+        val logDTO: LogDTO = logRepo.getRemoteLogById(logId)
+        val imageUrls = logDTO.remoteImageIds.filterValues { it }.keys.map { id ->
+            imageRepo.getRemoteImageById(id).url
+        }
+
+        return logDTO.toLogModel(imageUrls, logDTO.localId, logId)
+    }
+
+    suspend fun getMapSymbol(log: LogModel? = null, remotePlaceId: String = ""): MapSymbol {
+        val placeId = remotePlaceId.ifEmpty { log!!.remotePlaceId }
+        val placeDTO = placeRepo.getRemotePlaceById(placeId)
+        return placeDTO.toMapSymbol()
     }
 
     suspend fun getRemotePlace(placeId: String) = placeRepo.getRemotePlaceById(placeId)

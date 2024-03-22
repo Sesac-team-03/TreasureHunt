@@ -68,7 +68,7 @@ class DatabaseUpdateWorker @AssistedInject constructor(
 
     private suspend fun init(imageStorageUrls: List<String>, text: String) {
         val remotePlaceId = getRemotePlaceId()
-        val log = getLogFor(imageStorageUrls, remotePlaceId, text)
+        val log = logOf(imageStorageUrls, remotePlaceId, text)
         val remoteLogId = insertLog(log)
 
         updatePlaceWithLog(remotePlaceId, remoteLogId)
@@ -117,7 +117,7 @@ class DatabaseUpdateWorker @AssistedInject constructor(
         )
     }
 
-    private suspend fun getLogFor(
+    private suspend fun logOf(
         imageStorageUrls: List<String>,
         remotePlaceId: String,
         text: String
@@ -135,19 +135,21 @@ class DatabaseUpdateWorker @AssistedInject constructor(
             text,
             theme,
             createdDate,
-            imageIds,
+            imageIds
         )
     }
 
     private suspend fun insertLog(log: LogModel): String {
         if (remoteLogId != null) {
-            logRepo.update(log.asLogEntity(localLogId))
+            logRepo.update(log.asLogEntity(localLogId, remoteLogId))
             logRepo.update(remoteLogId, log.asLogDTO(localLogId))
             return remoteLogId
         }
 
         val localLogId = logRepo.insert(log.asLogEntity())
-        return logRepo.insert(log.asLogDTO(localLogId))
+        val remoteLogId = logRepo.insert(log.asLogDTO(localLogId))
+        logRepo.update(log.asLogEntity(localLogId, remoteLogId))
+        return remoteLogId
     }
 
     private suspend fun updatePlaceWithLog(remotePlaceId: String, remoteLogId: String) {
