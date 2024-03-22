@@ -105,6 +105,9 @@
         <action
             android:id="@+id/action_logDetailFragment_to_saveLogFragment"
             app:destination="@id/saveLogFragment" />
+        <action
+            android:id="@+id/action_logDetailFragment_to_feedFragment"
+            app:destination="@id/feedFragment" />
         <argument
             android:name="log"
             android:defaultValue="@null"
