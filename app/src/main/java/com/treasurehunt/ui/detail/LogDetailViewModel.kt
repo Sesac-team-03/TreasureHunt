@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.serialization.SerializationException
 import javax.inject.Inject
 
 private const val STORAGE_LOCATION_USER_IMAGES = "%s/$STORAGE_LOCATION_LOG_IMAGES"
@@ -50,12 +51,25 @@ class LogDetailViewModel @Inject constructor(
         viewModelScope.launch {
             val placeId = LogDetailFragmentArgs.fromSavedStateHandle(savedStateHandle).remotePlaceId
             val log = if (placeId.isNotEmpty()) {
-                getLogByRemotePlaceId(placeId)
+                getSafeLogByRemotePlaceId(placeId)
             } else {
                 args.log
             }
             _log.update { log }
         }
+    }
+
+    private suspend fun getSafeLogByRemotePlaceId(placeId: String): LogModel? {
+        var field: LogModel?
+        while (true) {
+            try {
+                field = getLogByRemotePlaceId(placeId)
+                break
+            } catch (e: SerializationException) {
+                continue
+            }
+        }
+        return field
     }
 
     suspend fun getMapSymbol(log: LogModel? = null, remotePlaceId: String = ""): MapSymbol {
