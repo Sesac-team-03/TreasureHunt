@@ -144,7 +144,7 @@ class LogDetailFragment : BottomSheetDialogFragment() {
                 }
 
                 val mapSymbol = viewModel.run {
-                    getMapSymbol(args.log, args.remotePlaceId)
+                    getMapSymbol(args.remotePlaceId, args.log)
                 }
                 val action = LogDetailFragmentDirections.actionLogDetailFragmentToSaveLogFragment(
                     mapSymbol, logResult.value

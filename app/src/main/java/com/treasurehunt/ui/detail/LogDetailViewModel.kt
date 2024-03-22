@@ -37,7 +37,7 @@ class LogDetailViewModel @Inject constructor(
     private val logRepo: LogRepository,
     private val userRepo: UserRepository,
     private val imageRepo: ImageRepository,
-    private val savedStateHandle: SavedStateHandle,
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     val args = LogDetailFragmentArgs.fromSavedStateHandle(savedStateHandle)
@@ -50,11 +50,14 @@ class LogDetailViewModel @Inject constructor(
 
     private fun initLog() {
         viewModelScope.launch {
-            val placeId = LogDetailFragmentArgs.fromSavedStateHandle(savedStateHandle).remotePlaceId
+            val placeId = args.remotePlaceId
+            val log = args.log
             val logResult = if (placeId != null) {
                 getSafeLogByRemotePlaceId(placeId)
+            } else if (log != null) {
+                getSafeLogByRemoteLogId(log.remoteId)
             } else {
-                getSafeLogByRemoteLogId(args.log?.remoteId)
+                LogResult.LogNotLoaded
             }
             _logResult.update { logResult }
         }
@@ -111,7 +114,7 @@ class LogDetailViewModel @Inject constructor(
         return logDTO.toLogModel(imageUrls, logDTO.localId, logId)
     }
 
-    suspend fun getMapSymbol(log: LogModel? = null, remotePlaceId: String? = null): MapSymbol {
+    suspend fun getMapSymbol(remotePlaceId: String? = null, log: LogModel? = null): MapSymbol {
         val placeId = remotePlaceId ?: log!!.remotePlaceId
         val placeDTO = placeRepo.getRemotePlaceById(placeId)
         return placeDTO.toMapSymbol()
