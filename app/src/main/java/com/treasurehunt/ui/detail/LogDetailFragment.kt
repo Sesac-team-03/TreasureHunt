@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -62,12 +63,24 @@ class LogDetailFragment : BottomSheetDialogFragment() {
     private fun loadLog() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.log.collect { log ->
-                if (log == null) return@collect
+                if (log == null) {
+                    showLoadingBar()
+                    return@collect
+                }
 
+                hideLoadingBar()
                 setTextAndImages(log)
                 setDotsIndicator()
             }
         }
+    }
+
+    private fun showLoadingBar() {
+        binding.cpiLoading.isVisible = true
+    }
+
+    private fun hideLoadingBar() {
+        binding.cpiLoading.isVisible = false
     }
 
     private fun setTextAndImages(log: LogModel) {
