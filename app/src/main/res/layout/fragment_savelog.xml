@@ -18,15 +18,14 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:paddingBottom="40dp">
+            android:layout_height="0dp">
 
             <ImageButton
                 android:id="@+id/ib_cancel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="40dp"
+                android:layout_marginTop="30dp"
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/savelog_ib_cancel"
                 android:src="@drawable/icon_cancel"
@@ -38,7 +37,7 @@
                 style="@style/SaveLogTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="40dp"
+                android:layout_marginTop="30dp"
                 android:text="@string/savelog_tv_title"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -75,7 +74,8 @@
                 android:layout_marginTop="16dp"
                 android:text="@{@string/savelog_tv_photo_count(viewModel.uiState.images.size())}"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/fcv_map" />
+                app:layout_constraintTop_toBottomOf="@id/fcv_map"
+                tools:text="사진 (1/5)" />
 
             <ImageButton
                 android:id="@+id/ib_pick_image"
@@ -119,13 +119,98 @@
                 android:layout_height="130dp"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:inputType="textMultiLine"
+                android:lines="5"
+                android:maxLength="300"
+                android:maxLines="5"
+                android:minLines="1"
                 android:onTextChanged="@{ (s, start, before, count) -> (start == 0 || before == 0) ? viewModel.setTextFieldState(s) : null }"
-                android:paddingStart="16dp"
-                android:paddingTop="16dp"
+                android:paddingVertical="4dp"
+                android:textAlignment="center"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_text"
-                tools:ignore="RtlSymmetry" />
+                tools:ignore="RtlSymmetry"
+                tools:text="보물찾기\n가주아" />
+
+            <TextView
+                android:id="@+id/tv_theme"
+                style="@style/SaveLogPhoto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="테마"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/et_text" />
+
+            <HorizontalScrollView
+                android:id="@+id/sv_theme"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_theme">
+
+                <RadioGroup
+                    android:id="@+id/rg_theme"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+
+                    android:orientation="horizontal">
+
+                    <RadioButton
+                        android:id="@+id/rb_default"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="14dp"
+                        android:background="@drawable/text_theme_default"
+                        android:button="@android:color/transparent"
+                        android:checked="true" />
+
+                    <RadioButton
+                        android:id="@+id/rb_lime_blue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="14dp"
+                        android:background="@drawable/ic_text_theme_lime_blue"
+                        android:button="@android:color/transparent" />
+
+                    <RadioButton
+                        android:id="@+id/rb_purple"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="14dp"
+                        android:background="@drawable/ic_text_theme_purple"
+                        android:button="@android:color/transparent" />
+
+                    <RadioButton
+                        android:id="@+id/rb_mint"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="14dp"
+                        android:background="@drawable/ic_text_theme_mint"
+                        android:button="@android:color/transparent" />
+
+                    <RadioButton
+                        android:id="@+id/rb_orange_black"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="14dp"
+                        android:background="@drawable/ic_text_theme_orange_black"
+                        android:button="@android:color/transparent" />
+
+                    <RadioButton
+                        android:id="@+id/rb_peach"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="14dp"
+                        android:background="@drawable/ic_text_theme_peach"
+                        android:button="@android:color/transparent" />
+                </RadioGroup>
+            </HorizontalScrollView>
 
             <Button
                 android:id="@+id/btn_save"
@@ -133,6 +218,7 @@
                 android:layout_width="0dp"
                 android:layout_height="52dp"
                 android:layout_marginHorizontal="16dp"
+                android:layout_marginBottom="40dp"
                 android:enabled="@{viewModel.uiState.isSaveButtonEnabled}"
                 android:text="@string/savelog_btn_save"
                 app:cornerRadius="12dp"
