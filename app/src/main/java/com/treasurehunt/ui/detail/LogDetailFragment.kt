@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import android.widget.Toast
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -21,6 +22,7 @@ import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentLogdetailBinding
 import com.treasurehunt.ui.detail.adapter.ImageSliderAdapter
 import com.treasurehunt.ui.model.LogModel
+import com.treasurehunt.ui.model.TextTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -63,7 +65,6 @@ class LogDetailFragment : BottomSheetDialogFragment() {
     private fun loadLog() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.logResult.collect { logResult ->
-
                 when (logResult) {
                     is LogResult.LogLoaded -> {
                         hideLoadingBar()
@@ -105,6 +106,13 @@ class LogDetailFragment : BottomSheetDialogFragment() {
     private fun setDotsIndicator() {
         binding.vpPhoto.adapter = imageSliderAdapter
         binding.diText.setViewPager2(binding.vpPhoto)
+    }
+
+    private fun setTextTheme(theme: TextTheme) {
+        binding.tvText.background = theme.backgroundResId?.let {
+            AppCompatResources.getDrawable(requireContext(), it)
+        }
+        binding.tvText.setTextColor(requireContext().getColor(theme.textColorResId))
     }
 
     private fun setPopupButton(popup: PopupMenu) {

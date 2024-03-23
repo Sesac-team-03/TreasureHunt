@@ -6,9 +6,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RadioButton
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
+import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -28,6 +31,7 @@ import com.naver.maps.map.util.FusedLocationSource
 import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentSavelogBinding
 import com.treasurehunt.ui.model.ImageModel
+import com.treasurehunt.ui.model.TextTheme
 import com.treasurehunt.ui.savelog.adapter.SaveLogAdapter
 import com.treasurehunt.util.showSnackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -48,6 +52,7 @@ internal const val WORK_DATA_PLAN_ID = "planId"
 internal const val WORK_DATA_LOCAL_LOG_ID = "localLogId"
 internal const val WORK_DATA_REMOTE_LOG_ID = "remoteLogId"
 internal const val WORK_DATA_REMOTE_PLACE_ID = "remotePlaceId"
+internal const val WORK_DATA_TEXT_THEME = "textTheme"
 
 @AndroidEntryPoint
 class SaveLogFragment : Fragment(), OnMapReadyCallback {
@@ -90,6 +95,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         setShowMapFullScreen()
         setPickImageButton()
         setCancelButton()
+        setTextThemeButtonGroup()
     }
 
     override fun onDestroyView() {
@@ -114,11 +120,17 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
                 viewModel.addImage(ImageModel(storageUrl = imageUrl))
             }
             setTextField(log.text)
+            setTextTheme(log.theme)
         }
     }
 
     private fun setTextField(input: String) {
         binding.etText.setText(input)
+    }
+
+    private fun setTextTheme(theme: Int) {
+        binding.rbDefault.isChecked = false
+        (binding.rgTheme[theme] as RadioButton).isChecked = true
     }
 
     private fun loadMap() {
@@ -308,6 +320,9 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         val uid = Firebase.auth.currentUser!!.uid
         val (lat, lng, isPlan, caption, planId) = args.mapSymbol
         val logText = binding.etText.text.toString()
+        val textTheme = binding.rgTheme.run {
+            indexOfChild(findViewById<RadioButton>(checkedRadioButtonId))
+        }
 
         return Data.Builder()
             .putString(WORK_DATA_UID, uid)
@@ -317,6 +332,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
             .putString(WORK_DATA_CAPTION, caption)
             .putBoolean(WORK_DATA_IS_PLAN, isPlan)
             .putString(WORK_DATA_PLAN_ID, planId)
+            .putInt(WORK_DATA_TEXT_THEME, textTheme)
             .apply {
                 args.log?.let { log ->
                     requireNotNull(log.localId)
@@ -333,6 +349,33 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
     private fun setCancelButton() {
         binding.ibCancel.setOnClickListener {
             findNavController().navigateUp()
+        }
+    }
+
+    private fun setTextThemeButtonGroup() {
+        with(binding) {
+            rbDefault.set(TextTheme.DEFAULT)
+
+            rbLimeBlue.set(TextTheme.LIME_BLUE)
+
+            rbPurple.set(TextTheme.PURPLE)
+
+            rbMint.set(TextTheme.MINT)
+
+            rbOrangeBlack.set(TextTheme.ORANGE_BLACK)
+
+            rbPeach.set(TextTheme.PEACH)
+        }
+    }
+
+    private fun RadioButton.set(theme: TextTheme) {
+        setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                binding.etText.background = theme.backgroundResId?.let {
+                    AppCompatResources.getDrawable(requireContext(), it)
+                }
+                binding.etText.setTextColor(requireContext().getColor(theme.textColorResId))
+            }
         }
     }
 }

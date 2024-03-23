@@ -37,7 +37,7 @@ class DatabaseUpdateWorker @AssistedInject constructor(
             val mapSymbol: MapSymbol = mapSymbolOf(inputData)
             val remotePlaceId = inputData.getString(WORK_DATA_REMOTE_PLACE_ID)
                 ?: getRemotePlaceId(mapSymbol)
-            val log = logOf(inputData, remotePlaceId)
+            val log = getLog(inputData, remotePlaceId)
                 ?: return Result.failure()
             val localLogId = inputData.getLong(WORK_DATA_LOCAL_LOG_ID, -1)
             val remoteLogId = inputData.getString(WORK_DATA_REMOTE_LOG_ID)?.also { remoteLogId ->
@@ -105,7 +105,7 @@ class DatabaseUpdateWorker @AssistedInject constructor(
         )
     }
 
-    private suspend fun logOf(
+    private suspend fun getLog(
         inputData: Data,
         remotePlaceId: String
     ): LogModel? {
@@ -113,8 +113,7 @@ class DatabaseUpdateWorker @AssistedInject constructor(
             ?: return null
         val text = inputData.getString(WORK_DATA_LOG_TEXT)
             ?: return null
-
-        val theme = "123"
+        val theme = inputData.getInt(WORK_DATA_TEXT_THEME, 0)
         val createdDate = getCurrentTime()
         val imageIds = imageStorageUrls.map { imageUrl ->
             imageRepo.insert(

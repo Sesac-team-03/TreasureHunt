@@ -10,7 +10,7 @@ import com.treasurehunt.ui.model.LogModel
 data class LogEntity(
     val remotePlaceId: String,
     val text: String,
-    val theme: String,
+    val theme: Int,
     @ColumnInfo("created_date")
     val createdDate: Long,
     val remoteImageIds: List<String>,
