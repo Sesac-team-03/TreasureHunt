@@ -98,6 +98,13 @@ class LogDetailFragment : BottomSheetDialogFragment() {
     }
 
     private fun setTextAndImages(log: LogModel) {
+        if (log.imageUrls.isEmpty()) {
+            val imageItem = ImageItem.Text(value = log.text, theme = TextTheme.entries[log.theme])
+            imageSliderAdapter.submitList(listOf(imageItem))
+            return
+        }
+
+        setTextTheme(TextTheme.entries[log.theme])
         binding.tvText.text = log.text
         val imageItems = log.imageUrls.map { ImageItem.Url(it) }
         imageSliderAdapter.submitList(imageItems)

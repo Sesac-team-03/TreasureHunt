@@ -9,11 +9,11 @@ import com.treasurehunt.ui.model.LogModel
 @Entity(tableName = "logs")
 data class LogEntity(
     val remotePlaceId: String,
-    val text: String,
-    val theme: Int,
+    val text: String = "",
+    val theme: Int = 0,
     @ColumnInfo("created_date")
     val createdDate: Long,
-    val remoteImageIds: List<String>,
+    val remoteImageIds: List<String> = emptyList(),
     @PrimaryKey(autoGenerate = true)
     val localId: Long = 0,
     @ColumnInfo("remote_id")

@@ -50,7 +50,7 @@ class SaveLogViewModel @Inject constructor(private val imageRepo: ImageRepositor
 
     private fun setSaveButtonState() {
         _uiState.update {  uiState ->
-            uiState.copy(isSaveButtonEnabled = uiState.images.isNotEmpty() && uiState.isTextFieldNotEmpty)
+            uiState.copy(isSaveButtonEnabled = uiState.images.isNotEmpty() || uiState.isTextFieldNotEmpty)
         }
     }
 

@@ -8,10 +8,10 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 data class LogModel(
     val remotePlaceId: String,
-    val text: String,
-    val theme: Int,
+    val text: String = "",
+    val theme: Int = 0,
     val createdDate: Long,
-    val remoteImageIds: List<String>,
+    val remoteImageIds: List<String> = emptyList(),
     val imageUrls: List<String> = emptyList(),
     val localId: Long? = null,
     val remoteId: String? = null

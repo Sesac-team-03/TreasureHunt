@@ -86,6 +86,8 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         initViewModel()
         initAdapter()
 
+        setTextThemeButtonGroup()
+
         viewLifecycleOwner.lifecycleScope.launch {
             loadLogIfExists()
             setSaveButton()
@@ -95,7 +97,6 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         setShowMapFullScreen()
         setPickImageButton()
         setCancelButton()
-        setTextThemeButtonGroup()
     }
 
     override fun onDestroyView() {
