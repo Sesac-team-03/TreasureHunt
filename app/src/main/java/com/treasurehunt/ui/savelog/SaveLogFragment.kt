@@ -86,7 +86,6 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
 
         initViewModel()
         initAdapter()
-        loadLogIfExists()
         setCancelButton()
         loadMap()
         setShowMapFullScreen()
@@ -95,6 +94,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         setRadioGroupTextOnlyThemeWarningMessage()
         setUiStateTextOnlyThemeWarningMessage()
         setSaveButton()
+        loadLogIfExists()
     }
 
     override fun onDestroyView() {
@@ -179,29 +179,6 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         binding.rvPhoto.adapter = SaveLogAdapter { imageModel ->
             viewModel.removeImage(imageModel)
         }
-    }
-
-    private fun loadLogIfExists() {
-        args.log?.let { log ->
-            viewModel.setLogLoadingState(true)
-            viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.getImageStorageUrls(log.remoteImageIds).forEach { imageUrl ->
-                    viewModel.addImage(ImageModel(storageUrl = imageUrl))
-                }
-                setTextField(log.text)
-                setTextTheme(log.theme)
-                viewModel.setLogLoadingState(false)
-            }
-        }
-    }
-
-    private fun setTextField(input: String) {
-        binding.etText.setText(input)
-    }
-
-    private fun setTextTheme(theme: Int) {
-        binding.rbDefault.isChecked = false
-        (binding.rgTheme[theme] as RadioButton).isChecked = true
     }
 
     private fun setCancelButton() {
@@ -402,5 +379,28 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
                 }
             }
             .build()
+    }
+
+    private fun loadLogIfExists() {
+        args.log?.let { log ->
+            viewModel.setLogLoadingState(true)
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewModel.getImageStorageUrls(log.remoteImageIds).forEach { imageUrl ->
+                    viewModel.addImage(ImageModel(storageUrl = imageUrl))
+                }
+                setTextField(log.text)
+                setTextTheme(log.theme)
+                viewModel.setLogLoadingState(false)
+            }
+        }
+    }
+
+    private fun setTextField(input: String) {
+        binding.etText.setText(input)
+    }
+
+    private fun setTextTheme(theme: Int) {
+        binding.rbDefault.isChecked = false
+        (binding.rgTheme[theme] as RadioButton).isChecked = true
     }
 }
