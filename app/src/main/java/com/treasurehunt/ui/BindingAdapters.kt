@@ -1,16 +1,18 @@
 package com.treasurehunt.ui
 
 import android.widget.ImageView
+import android.widget.TextView
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.treasurehunt.R
 import com.treasurehunt.ui.model.ImageModel
-import java.lang.Exception
+import com.treasurehunt.ui.model.LogModel
+import com.treasurehunt.ui.model.TextTheme
 
 private val storage = Firebase.storage
 
@@ -33,7 +35,9 @@ fun bindImageSource(
 }
 
 @BindingAdapter("imageStorageUrl")
-fun bindImageStorageUrl(view: ImageView, url: String) {
+fun bindImageStorageUrl(view: ImageView, url: String?) {
+    if (url == null) return
+
     try {
         view.run {
             val storageRef = storage.getReferenceFromUrl(url)
@@ -53,5 +57,19 @@ fun bindImageStorageUrl(view: ImageView, url: String) {
             setImageResource(R.drawable.ic_no_image)
             scaleType = ImageView.ScaleType.CENTER_INSIDE
         }
+    }
+}
+
+@BindingAdapter("themedText")
+fun bindThemedText(view: TextView, log: LogModel?) {
+    if (log == null) return
+
+    view.run {
+        val theme = TextTheme.entries[log.theme]
+        background = theme.backgroundResId?.let {
+            AppCompatResources.getDrawable(view.context, it)
+        }
+        setTextColor(view.context.getColor(theme.textColorResId))
+        text = log.text
     }
 }

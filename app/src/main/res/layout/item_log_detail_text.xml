@@ -4,6 +4,7 @@
     android:id="@+id/tv_text"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:ellipsize="end"
     android:fontFamily="@font/pretendard"
     android:gravity="center"
     android:maxLines="5"
