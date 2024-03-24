@@ -99,7 +99,7 @@
                 app:layout_constraintStart_toEndOf="@+id/ib_pick_image"
                 app:layout_constraintTop_toTopOf="@+id/ib_pick_image"
                 bind:dataset="@{viewModel.uiState.images}"
-                tools:listitem="@layout/item_savelog" />
+                tools:listitem="@layout/item_save_log" />
 
             <TextView
                 android:id="@+id/tv_text"

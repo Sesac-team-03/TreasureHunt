@@ -29,7 +29,7 @@ private const val NAVER_LOGIN_CLIENT_SECRET = BuildConfig.NAVER_LOGIN_CLIENT_SEC
 private const val APP_NAME = BuildConfig.APP_NAME
 
 @AndroidEntryPoint
-class LogInFragment : PreloadFragment() {
+class LoginFragment : PreloadFragment() {
 
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!

@@ -19,7 +19,7 @@ import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.treasurehunt.R
-import com.treasurehunt.databinding.FragmentLogdetailBinding
+import com.treasurehunt.databinding.FragmentLogDetailBinding
 import com.treasurehunt.ui.detail.adapter.LogDetailViewPagerAdapter
 import com.treasurehunt.ui.model.LogModel
 import com.treasurehunt.ui.model.TextTheme
@@ -33,7 +33,7 @@ const val MIME_TYPE_TEXT_PLAIN = "text/plain"
 @AndroidEntryPoint
 class LogDetailFragment : BottomSheetDialogFragment() {
 
-    private var _binding: FragmentLogdetailBinding? = null
+    private var _binding: FragmentLogDetailBinding? = null
     private val binding get() = _binding!!
     private val logDetailViewPagerAdapter = LogDetailViewPagerAdapter()
     private val viewModel: LogDetailViewModel by viewModels()
@@ -41,7 +41,7 @@ class LogDetailFragment : BottomSheetDialogFragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentLogdetailBinding.inflate(inflater, container, false)
+        _binding = FragmentLogDetailBinding.inflate(inflater, container, false)
         return binding.root
     }
 

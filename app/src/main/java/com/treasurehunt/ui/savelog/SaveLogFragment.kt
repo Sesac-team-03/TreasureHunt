@@ -30,7 +30,7 @@ import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.util.FusedLocationSource
 import com.treasurehunt.R
-import com.treasurehunt.databinding.FragmentSavelogBinding
+import com.treasurehunt.databinding.FragmentSaveLogBinding
 import com.treasurehunt.ui.model.ImageModel
 import com.treasurehunt.ui.model.TextTheme
 import com.treasurehunt.ui.savelog.adapter.SaveLogAdapter
@@ -58,7 +58,7 @@ internal const val WORK_DATA_TEXT_THEME = "textTheme"
 @AndroidEntryPoint
 class SaveLogFragment : Fragment(), OnMapReadyCallback {
 
-    private var _binding: FragmentSavelogBinding? = null
+    private var _binding: FragmentSaveLogBinding? = null
     private val binding get() = _binding!!
     private val viewModel: SaveLogViewModel by viewModels()
     private lateinit var map: NaverMap
@@ -77,7 +77,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentSavelogBinding.inflate(inflater, container, false)
+        _binding = FragmentSaveLogBinding.inflate(inflater, container, false)
         return binding.root
     }
 
