@@ -3,6 +3,7 @@ package com.treasurehunt.ui.savelog
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -383,14 +384,14 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
 
     private fun loadLogIfExists() {
         args.log?.let { log ->
-            viewModel.setLogLoadingState(true)
+            viewModel.setSaveButtonState(false)
             viewLifecycleOwner.lifecycleScope.launch {
                 viewModel.getImageStorageUrls(log.remoteImageIds).forEach { imageUrl ->
                     viewModel.addImage(ImageModel(storageUrl = imageUrl))
                 }
                 setTextField(log.text)
                 setTextTheme(log.theme)
-                viewModel.setLogLoadingState(false)
+                viewModel.setSaveButtonState(true)
             }
         }
     }
@@ -400,6 +401,8 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun setTextTheme(theme: Int) {
+        if (theme == 0) return
+
         binding.rbDefault.isChecked = false
         (binding.rgTheme[theme] as RadioButton).isChecked = true
     }

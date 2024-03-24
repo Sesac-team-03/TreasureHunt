@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 data class LogDTO(
     val remotePlaceId: String,
     val text: String = "",
-    val theme: Int = 0,
+    val theme: Int,
     val createdDate: Long,
     val remoteImageIds: Map<String, Boolean> = emptyMap(),
     val localId: Long = 0

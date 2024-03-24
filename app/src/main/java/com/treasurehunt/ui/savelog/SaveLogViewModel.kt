@@ -70,15 +70,15 @@ class SaveLogViewModel @Inject constructor(
         setTextThemeState()
     }
 
-    fun setLogLoadingState(value: Boolean) {
+    private fun setSaveButtonState() {
         _uiState.update { uiState ->
-            uiState.copy(isLogLoading = value)
+            uiState.copy(isSaveButtonEnabled = uiState.images.isNotEmpty() || uiState.isTextFieldNotEmpty)
         }
     }
 
-    private fun setSaveButtonState() {
+    fun setSaveButtonState(value: Boolean) {
         _uiState.update { uiState ->
-            uiState.copy(isSaveButtonEnabled = !uiState.isLogLoading &&( uiState.images.isNotEmpty() || uiState.isTextFieldNotEmpty))
+            uiState.copy(isSaveButtonEnabled = value)
         }
     }
 

@@ -6,6 +6,5 @@ data class SaveLogUiState(
     val isTextFieldNotEmpty: Boolean = false,
     val isSaveButtonEnabled: Boolean = false,
     val isTextThemeEnabled: Boolean = false,
-    val isLogLoading: Boolean = false,
     val isOnline: Boolean = false
 )
