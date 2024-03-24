@@ -4,7 +4,6 @@ import android.content.Intent
 import android.provider.MediaStore
 import androidx.lifecycle.ViewModel
 import com.treasurehunt.data.ImageRepository
-import com.treasurehunt.data.remote.model.LogDTO
 import com.treasurehunt.ui.model.ImageModel
 import com.treasurehunt.ui.model.SaveLogUiState
 import com.treasurehunt.util.MIME_TYPE_IMAGE
@@ -28,17 +27,19 @@ class SaveLogViewModel @Inject constructor(private val imageRepo: ImageRepositor
         }
 
     fun addImage(image: ImageModel) {
-        _uiState.update {  uiState ->
+        _uiState.update { uiState ->
             uiState.copy(images = uiState.images + image)
         }
         setSaveButtonState()
+        setTextThemeState()
     }
 
     fun removeImage(image: ImageModel) {
-        _uiState.update {  uiState ->
+        _uiState.update { uiState ->
             uiState.copy(images = uiState.images - image)
         }
         setSaveButtonState()
+        setTextThemeState()
     }
 
     fun setTextFieldState(input: CharSequence) {
@@ -46,11 +47,24 @@ class SaveLogViewModel @Inject constructor(private val imageRepo: ImageRepositor
             uiState.copy(isTextFieldNotEmpty = input.isNotEmpty())
         }
         setSaveButtonState()
+        setTextThemeState()
+    }
+
+    fun setLogLoadingState(value: Boolean) {
+        _uiState.update { uiState ->
+            uiState.copy(isLogLoading = value)
+        }
     }
 
     private fun setSaveButtonState() {
-        _uiState.update {  uiState ->
-            uiState.copy(isSaveButtonEnabled = uiState.images.isNotEmpty() || uiState.isTextFieldNotEmpty)
+        _uiState.update { uiState ->
+            uiState.copy(isSaveButtonEnabled = !uiState.isLogLoading &&( uiState.images.isNotEmpty() || uiState.isTextFieldNotEmpty))
+        }
+    }
+
+    private fun setTextThemeState() {
+        _uiState.update { uiState ->
+            uiState.copy(isTextThemeEnabled = uiState.images.isEmpty() && uiState.isTextFieldNotEmpty)
         }
     }
 

@@ -36,6 +36,7 @@
     <string name="savelog_sb_warning_count">사진은 5개까지만 등록 가능합니다.</string>
     <string name="savelog_sb_upload_success">사진 업로드 (%1$d/%2$d)</string>
     <string name="savelog_sb_upload_failure">사진 업로드 실패</string>
+    <string name="savelog_text_theme_not_allowed_message">사진 없이 글을 작성하면, 테마를 적용할 수 있어요</string>
 
     <!-- 기록 저장 화면 - 백그라운드 -->
     <string name="savelog_image_upload_notification_title">업로드 알리미</string>
