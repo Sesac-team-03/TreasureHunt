@@ -24,10 +24,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.serialization.SerializationException
 import javax.inject.Inject
 
 private const val STORAGE_LOCATION_USER_IMAGES = "%s/$STORAGE_LOCATION_LOG_IMAGES"
 private const val IMAGE_FILE_NAME_PREFIX = "$STORAGE_LOCATION_LOG_IMAGES/"
+private const val REMOTE_DATABASE_READ_REQUEST_ITERATION_COUNT = 20
 
 @HiltViewModel
 class LogDetailViewModel @Inject constructor(
@@ -35,12 +37,12 @@ class LogDetailViewModel @Inject constructor(
     private val logRepo: LogRepository,
     private val userRepo: UserRepository,
     private val imageRepo: ImageRepository,
-    private val savedStateHandle: SavedStateHandle,
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     val args = LogDetailFragmentArgs.fromSavedStateHandle(savedStateHandle)
-    private val _log: MutableStateFlow<LogModel?> = MutableStateFlow(null)
-    val log: StateFlow<LogModel?> = _log.asStateFlow()
+    private val _logResult: MutableStateFlow<LogResult> = MutableStateFlow(LogResult.LogLoading)
+    val logResult: StateFlow<LogResult> = _logResult.asStateFlow()
 
     init {
         initLog()
@@ -48,20 +50,31 @@ class LogDetailViewModel @Inject constructor(
 
     private fun initLog() {
         viewModelScope.launch {
-            val placeId = LogDetailFragmentArgs.fromSavedStateHandle(savedStateHandle).remotePlaceId
-            val log = if (placeId.isNotEmpty()) {
-                getLogByRemotePlaceId(placeId)
+            val placeId = args.remotePlaceId
+            val log = args.log
+            val logResult = if (placeId != null) {
+                getSafeLogByRemotePlaceId(placeId)
+            } else if (log != null) {
+                getSafeLogByRemoteLogId(log.remoteId)
             } else {
-                args.log
+                LogResult.LogNotLoaded
             }
-            _log.update { log }
+            _logResult.update { logResult }
         }
     }
 
-    suspend fun getMapSymbol(log: LogModel? = null, remotePlaceId: String = ""): MapSymbol {
-        val placeId = remotePlaceId.ifEmpty { log!!.remotePlaceId }
-        val placeDTO = placeRepo.getRemotePlaceById(placeId)
-        return placeDTO.toMapSymbol()
+    private suspend fun getSafeLogByRemotePlaceId(placeId: String): LogResult {
+        var field: LogModel? = null
+
+        for (i in 0..<REMOTE_DATABASE_READ_REQUEST_ITERATION_COUNT) {
+            try {
+                field = getLogByRemotePlaceId(placeId)
+                break
+            } catch (e: SerializationException) {
+                continue
+            }
+        }
+        return if (field == null) LogResult.LogNotLoaded else LogResult.LogLoaded(field)
     }
 
     private suspend fun getLogByRemotePlaceId(placeId: String): LogModel? {
@@ -73,6 +86,38 @@ class LogDetailViewModel @Inject constructor(
         }
 
         return logDTO.toLogModel(imageUrls, logDTO.localId, logId)
+    }
+
+
+    private suspend fun getSafeLogByRemoteLogId(logId: String?): LogResult {
+        if (logId == null) return LogResult.LogNotLoaded
+
+        var field: LogModel? = null
+
+        for (i in 0..<REMOTE_DATABASE_READ_REQUEST_ITERATION_COUNT) {
+            try {
+                field = getLogByRemoteLogId(logId)
+                break
+            } catch (e: SerializationException) {
+                continue
+            }
+        }
+        return if (field == null) LogResult.LogNotLoaded else LogResult.LogLoaded(field)
+    }
+
+    private suspend fun getLogByRemoteLogId(logId: String): LogModel {
+        val logDTO: LogDTO = logRepo.getRemoteLogById(logId)
+        val imageUrls = logDTO.remoteImageIds.filterValues { it }.keys.map { id ->
+            imageRepo.getRemoteImageById(id).url
+        }
+
+        return logDTO.toLogModel(imageUrls, logDTO.localId, logId)
+    }
+
+    suspend fun getMapSymbol(remotePlaceId: String? = null, log: LogModel? = null): MapSymbol {
+        val placeId = remotePlaceId ?: log!!.remotePlaceId
+        val placeDTO = placeRepo.getRemotePlaceById(placeId)
+        return placeDTO.toMapSymbol()
     }
 
     suspend fun getRemotePlace(placeId: String) = placeRepo.getRemotePlaceById(placeId)

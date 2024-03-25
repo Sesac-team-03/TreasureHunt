@@ -17,7 +17,7 @@ data class LogModel(
     val remoteId: String? = null
 ) : Parcelable
 
-fun LogModel.asLogEntity(localId: Long = 0, remoteId: String? = null) =
+fun LogModel.asLogEntity(localId: Long = 0, remoteId: String? = this.remoteId) =
     LogEntity(remotePlaceId, text, theme, createdDate, remoteImageIds, localId, remoteId)
 
 fun LogModel.asLogDTO(localId: Long = 0) =

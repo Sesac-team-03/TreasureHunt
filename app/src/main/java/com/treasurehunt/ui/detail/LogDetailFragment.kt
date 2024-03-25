@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -61,13 +62,38 @@ class LogDetailFragment : BottomSheetDialogFragment() {
 
     private fun loadLog() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.log.collect { log ->
-                if (log == null) return@collect
+            viewModel.logResult.collect { logResult ->
 
-                setTextAndImages(log)
-                setDotsIndicator()
+                when (logResult) {
+                    is LogResult.LogLoaded -> {
+                        hideLoadingBar()
+                        setTextAndImages(logResult.value)
+                        setDotsIndicator()
+                    }
+
+                    is LogResult.LogLoading -> {
+                        showLoadingBar()
+                    }
+
+                    is LogResult.LogNotLoaded -> {
+                        hideLoadingBar()
+                        showLoadFailMessage()
+                    }
+                }
             }
         }
+    }
+
+    private fun showLoadingBar() {
+        binding.cpiLoading.isVisible = true
+    }
+
+    private fun hideLoadingBar() {
+        binding.cpiLoading.isVisible = false
+    }
+
+    private fun showLoadFailMessage() {
+        binding.tvLoadFail.isVisible = true
     }
 
     private fun setTextAndImages(log: LogModel) {
@@ -102,7 +128,6 @@ class LogDetailFragment : BottomSheetDialogFragment() {
 
                     LogDetailMenuAction.DELETE -> {
                         setDeleteLog()
-                        // TODO: 피드 화면에서 상세 화면으로 진입한 경우는 구분해서 처리
                         true
                     }
                 }
@@ -112,17 +137,17 @@ class LogDetailFragment : BottomSheetDialogFragment() {
 
     private fun setEditLog() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.log.collect { log ->
-                if (log == null) {
+            viewModel.logResult.collect { logResult ->
+                if (logResult !is LogResult.LogLoaded) {
                     showToast(R.string.logdetail_log_still_loading_message)
                     return@collect
                 }
 
                 val mapSymbol = viewModel.run {
-                    getMapSymbol(args.log, args.remotePlaceId)
+                    getMapSymbol(args.remotePlaceId, args.log)
                 }
                 val action = LogDetailFragmentDirections.actionLogDetailFragmentToSaveLogFragment(
-                    mapSymbol, log
+                    mapSymbol, logResult.value
                 )
                 findNavController().navigate(action)
             }
@@ -130,27 +155,56 @@ class LogDetailFragment : BottomSheetDialogFragment() {
     }
 
     private fun setDeleteLog() {
-        val placeId = viewModel.args.remotePlaceId
-        val userId = Firebase.auth.currentUser?.uid
+        viewLifecycleOwner.lifecycleScope.launch {
+            val userId = Firebase.auth.currentUser?.uid ?: return@launch showErrorMessage()
+            val placeId = viewModel.args.remotePlaceId
+            val log = viewModel.args.log
 
-        if (placeId.isNotEmpty() && userId != null) {
-            viewLifecycleOwner.lifecycleScope.launch {
-                val placeDTO = viewModel.getRemotePlace(placeId)
-                placeDTO.remoteLogId?.let { logId ->
-                    viewModel.deleteLogAndAssociatedData(logId, placeId, userId)
-                    showToast(R.string.logdetail_log_deleted_message)
-                    dismiss()
-                } ?: run {
-                    showToast(R.string.logdetail_error_message)
-                }
-                val action = LogDetailFragmentDirections.actionLogDetailFragmentToHomeFragment(
-                    viewModel.args.remotePlaceId
-                )
-                findNavController().navigate(action)
+            if (placeId != null) {
+                handleDeleteFromHome(placeId, userId)
+            } else if (log != null) {
+                handleDeleteFromFeed(log, userId)
+            } else {
+                showErrorMessage()
             }
-        } else {
+        }
+    }
+
+    private suspend fun handleDeleteFromHome(placeId: String, userId: String) {
+        val placeDTO = viewModel.getRemotePlace(placeId)
+
+        placeDTO.remoteLogId?.let { logId ->
+            deleteLog(logId, placeId, userId)
+        } ?: return showErrorMessage()
+
+        val action = LogDetailFragmentDirections.actionLogDetailFragmentToHomeFragment(
+            placeId
+        )
+        findNavController().navigate(action)
+    }
+
+    private suspend fun handleDeleteFromFeed(log: LogModel, userId: String) {
+        log.remoteId?.let { logId ->
+            deleteLog(logId, log.remotePlaceId, userId)
+        } ?: return showErrorMessage()
+
+        findNavController().navigate(LogDetailFragmentDirections.actionLogDetailFragmentToFeedFragment())
+    }
+
+    private fun showErrorMessage() {
+        kotlin.run {
             showToast(R.string.logdetail_error_message)
         }
+    }
+
+    private suspend fun deleteLog(
+        logId: String,
+        placeId: String,
+        userId: String
+    ) {
+        viewModel.deleteLogAndAssociatedData(logId, placeId, userId)
+        showToast(R.string.logdetail_log_deleted_message)
+        dismiss()
     }
 
     private fun setCloseButton() {

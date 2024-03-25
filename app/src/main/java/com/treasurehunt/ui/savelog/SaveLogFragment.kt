@@ -223,7 +223,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
 
             scheduleImageUploadAndDatabaseUpdateWorks()
 
-            findNavController().navigate(R.id.action_saveLogFragment_to_homeFragment)
+            findNavController().navigateUp()
         }
     }
 
@@ -284,7 +284,6 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
             .putStringArray(WORK_DATA_URL_STRINGS, storageUrls)
             .apply {
                 args.log?.let { log ->
-                    // TODO: check Feed
                     requireNotNull(log.remoteId)
                     putString(WORK_DATA_REMOTE_LOG_ID, log.remoteId)
                 }
@@ -320,7 +319,6 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
             .putString(WORK_DATA_PLAN_ID, planId)
             .apply {
                 args.log?.let { log ->
-                    // TODO: check Feed
                     requireNotNull(log.localId)
                     requireNotNull(log.remoteId)
                     requireNotNull(log.remotePlaceId)

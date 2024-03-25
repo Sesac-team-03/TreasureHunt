@@ -3,6 +3,7 @@ package com.treasurehunt.ui.savelog
 import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
+import androidx.work.Data
 import androidx.work.WorkerParameters
 import com.treasurehunt.data.ImageRepository
 import com.treasurehunt.data.LogRepository
@@ -31,34 +32,22 @@ class DatabaseUpdateWorker @AssistedInject constructor(
     private val imageRepo: ImageRepository
 ) : CoroutineWorker(context, params) {
 
-    private val uid = inputData.getString(WORK_DATA_UID) ?: ""
-    private lateinit var mapSymbol: MapSymbol
-    private val localLogId = inputData.getLong(WORK_DATA_LOCAL_LOG_ID, -1)
-    private val remoteLogId = inputData.getString(WORK_DATA_REMOTE_LOG_ID)
-    private var localPlaceId = -1L
-    private val remotePlaceId = inputData.getString(WORK_DATA_REMOTE_PLACE_ID)
-
     override suspend fun doWork(): Result {
-        remotePlaceId?.let { remotePlaceId ->
-            localPlaceId = placeRepo.getRemotePlaceById(remotePlaceId).localId
-        }
-
         return try {
-            if (uid.isEmpty()) return Result.failure()
-
-            val urlStrings = inputData.getStringArray(WORK_DATA_URL_STRINGS)?.asList()
+            val mapSymbol: MapSymbol = mapSymbolOf(inputData)
+            val remotePlaceId = inputData.getString(WORK_DATA_REMOTE_PLACE_ID)
+                ?: getRemotePlaceId(mapSymbol)
+            val log = logOf(inputData, remotePlaceId)
                 ?: return Result.failure()
-            val text = inputData.getString(WORK_DATA_LOG_TEXT)
-                ?: return Result.failure()
-            val lat = inputData.getDouble(WORK_DATA_LAT, 0.0)
-            val lng = inputData.getDouble(WORK_DATA_LNG, 0.0)
-            val caption = inputData.getString(WORK_DATA_CAPTION) ?: ""
-            val isPlan = inputData.getBoolean(WORK_DATA_IS_PLAN, false)
-            val planId = inputData.getString(WORK_DATA_PLAN_ID)
+            val localLogId = inputData.getLong(WORK_DATA_LOCAL_LOG_ID, -1)
+            val remoteLogId = inputData.getString(WORK_DATA_REMOTE_LOG_ID)?.also { remoteLogId ->
+                updateLog(log, localLogId, remoteLogId)
+            } ?: insertLog(log)
+            val uid = inputData.getString(WORK_DATA_UID) ?: return Result.failure()
 
-            mapSymbol = MapSymbol(lat, lng, isPlan, caption, planId)
+            updatePlaceWithLog(remotePlaceId, remoteLogId)
 
-            init(urlStrings, text)
+            updateUser(uid, remotePlaceId, mapSymbol.remotePlanId, remoteLogId)
 
             Result.success()
         } catch (e: Exception) {
@@ -66,19 +55,18 @@ class DatabaseUpdateWorker @AssistedInject constructor(
         }
     }
 
-    private suspend fun init(imageStorageUrls: List<String>, text: String) {
-        val remotePlaceId = getRemotePlaceId()
-        val log = getLogFor(imageStorageUrls, remotePlaceId, text)
-        val remoteLogId = insertLog(log)
+    private fun mapSymbolOf(inputData: Data): MapSymbol {
+        val lat = inputData.getDouble(WORK_DATA_LAT, 0.0)
+        val lng = inputData.getDouble(WORK_DATA_LNG, 0.0)
+        val caption = inputData.getString(WORK_DATA_CAPTION) ?: ""
+        val isPlan = inputData.getBoolean(WORK_DATA_IS_PLAN, false)
+        val planId = inputData.getString(WORK_DATA_PLAN_ID)
 
-        updatePlaceWithLog(remotePlaceId, remoteLogId)
-        updateUser(remotePlaceId, remoteLogId)
+        return MapSymbol(lat, lng, isPlan, caption, planId)
     }
 
     // 기록 저장 화면 진입 경로 (처리 순서대로): 기록 상세 화면 수정 / 홈 지도 화면 다이얼로그 "네, 가봤어요" / 홈 지도 화면 닫힌 보물상자 마커
-    private suspend fun getRemotePlaceId(): String {
-        if (remotePlaceId != null) return remotePlaceId
-
+    private suspend fun getRemotePlaceId(mapSymbol: MapSymbol): String {
         val planId = mapSymbol.remotePlanId
         return if (planId.isNullOrEmpty()) {
             insertPlace(mapSymbol)
@@ -117,11 +105,15 @@ class DatabaseUpdateWorker @AssistedInject constructor(
         )
     }
 
-    private suspend fun getLogFor(
-        imageStorageUrls: List<String>,
-        remotePlaceId: String,
-        text: String
-    ): LogModel {
+    private suspend fun logOf(
+        inputData: Data,
+        remotePlaceId: String
+    ): LogModel? {
+        val imageStorageUrls = inputData.getStringArray(WORK_DATA_URL_STRINGS)?.asList()
+            ?: return null
+        val text = inputData.getString(WORK_DATA_LOG_TEXT)
+            ?: return null
+
         val theme = "123"
         val createdDate = getCurrentTime()
         val imageIds = imageStorageUrls.map { imageUrl ->
@@ -135,19 +127,21 @@ class DatabaseUpdateWorker @AssistedInject constructor(
             text,
             theme,
             createdDate,
-            imageIds,
+            imageIds
         )
     }
 
-    private suspend fun insertLog(log: LogModel): String {
-        if (remoteLogId != null) {
-            logRepo.update(log.asLogEntity(localLogId))
-            logRepo.update(remoteLogId, log.asLogDTO(localLogId))
-            return remoteLogId
-        }
+    private suspend fun updateLog(log: LogModel, localLogId: Long, remoteLogId: String): String {
+        logRepo.update(log.asLogEntity(localLogId, remoteLogId))
+        logRepo.update(remoteLogId, log.asLogDTO(localLogId))
+        return remoteLogId
+    }
 
+    private suspend fun insertLog(log: LogModel): String {
         val localLogId = logRepo.insert(log.asLogEntity())
-        return logRepo.insert(log.asLogDTO(localLogId))
+        val remoteLogId = logRepo.insert(log.asLogDTO(localLogId))
+        logRepo.update(log.asLogEntity(localLogId, remoteLogId))
+        return remoteLogId
     }
 
     private suspend fun updatePlaceWithLog(remotePlaceId: String, remoteLogId: String) {
@@ -156,21 +150,23 @@ class DatabaseUpdateWorker @AssistedInject constructor(
         placeRepo.update(remotePlaceId, updatedPlace)
     }
 
-    private suspend fun updateUser(remotePlaceId: String, remoteLogId: String) {
+    private suspend fun updateUser(
+        uid: String,
+        remotePlaceId: String,
+        remotePlanId: String?,
+        remoteLogId: String
+    ) {
         val userDTO = userRepo.getRemoteUserById(uid)
-
-        if (!mapSymbol.remotePlanId.isNullOrEmpty()) {
-            userRepo.update(
-                uid, userDTO.copy(
-                    remotePlanIds = userDTO.remotePlanIds.minus(remotePlaceId)
-                )
-            )
-        }
 
         userRepo.update(
             uid, userDTO.copy(
+                remoteLogIds = userDTO.remoteLogIds.plus(remoteLogId to true),
                 remoteVisitIds = userDTO.remoteVisitIds.plus(remotePlaceId to true),
-                remoteLogIds = userDTO.remoteLogIds.plus(remoteLogId to true)
+                remotePlanIds = if (remotePlanId != null) {
+                    userDTO.remotePlanIds.minus(remotePlanId)
+                } else {
+                    userDTO.remotePlanIds
+                }
             )
         )
     }

@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.serialization.SerializationException
 import javax.inject.Inject
 
 private const val INITIAL_LOAD_SIZE = 3
@@ -56,8 +57,12 @@ class FeedViewModel @Inject constructor(
     }
 
     private suspend fun getImageUrls(imageIds: List<String>): List<String> {
-        return imageIds.map { id ->
-            imageRepo.getRemoteImageById(id).url
+        return try {
+            imageIds.map { id ->
+                imageRepo.getRemoteImageById(id).url
+            }
+        } catch (e: SerializationException) {
+            listOf("")
         }
     }
 }
