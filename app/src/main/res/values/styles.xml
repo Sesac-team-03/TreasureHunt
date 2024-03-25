@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- 앱 -->
+    <style name="PopupMenu" parent="@style/Widget.MaterialComponents.PopupMenu">
+        <item name="android:popupBackground">@color/white</item>
+    </style>
+
+    <style name="BottomSheet" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@drawable/bottom_sheet_background</item>
+    </style>
+
+    <style name="Font">
+        <item name="fontFamily">@font/pretendard</item>
+    </style>
+
     <!-- 홈 액티비티 -->
     <style name="HomeBottomNavigationView">
         <item name="itemActiveIndicatorStyle">@android:color/transparent</item>
@@ -9,10 +22,6 @@
     </style>
 
     <!--로그인 화면-->
-    <style name="Font">
-        <item name="fontFamily">@font/pretendard</item>
-    </style>
-
     <style name="Font.Login">
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">@dimen/middle</item>
@@ -72,6 +81,20 @@
     <style name="Font.SaveLogMapTitle">
         <item name="android:textColor">@color/black</item>
         <item name="android:textSize">@dimen/xLarge</item>
+    </style>
+
+    <!-- 기록 상세 화면 -->
+    <style name="Font.LogDetailLoadFailMessage">
+        <item name="android:textAlignment">center</item>
+        <item name="android:textColor">@color/gray_100</item>
+        <item name="android:textSize">@dimen/middle</item>
+    </style>
+
+    <style name="Font.LogDetailText">
+        <item name="android:fontFamily">@font/pretendard</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textSize">@dimen/large</item>
     </style>
 
     <!-- 프로필 화면 -->

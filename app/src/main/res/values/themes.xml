@@ -5,5 +5,13 @@
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>
 
-    <style name="Theme.TreasureHunt" parent="Base.Theme.TreasureHunt" />
+    <style name="Theme.TreasureHunt" parent="Base.Theme.TreasureHunt">
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
+        <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
+    </style>
+
+    <style name="BottomSheetDialogTheme"
+        parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/BottomSheet</item>
+    </style>
 </resources>

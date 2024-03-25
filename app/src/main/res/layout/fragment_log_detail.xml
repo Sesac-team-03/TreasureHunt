@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/bottom_sheet_background"
     android:paddingTop="16dp">
 
     <com.google.android.material.progressindicator.CircularProgressIndicator
@@ -20,13 +19,10 @@
 
     <TextView
         android:id="@+id/tv_load_fail"
+        style="@style/Font.LogDetailLoadFailMessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/pretendard"
         android:text="@string/logdetail_log_failed"
-        android:textAlignment="center"
-        android:textColor="@color/gray_100"
-        android:textSize="16sp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -34,7 +30,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.4"
         tools:visibility="visible" />
-    =======
 
     <ImageView
         android:id="@+id/iv_bar"
@@ -116,14 +111,11 @@
 
     <TextView
         android:id="@+id/tv_text"
+        style="@style/Font.LogDetailText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="42dp"
-        android:fontFamily="@font/pretendard"
-        android:gravity="center"
         android:padding="16dp"
-        android:textAlignment="center"
-        android:textSize="@dimen/large"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/vp_image"
