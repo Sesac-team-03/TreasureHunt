@@ -9,7 +9,7 @@ plugins {
 
 buildscript {
     dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-serialization:1.9.22")
-        classpath("androidx.navigation:navigation-safe-args-gradle-plugin:2.7.6")
+        classpath("org.jetbrains.kotlin:kotlin-serialization:1.9.23")
+        classpath("androidx.navigation:navigation-safe-args-gradle-plugin:2.7.7")
     }
 }
