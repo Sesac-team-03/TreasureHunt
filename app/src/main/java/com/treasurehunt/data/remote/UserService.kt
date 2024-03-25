@@ -37,4 +37,8 @@ interface UserService {
         @Query("startAt") startAt: String,
         @Query("limitToFirst") limit: Int
     ): JsonObject
+
+    suspend fun searchNaverUserEmail(
+        @Query("email") email: String
+    ): String
 }

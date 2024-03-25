@@ -25,4 +25,6 @@ interface UserRepository {
     suspend fun delete(id: String)
 
     suspend fun search(startAt: String, limit: Int = 10): Map<String, UserDTO>
+
+    suspend fun searchNaverUserEmail(email: String): String
 }

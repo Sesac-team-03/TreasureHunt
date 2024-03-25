@@ -98,4 +98,5 @@
     <string name="conversion_account_tv_warning_title">정말 회원 전환 하시겠습니까?</string>
     <string name="conversion_account_btn_cancel">아니요</string>
     <string name="conversion_account_btn_account_conversion">네, 전환할래요</string>
+    <string name="conversion_account_sb_has_naver_account">네이버 계정이 존재합니다</string>
 </resources>

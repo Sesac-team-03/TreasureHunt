@@ -36,4 +36,6 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun search(startAt: String, limit: Int) = userRemoteDataSource.search(startAt, limit)
+
+    override suspend fun searchNaverUserEmail(email: String): String = userRemoteDataSource.searchEmail(email)
 }

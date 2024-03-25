@@ -92,4 +92,8 @@ class SettingViewModel @Inject constructor(
     suspend fun updateSwitchState(isChecked: Boolean) {
         loginRepo.updateAutoLoginSwitch(isChecked)
     }
+
+    suspend fun checkNaverUser(email: String): String {
+        return userRepo.searchNaverUserEmail("\"$email\"")
+    }
 }

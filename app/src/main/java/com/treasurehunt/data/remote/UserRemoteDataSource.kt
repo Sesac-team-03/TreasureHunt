@@ -33,4 +33,14 @@ class UserRemoteDataSource @Inject constructor(private val userService: UserServ
             emptyMap()
         }
     }
+
+    suspend fun searchEmail(email: String): String {
+        return try {
+            userService.searchNaverUserEmail(
+                email = email
+            )
+        } catch (e: Exception) {
+            ""
+        }
+    }
 }
