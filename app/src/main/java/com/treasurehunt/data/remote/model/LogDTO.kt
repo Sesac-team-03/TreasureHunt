@@ -2,15 +2,17 @@ package com.treasurehunt.data.remote.model
 
 import com.treasurehunt.data.local.model.LogEntity
 import com.treasurehunt.ui.model.LogModel
+import kotlinx.serialization.EncodeDefault
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class LogDTO(
+data class LogDTO @OptIn(ExperimentalSerializationApi::class) constructor(
     val remotePlaceId: String,
-    val text: String = "",
+    @EncodeDefault val text: String = "",
     val theme: Int,
     val createdDate: Long,
-    val remoteImageIds: Map<String, Boolean> = emptyMap(),
+    @EncodeDefault val remoteImageIds: Map<String, Boolean> = emptyMap(),
     val localId: Long = 0
 )
 
@@ -19,7 +21,7 @@ fun LogDTO.toLogEntity(remoteId: String) = LogEntity(
     text,
     theme,
     createdDate,
-    remoteImageIds.keys.toList(),
+    remoteImageIds.filterValues { it }.keys.toList(),
     localId,
     remoteId
 )
@@ -30,7 +32,7 @@ fun LogDTO.toLogModel(imageUrls: List<String>, localId: Long? = null, remoteId: 
         text,
         theme,
         createdDate,
-        remoteImageIds.keys.toList(),
+        remoteImageIds.filterValues { it }.keys.toList(),
         imageUrls,
         localId,
         remoteId
