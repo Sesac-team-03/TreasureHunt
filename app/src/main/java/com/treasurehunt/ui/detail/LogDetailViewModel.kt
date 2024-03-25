@@ -16,6 +16,7 @@ import com.treasurehunt.data.remote.model.toLogModel
 import com.treasurehunt.data.remote.model.toMapSymbol
 import com.treasurehunt.data.remote.model.toPlaceEntity
 import com.treasurehunt.ui.model.LogModel
+import com.treasurehunt.ui.model.LogResult
 import com.treasurehunt.ui.model.MapSymbol
 import com.treasurehunt.util.STORAGE_LOCATION_LOG_IMAGES
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -41,7 +42,7 @@ class LogDetailViewModel @Inject constructor(
 ) : ViewModel() {
 
     val args = LogDetailFragmentArgs.fromSavedStateHandle(savedStateHandle)
-    private val _logResult: MutableStateFlow<LogResult> = MutableStateFlow(LogResult.LogLoading)
+    private val _logResult: MutableStateFlow<LogResult> = MutableStateFlow(LogResult.Loading)
     val logResult: StateFlow<LogResult> = _logResult.asStateFlow()
 
     init {
@@ -57,7 +58,7 @@ class LogDetailViewModel @Inject constructor(
             } else if (log != null) {
                 getSafeLogByRemoteLogId(log.remoteId)
             } else {
-                LogResult.LogNotLoaded
+                LogResult.NotLoaded
             }
             _logResult.update { logResult }
         }
@@ -74,7 +75,7 @@ class LogDetailViewModel @Inject constructor(
                 continue
             }
         }
-        return if (field == null) LogResult.LogNotLoaded else LogResult.LogLoaded(field)
+        return if (field == null) LogResult.NotLoaded else LogResult.Loaded(field)
     }
 
     private suspend fun getLogByRemotePlaceId(placeId: String): LogModel? {
@@ -90,7 +91,7 @@ class LogDetailViewModel @Inject constructor(
 
 
     private suspend fun getSafeLogByRemoteLogId(logId: String?): LogResult {
-        if (logId == null) return LogResult.LogNotLoaded
+        if (logId == null) return LogResult.NotLoaded
 
         var field: LogModel? = null
 
@@ -102,7 +103,7 @@ class LogDetailViewModel @Inject constructor(
                 continue
             }
         }
-        return if (field == null) LogResult.LogNotLoaded else LogResult.LogLoaded(field)
+        return if (field == null) LogResult.NotLoaded else LogResult.Loaded(field)
     }
 
     private suspend fun getLogByRemoteLogId(logId: String): LogModel {

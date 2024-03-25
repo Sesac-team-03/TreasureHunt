@@ -22,6 +22,7 @@ import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentLogDetailBinding
 import com.treasurehunt.ui.detail.adapter.LogDetailViewPagerAdapter
 import com.treasurehunt.ui.model.LogModel
+import com.treasurehunt.ui.model.LogResult
 import com.treasurehunt.ui.model.TextTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -72,21 +73,21 @@ class LogDetailFragment : BottomSheetDialogFragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.logResult.collect { logResult ->
                 when (logResult) {
-                    is LogResult.LogLoaded -> {
+                    is LogResult.Loaded -> {
                         hideLoadingBar()
                         if (logResult.value.imageUrls.isEmpty()) {
                             setThemedText(logResult.value)
                         } else {
-                            setTextAndImages(logResult.value)
+                            setImagesAndText(logResult.value)
                         }
                         setDotsIndicator()
                     }
 
-                    is LogResult.LogLoading -> {
+                    is LogResult.Loading -> {
                         showLoadingBar()
                     }
 
-                    is LogResult.LogNotLoaded -> {
+                    is LogResult.NotLoaded -> {
                         hideLoadingBar()
                         showLoadFailMessage()
                     }
@@ -105,14 +106,6 @@ class LogDetailFragment : BottomSheetDialogFragment() {
 
     private fun showLoadFailMessage() {
         binding.tvLoadFail.isVisible = true
-    }
-
-    private fun setTextAndImages(log: LogModel) {
-        val imageItem = LogDetailItem.TextItem(
-            value = log.text,
-            theme = TextTheme.entries[log.theme]
-        )
-        logDetailViewPagerAdapter.submitList(listOf(imageItem))
     }
 
     private fun setThemedText(log: LogModel) {
@@ -162,7 +155,7 @@ class LogDetailFragment : BottomSheetDialogFragment() {
     private fun setEditLog() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.logResult.collect { logResult ->
-                if (logResult !is LogResult.LogLoaded) {
+                if (logResult !is LogResult.Loaded) {
                     showToast(R.string.logdetail_log_still_loading_message)
                     return@collect
                 }

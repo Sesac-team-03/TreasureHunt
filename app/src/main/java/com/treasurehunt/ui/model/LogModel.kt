@@ -3,7 +3,7 @@ package com.treasurehunt.ui.model
 import android.os.Parcelable
 import com.treasurehunt.data.local.model.LogEntity
 import com.treasurehunt.data.remote.model.LogDTO
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class LogModel(
