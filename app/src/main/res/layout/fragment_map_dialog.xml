@@ -4,10 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.home.MapDialogFragment">
+    tools:context=".ui.home.MapDialogFragment"
+    tools:theme="@style/BottomSheetDialogTheme">
 
     <TextView
         android:id="@+id/tv_title"
+        style="@style/Font.MapDialog.Title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
@@ -17,32 +19,45 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.constraintlayout.helper.widget.Flow
-        android:id="@+id/flow_btns"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:orientation="vertical"
-        app:constraint_referenced_ids="btn_visit,btn_plan,btn_cancel"
-        app:flow_verticalGap="10dp"
+    <ImageView
+        android:id="@+id/iv_logo"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="20dp"
+        android:src="@drawable/ic_chest_open"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_title" />
 
+    <androidx.constraintlayout.helper.widget.Flow
+        android:id="@+id/flow_btns"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:orientation="vertical"
+        app:constraint_referenced_ids="btn_visit,btn_plan,btn_cancel"
+        app:flow_verticalGap="15dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/iv_logo" />
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_visit"
+        style="@style/Font.MapDialog.Body"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/map_answer_visit" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_plan"
+        style="@style/Font.MapDialog.Body"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/map_answer_plan" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_cancel"
+        style="@style/Font.MapDialog.Body"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/map_answer_no" />

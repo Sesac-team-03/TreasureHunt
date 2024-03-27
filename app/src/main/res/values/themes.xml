@@ -10,8 +10,8 @@
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
     </style>
 
-    <style name="BottomSheetDialogTheme"
-        parent="Theme.Design.Light.BottomSheetDialog">
+    <style name="BottomSheetDialogTheme" parent="Theme.MaterialComponents.DayNight.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/BottomSheet</item>
+        <item name="materialButtonStyle">@style/Widget.Material3.Button</item>
     </style>
 </resources>
