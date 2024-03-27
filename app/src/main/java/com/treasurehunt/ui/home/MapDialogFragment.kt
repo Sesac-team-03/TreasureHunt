@@ -13,6 +13,7 @@ import com.treasurehunt.R
 import com.treasurehunt.data.local.model.PlaceEntity
 import com.treasurehunt.data.remote.model.PlaceDTO
 import com.treasurehunt.databinding.FragmentMapDialogBinding
+import com.treasurehunt.util.getPostfix
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -41,7 +42,11 @@ class MapDialogFragment : BottomSheetDialogFragment() {
     }
 
     private fun setPrompt() {
-        binding.tvTitle.text = getString(R.string.map_prompt, args.mapSymbol.caption)
+        binding.tvTitle.text = getString(
+            R.string.map_prompt,
+            args.mapSymbol.caption,
+            getPostfix(args.mapSymbol.caption.lastOrNull())
+        )
     }
 
     private fun setBtnVisit() {
