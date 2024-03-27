@@ -17,10 +17,13 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.dynamiclinks.DynamicLink
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import com.treasurehunt.R
-import com.treasurehunt.databinding.FragmentLogdetailBinding
-import com.treasurehunt.ui.detail.adapter.ImageSliderAdapter
+import com.treasurehunt.databinding.FragmentLogDetailBinding
+import com.treasurehunt.ui.detail.adapter.LogDetailViewPagerAdapter
 import com.treasurehunt.ui.model.LogModel
+import com.treasurehunt.ui.model.LogResult
+import com.treasurehunt.ui.model.TextTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -30,21 +33,23 @@ const val MIME_TYPE_TEXT_PLAIN = "text/plain"
 
 @AndroidEntryPoint
 class LogDetailFragment : BottomSheetDialogFragment() {
-    private var _binding: FragmentLogdetailBinding? = null
+
+    private var _binding: FragmentLogDetailBinding? = null
     private val binding get() = _binding!!
-    private lateinit var imageSliderAdapter: ImageSliderAdapter
+    private val logDetailViewPagerAdapter = LogDetailViewPagerAdapter()
     private val viewModel: LogDetailViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentLogdetailBinding.inflate(inflater, container, false)
+        _binding = FragmentLogDetailBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setImageSliderAdapter()
+        setAdapter()
+        setDotsIndicator()
         loadLog()
         setPopupButton(getPopupMenu())
         setCloseButton()
@@ -56,26 +61,33 @@ class LogDetailFragment : BottomSheetDialogFragment() {
         _binding = null
     }
 
-    private fun setImageSliderAdapter() {
-        imageSliderAdapter = ImageSliderAdapter()
+    private fun setAdapter() {
+        binding.vpImage.adapter = logDetailViewPagerAdapter
+    }
+
+    private fun setDotsIndicator() {
+        binding.diImage.setViewPager2(binding.vpImage)
     }
 
     private fun loadLog() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.logResult.collect { logResult ->
-
                 when (logResult) {
-                    is LogResult.LogLoaded -> {
+                    is LogResult.Loaded -> {
                         hideLoadingBar()
-                        setTextAndImages(logResult.value)
+                        if (logResult.value.imageUrls.isEmpty()) {
+                            setThemedText(logResult.value)
+                        } else {
+                            setImagesAndText(logResult.value)
+                        }
                         setDotsIndicator()
                     }
 
-                    is LogResult.LogLoading -> {
+                    is LogResult.Loading -> {
                         showLoadingBar()
                     }
 
-                    is LogResult.LogNotLoaded -> {
+                    is LogResult.NotLoaded -> {
                         hideLoadingBar()
                         showLoadFailMessage()
                     }
@@ -96,25 +108,30 @@ class LogDetailFragment : BottomSheetDialogFragment() {
         binding.tvLoadFail.isVisible = true
     }
 
-    private fun setTextAndImages(log: LogModel) {
-        binding.tvText.text = log.text
-        val imageItems = log.imageUrls.map { ImageItem.Url(it) }
-        imageSliderAdapter.submitList(imageItems)
+    private fun setThemedText(log: LogModel) {
+        val item = LogDetailItem.TextItem(
+            value = log.text,
+            theme = TextTheme.entries[log.theme]
+        )
+        logDetailViewPagerAdapter.submitList(listOf(item))
     }
 
-    private fun setDotsIndicator() {
-        binding.vpPhoto.adapter = imageSliderAdapter
-        binding.diText.setViewPager2(binding.vpPhoto)
+    private fun setImagesAndText(log: LogModel) {
+        val items = log.imageUrls.map {
+            LogDetailItem.ImageItem(storageReference = Firebase.storage.getReferenceFromUrl(it))
+        }
+        logDetailViewPagerAdapter.submitList(items)
+        binding.tvText.text = log.text
     }
 
     private fun setPopupButton(popup: PopupMenu) {
-        binding.btnPopup.setOnClickListener {
+        binding.ibPopup.setOnClickListener {
             popup.show()
         }
     }
 
     private fun getPopupMenu(): PopupMenu {
-        return PopupMenu(requireContext(), binding.btnPopup).apply {
+        return PopupMenu(requireContext(), binding.ibPopup).apply {
             menuInflater.inflate(R.menu.edit_menu, menu)
 
             setOnMenuItemClickListener { menuItem ->
@@ -138,7 +155,7 @@ class LogDetailFragment : BottomSheetDialogFragment() {
     private fun setEditLog() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.logResult.collect { logResult ->
-                if (logResult !is LogResult.LogLoaded) {
+                if (logResult !is LogResult.Loaded) {
                     showToast(R.string.logdetail_log_still_loading_message)
                     return@collect
                 }
@@ -146,9 +163,10 @@ class LogDetailFragment : BottomSheetDialogFragment() {
                 val mapSymbol = viewModel.run {
                     getMapSymbol(args.remotePlaceId, args.log)
                 }
-                val action = LogDetailFragmentDirections.actionLogDetailFragmentToSaveLogFragment(
-                    mapSymbol, logResult.value
-                )
+                val action =
+                    LogDetailFragmentDirections.actionLogDetailFragmentToSaveLogFragment(
+                        mapSymbol, logResult.value
+                    )
                 findNavController().navigate(action)
             }
         }
@@ -208,13 +226,13 @@ class LogDetailFragment : BottomSheetDialogFragment() {
     }
 
     private fun setCloseButton() {
-        binding.btnClose.setOnClickListener {
+        binding.ibClose.setOnClickListener {
             findNavController().navigateUp()
         }
     }
 
     private fun setShareButton() {
-        binding.btnShare.setOnClickListener {
+        binding.ibShare.setOnClickListener {
             shareContent(getDynamicLink())
         }
     }

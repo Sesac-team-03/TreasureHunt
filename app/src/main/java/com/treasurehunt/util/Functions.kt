@@ -73,3 +73,33 @@ fun formatDistance(meter: Long): String {
 
     return "${(meter / KILOMETER_BREAKPOINT).roundOff()}$UNIT_KILOMETER"
 }
+
+/* ----------- 문자 ----------- */
+
+private const val KOREAN_ENDING_CONSONANT_COUNT = 28
+
+private fun Int.hasKoreanEndingConsonant() = (this - '가'.code) % KOREAN_ENDING_CONSONANT_COUNT > 0
+
+private val vowels = listOf('A', 'E', 'I', 'O', 'U', 'a', 'e', 'i', 'o', 'u')
+
+private fun Int.hasEnglishEndingConsonant() = this !in vowels.map { vowel -> vowel.code }
+
+fun getPostfix(lastChar: Char?): Char {
+    return when (lastChar?.code) {
+        null -> {
+            ' '
+        }
+
+        in '가'.code..'힣'.code -> {
+            if ((lastChar.code).hasKoreanEndingConsonant()) '을' else '를'
+        }
+
+        in 'A'.code..'z'.code -> {
+            if ((lastChar.code).hasEnglishEndingConsonant()) '을' else '를'
+        }
+
+        else -> {
+            ' '
+        }
+    }
+}

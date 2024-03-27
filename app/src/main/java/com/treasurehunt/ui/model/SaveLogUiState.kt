@@ -5,5 +5,6 @@ data class SaveLogUiState(
     val images: List<ImageModel> = listOf(),
     val isTextFieldNotEmpty: Boolean = false,
     val isSaveButtonEnabled: Boolean = false,
+    val isTextThemeEnabled: Boolean = false,
     val isOnline: Boolean = false
 )

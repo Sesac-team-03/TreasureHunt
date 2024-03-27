@@ -10,14 +10,14 @@
     <string name="home_feed">피드</string>
     <string name="home_map_tiet_search_place_hint">보물찾기할 장소를 검색해 보세요</string>
 
-    <!-- 지도 다이얼로그 -->
-    <string name="map_prompt">%1$s를 보물상자로 지정할까요?</string>
+    <!-- 홈 지도 다이얼로그 화면 -->
+    <string name="map_prompt">%1$s%2$s 보물상자로 지정할까요?</string>
     <string name="map_answer_visit">네, 가봤어요</string>
     <string name="map_answer_plan">네, 가볼래요</string>
     <string name="map_answer_no">아니요</string>
 
     <!-- 지도 장소 검색 화면 -->
-    <string name="search_map_place_unknown">?</string>
+    <string name="search_map_place_unknown">\?</string>
 
     <!-- 로그인 화면 -->
     <string name="login_naver">네이버로 계속하기</string>
@@ -36,6 +36,7 @@
     <string name="savelog_sb_warning_count">사진은 5개까지만 등록 가능합니다.</string>
     <string name="savelog_sb_upload_success">사진 업로드 (%1$d/%2$d)</string>
     <string name="savelog_sb_upload_failure">사진 업로드 실패</string>
+    <string name="savelog_text_theme_not_allowed_message">사진 없이 글을 작성하면, 테마를 적용할 수 있어요</string>
 
     <!-- 기록 저장 화면 - 백그라운드 -->
     <string name="savelog_image_upload_notification_title">업로드 알리미</string>

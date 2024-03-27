@@ -4,11 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/bottom_sheet_background"
-    android:paddingStart="0dp"
     android:paddingTop="16dp"
-    android:paddingEnd="0dp"
-    android:paddingBottom="16dp">
+    tools:theme="@style/BottomSheetDialogTheme">
 
     <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/cpi_loading"
@@ -23,13 +20,10 @@
 
     <TextView
         android:id="@+id/tv_load_fail"
+        style="@style/Font.LogDetailLoadFailMessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/pretendard"
         android:text="@string/logdetail_log_failed"
-        android:textAlignment="center"
-        android:textColor="@color/gray_100"
-        android:textSize="16sp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -38,8 +32,18 @@
         app:layout_constraintVertical_bias="0.4"
         tools:visibility="visible" />
 
+    <ImageView
+        android:id="@+id/iv_bar"
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_marginBottom="56dp"
+        android:src="@drawable/ic_dialogtop"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <ImageButton
-        android:id="@+id/btn_popup"
+        android:id="@+id/ib_popup"
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_marginStart="22dp"
@@ -49,7 +53,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
-        android:id="@+id/btn_close"
+        android:id="@+id/ib_close"
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_marginTop="22dp"
@@ -59,18 +63,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/iv_bar"
-        android:layout_width="40dp"
-        android:layout_height="4dp"
-        android:layout_marginBottom="56dp"
-        android:src="@drawable/ic_dialogtop"
-        app:layout_constraintBottom_toTopOf="@+id/vp_photo"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
     <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/vp_photo"
+        android:id="@+id/vp_image"
         android:layout_width="0dp"
         android:layout_height="260dp"
         android:layout_marginTop="70dp"
@@ -79,7 +73,7 @@
         app:layout_constraintTop_toBottomOf="@+id/iv_bar" />
 
     <com.tbuonomo.viewpagerdotsindicator.DotsIndicator
-        android:id="@+id/di_text"
+        android:id="@+id/di_image"
         android:layout_width="wrap_content"
         android:layout_height="30dp"
         android:layout_gravity="center"
@@ -93,36 +87,38 @@
         app:layout_constraintBottom_toTopOf="@+id/tv_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/vp_photo"
+        app:layout_constraintTop_toBottomOf="@+id/vp_image"
         app:selectedDotColor="@color/black" />
 
-    <TextView
-        android:id="@+id/tv_text"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:padding="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/vp_photo" />
+    <ImageButton
+        android:id="@+id/ib_comment"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="28dp"
+        android:background="@drawable/ic_message"
+        app:layout_constraintEnd_toStartOf="@+id/ib_share"
+        app:layout_constraintTop_toBottomOf="@+id/vp_image" />
 
     <ImageButton
-        android:id="@+id/btn_share"
+        android:id="@+id/ib_share"
         android:layout_width="18dp"
         android:layout_height="20dp"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="16dp"
         android:background="@drawable/ic_share"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/vp_photo" />
+        app:layout_constraintTop_toBottomOf="@+id/vp_image" />
 
-    <ImageButton
-        android:id="@+id/btn_message"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="28dp"
-        android:background="@drawable/ic_message"
-        app:layout_constraintEnd_toStartOf="@+id/btn_share"
-        app:layout_constraintTop_toBottomOf="@+id/vp_photo" />
+    <TextView
+        android:id="@+id/tv_text"
+        style="@style/Font.LogDetailText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="42dp"
+        android:padding="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/vp_image"
+        tools:text="보물찾기\n가주아" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -48,7 +48,7 @@ class HomeActivity : AppCompatActivity() {
         navController.addOnDestinationChangedListener { _, destination, _ ->
             binding.bnvHome.visibility = when (destination.id) {
                 R.id.splashFragment -> View.GONE
-                R.id.logInFragment -> View.GONE
+                R.id.loginFragment -> View.GONE
                 R.id.saveLogFragment -> View.GONE
                 R.id.saveLogMapFragment -> View.GONE
                 R.id.settingFragment -> View.GONE

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:bind="http://schemas.android.com/apk/res-auto">
+    xmlns:bind="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -23,13 +24,12 @@
             android:id="@+id/iv_image"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:padding="4dp"
             android:scaleType="centerCrop"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            bind:imageStorageUrl="@{log.imageUrls.get(0)}" />
+            bind:imageStorageUrl="@{log.imageUrls.size > 0 ? log.imageUrls.get(0) : null}" />
 
         <ImageView
             android:id="@+id/iv_album"
@@ -41,5 +41,24 @@
             android:visibility="invisible"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_text"
+            bind:themedText="@{log.imageUrls.size == 0 ? log : null}"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:ellipsize="end"
+            android:fontFamily="@font/pretendard"
+            android:gravity="center"
+            android:maxLines="3"
+            android:padding="8dp"
+            android:textAlignment="center"
+            android:lineSpacingMultiplier="1.3"
+            android:textSize="@dimen/middle"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="보물찾기\n가주아\n!!" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

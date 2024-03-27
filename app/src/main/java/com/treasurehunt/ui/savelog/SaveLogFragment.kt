@@ -6,9 +6,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RadioButton
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
+import androidx.core.view.children
+import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -26,8 +30,9 @@ import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.util.FusedLocationSource
 import com.treasurehunt.R
-import com.treasurehunt.databinding.FragmentSavelogBinding
+import com.treasurehunt.databinding.FragmentSaveLogBinding
 import com.treasurehunt.ui.model.ImageModel
+import com.treasurehunt.ui.model.TextTheme
 import com.treasurehunt.ui.savelog.adapter.SaveLogAdapter
 import com.treasurehunt.util.showSnackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -48,11 +53,12 @@ internal const val WORK_DATA_PLAN_ID = "planId"
 internal const val WORK_DATA_LOCAL_LOG_ID = "localLogId"
 internal const val WORK_DATA_REMOTE_LOG_ID = "remoteLogId"
 internal const val WORK_DATA_REMOTE_PLACE_ID = "remotePlaceId"
+internal const val WORK_DATA_TEXT_THEME = "textTheme"
 
 @AndroidEntryPoint
 class SaveLogFragment : Fragment(), OnMapReadyCallback {
 
-    private var _binding: FragmentSavelogBinding? = null
+    private var _binding: FragmentSaveLogBinding? = null
     private val binding get() = _binding!!
     private val viewModel: SaveLogViewModel by viewModels()
     private lateinit var map: NaverMap
@@ -71,7 +77,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentSavelogBinding.inflate(inflater, container, false)
+        _binding = FragmentSaveLogBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -80,16 +86,15 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
 
         initViewModel()
         initAdapter()
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            loadLogIfExists()
-            setSaveButton()
-        }
-
+        setCancelButton()
         loadMap()
         setShowMapFullScreen()
         setPickImageButton()
-        setCancelButton()
+        setTextThemeButtonGroup()
+        setRadioGroupTextOnlyThemeWarningMessage()
+        setUiStateTextOnlyThemeWarningMessage()
+        setSaveButton()
+        loadLogIfExists()
     }
 
     override fun onDestroyView() {
@@ -97,73 +102,11 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         _binding = null
     }
 
-    private fun initViewModel() {
-        binding.lifecycleOwner = viewLifecycleOwner
-        binding.viewModel = viewModel
-    }
-
-    private fun initAdapter() {
-        binding.rvPhoto.adapter = SaveLogAdapter { imageModel ->
-            viewModel.removeImage(imageModel)
-        }
-    }
-
-    private suspend fun loadLogIfExists() {
-        args.log?.let { log ->
-            viewModel.getImageStorageUrls(log.remoteImageIds).forEach { imageUrl ->
-                viewModel.addImage(ImageModel(storageUrl = imageUrl))
-            }
-            setTextField(log.text)
-        }
-    }
-
-    private fun setTextField(input: String) {
-        binding.etText.setText(input)
-    }
-
-    private fun loadMap() {
-        val mapFragment = childFragmentManager.findFragmentById(R.id.fcv_map) as MapFragment
-        mapFragment.getMapAsync(this)
-    }
-
-    private fun setShowMapFullScreen() {
-        binding.ibFullScreen.setOnClickListener {
-            findNavController().navigate(R.id.action_saveLogFragment_to_saveLogMapFragment)
-        }
-    }
-
     private fun setLocationTrackingMode(isGranted: Boolean) {
         map.locationTrackingMode = if (isGranted) {
             LocationTrackingMode.Follow
         } else {
             LocationTrackingMode.None
-        }
-    }
-
-    private fun initMap(naverMap: NaverMap) {
-        map = naverMap.apply {
-            locationSource =
-                FusedLocationSource(this@SaveLogFragment, LOCATION_PERMISSION_REQUEST_CODE)
-            uiSettings.isZoomControlEnabled = false
-        }
-    }
-
-    override fun onMapReady(naverMap: NaverMap) {
-        initMap(naverMap)
-        handleLocationAccessPermission()
-    }
-
-    private fun handleLocationAccessPermission() {
-        when (PackageManager.PERMISSION_GRANTED) {
-            ContextCompat.checkSelfPermission(
-                requireContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION
-            ) -> {
-                setLocationTrackingMode(true)
-            }
-
-            else -> {
-                requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_COARSE_LOCATION)
-            }
         }
     }
 
@@ -191,12 +134,67 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    override fun onMapReady(naverMap: NaverMap) {
+        initMap(naverMap)
+        handleLocationAccessPermission()
+    }
+
+    private fun initMap(naverMap: NaverMap) {
+        map = naverMap.apply {
+            locationSource =
+                FusedLocationSource(this@SaveLogFragment, LOCATION_PERMISSION_REQUEST_CODE)
+            uiSettings.isZoomControlEnabled = false
+        }
+    }
+
+    private fun handleLocationAccessPermission() {
+        when (PackageManager.PERMISSION_GRANTED) {
+            ContextCompat.checkSelfPermission(
+                requireContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION
+            ) -> {
+                setLocationTrackingMode(true)
+            }
+
+            else -> {
+                requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_COARSE_LOCATION)
+            }
+        }
+    }
+
     private fun isMaxCountExceeded(count: Int): Boolean {
         return if (viewModel.uiState.value.images.size + count > PICK_IMAGE_MAX_COUNT) {
             binding.root.showSnackbar(R.string.savelog_sb_warning_count)
             true
         } else {
             false
+        }
+    }
+
+    private fun initViewModel() {
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.viewModel = viewModel
+    }
+
+    private fun initAdapter() {
+        binding.rvPhoto.adapter = SaveLogAdapter { imageModel ->
+            viewModel.removeImage(imageModel)
+        }
+    }
+
+    private fun setCancelButton() {
+        binding.ibCancel.setOnClickListener {
+            findNavController().navigateUp()
+        }
+    }
+
+    private fun loadMap() {
+        val mapFragment = childFragmentManager.findFragmentById(R.id.fcv_map) as MapFragment
+        mapFragment.getMapAsync(this)
+    }
+
+    private fun setShowMapFullScreen() {
+        binding.ibFullScreen.setOnClickListener {
+            findNavController().navigate(R.id.action_saveLogFragment_to_saveLogMapFragment)
         }
     }
 
@@ -213,6 +211,55 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
             android.Manifest.permission.READ_EXTERNAL_STORAGE
         }
         requestPermissionLauncher.launch(permissionId)
+    }
+
+    private fun setTextThemeButtonGroup() {
+        binding.rgTheme.children.forEachIndexed { index, radioButton ->
+            (radioButton as RadioButton).set(TextTheme.entries[index])
+        }
+    }
+
+    private fun RadioButton.set(theme: TextTheme) {
+        setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                binding.etText.background = theme.backgroundResId?.let {
+                    AppCompatResources.getDrawable(requireContext(), it)
+                }
+                binding.etText.setTextColor(requireContext().getColor(theme.textColorResId))
+            }
+        }
+    }
+
+    private fun setRadioGroupTextOnlyThemeWarningMessage() {
+        binding.rgTheme.children.forEach {
+            it.setOnClickListener {
+                handleTextOnlyThemeWarning()
+            }
+        }
+    }
+
+    private fun setUiStateTextOnlyThemeWarningMessage() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.uiState.collect {
+                handleTextOnlyThemeWarning()
+            }
+        }
+    }
+
+    private fun handleTextOnlyThemeWarning() {
+        if (!binding.rbDefault.isChecked && !viewModel.uiState.value.isTextThemeEnabled) {
+            resetRadioButtonCheckedState()
+            showWarningMessage()
+        }
+    }
+
+    private fun resetRadioButtonCheckedState() {
+        binding.rgTheme.clearCheck()
+        binding.rbDefault.isChecked = true
+    }
+
+    private fun showWarningMessage() {
+        binding.root.showSnackbar(R.string.savelog_text_theme_not_allowed_message)
     }
 
     private fun setSaveButton() {
@@ -308,6 +355,9 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
         val uid = Firebase.auth.currentUser!!.uid
         val (lat, lng, isPlan, caption, planId) = args.mapSymbol
         val logText = binding.etText.text.toString()
+        val textTheme = binding.rgTheme.run {
+            indexOfChild(findViewById<RadioButton>(checkedRadioButtonId))
+        }
 
         return Data.Builder()
             .putString(WORK_DATA_UID, uid)
@@ -317,6 +367,7 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
             .putString(WORK_DATA_CAPTION, caption)
             .putBoolean(WORK_DATA_IS_PLAN, isPlan)
             .putString(WORK_DATA_PLAN_ID, planId)
+            .putInt(WORK_DATA_TEXT_THEME, textTheme)
             .apply {
                 args.log?.let { log ->
                     requireNotNull(log.localId)
@@ -330,9 +381,28 @@ class SaveLogFragment : Fragment(), OnMapReadyCallback {
             .build()
     }
 
-    private fun setCancelButton() {
-        binding.ibCancel.setOnClickListener {
-            findNavController().navigateUp()
+    private fun loadLogIfExists() {
+        args.log?.let { log ->
+            viewModel.setSaveButtonState(false)
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewModel.getImageStorageUrls(log.remoteImageIds).forEach { imageUrl ->
+                    viewModel.addImage(ImageModel(storageUrl = imageUrl))
+                }
+                setTextField(log.text)
+                setTextTheme(log.theme)
+                viewModel.setSaveButtonState(true)
+            }
         }
+    }
+
+    private fun setTextField(input: String) {
+        binding.etText.setText(input)
+    }
+
+    private fun setTextTheme(theme: Int) {
+        if (theme == 0) return
+
+        binding.rbDefault.isChecked = false
+        (binding.rgTheme[theme] as RadioButton).isChecked = true
     }
 }

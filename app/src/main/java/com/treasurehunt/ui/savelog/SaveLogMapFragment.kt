@@ -15,13 +15,13 @@ import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.util.FusedLocationSource
 import com.treasurehunt.R
-import com.treasurehunt.databinding.FragmentSavelogMapBinding
+import com.treasurehunt.databinding.FragmentSaveLogMapBinding
 
 private const val LOCATION_PERMISSION_REQUEST_CODE = 1002
 
 class SaveLogMapFragment : Fragment(), OnMapReadyCallback {
 
-    private var _binding: FragmentSavelogMapBinding? = null
+    private var _binding: FragmentSaveLogMapBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var map: NaverMap
@@ -37,7 +37,7 @@ class SaveLogMapFragment : Fragment(), OnMapReadyCallback {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentSavelogMapBinding.inflate(inflater, container, false)
+        _binding = FragmentSaveLogMapBinding.inflate(inflater, container, false)
         return binding.root
     }
 
