@@ -86,12 +86,15 @@ class HomeViewModel @Inject constructor(
 
     suspend fun getRemoteUser(uid: String): UserDTO = userRepo.getRemoteUserById(uid)
 
-    suspend fun getUserProfileImageStorageRef(uid: String): StorageReference? =
-        Firebase.storage.reference.child(uid).child(STORAGE_LOCATION_PROFILE_IMAGE)
+    suspend fun getUserProfileImageStorageRef(): StorageReference? {
+        val uid = uiState.value.uid ?: return null
+
+        return Firebase.storage.reference.child(uid).child(STORAGE_LOCATION_PROFILE_IMAGE)
             .list(1)
             .await()
             .items
             .singleOrNull()
+    }
 
     suspend fun updateUser(uid: String, user: UserDTO) {
         userRepo.update(uid, user)

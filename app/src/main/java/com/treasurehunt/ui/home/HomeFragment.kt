@@ -148,14 +148,12 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         locationOverlay.isVisible = true
         locationOverlay.anchor = PointF(0.5f, 1f)
 
-        setLocationOverlayIcon(Firebase.auth.currentUser?.uid, locationOverlay)
+        setLocationOverlayIcon(locationOverlay)
     }
 
-    private fun setLocationOverlayIcon(uid: String?, locationOverlay: LocationOverlay) {
-        if (uid == null) return
-
+    private fun setLocationOverlayIcon(locationOverlay: LocationOverlay) {
         viewLifecycleOwner.lifecycleScope.launch {
-            val storageRef = viewModel.getUserProfileImageStorageRef(uid)
+            val storageRef = viewModel.getUserProfileImageStorageRef()
             val defaultAction = {
                 locationOverlay.icon = OverlayImage.fromResource(R.drawable.ic_launcher_foreground)
             }
@@ -284,8 +282,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
     private fun setSymbolClick() {
         map.setOnSymbolClickListener { symbol ->
-            Firebase.auth.signOut()
-            if (!viewModel.uiState.value.isOnline || viewModel.uiState.value.uid.isNullOrEmpty()) {
+            if (!viewModel.uiState.value.isOnline) {
                 return@setOnSymbolClickListener false
             }
 
@@ -319,8 +316,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { uiState ->
-                    if (uiState.uid == null) return@collect
-
                     uiState.visitMarkers.forEach { marker ->
                         marker.show()
                         marker.setVisitClick()
@@ -365,7 +360,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         val remotePlaceId = tag.toString()
 
         setOnClickListener {
-            if (!viewModel.uiState.value.isOnline || viewModel.uiState.value.uid.isNullOrEmpty()) {
+            if (!viewModel.uiState.value.isOnline) {
                 return@setOnClickListener false
             }
 
