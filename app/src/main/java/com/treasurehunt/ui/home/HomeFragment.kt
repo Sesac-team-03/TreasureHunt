@@ -46,6 +46,7 @@ import com.treasurehunt.databinding.ViewInfoWindowSelectedSearchResultBinding
 import com.treasurehunt.ui.model.MapPlaceModel
 import com.treasurehunt.ui.model.MapSymbol
 import com.treasurehunt.util.MAP_PLACE_CATEGORY_SEPARATOR
+import com.treasurehunt.util.directToLoginScreenOnNullUid
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -80,6 +81,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         super.onViewCreated(view, savedInstanceState)
         initSegmentedButton()
         loadMap()
+        directToLoginScreenOnNullUid(viewModel.uiState)
     }
 
     override fun onDestroyView() {
@@ -282,6 +284,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
     private fun setSymbolClick() {
         map.setOnSymbolClickListener { symbol ->
+            Firebase.auth.signOut()
             if (!viewModel.uiState.value.isOnline || viewModel.uiState.value.uid.isNullOrEmpty()) {
                 return@setOnSymbolClickListener false
             }
