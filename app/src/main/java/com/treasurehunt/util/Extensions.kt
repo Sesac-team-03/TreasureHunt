@@ -1,7 +1,11 @@
 package com.treasurehunt.util
 
 import android.view.View
+import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.Firebase
+import com.google.firebase.storage.storage
 import kotlinx.serialization.json.Json
 import java.math.RoundingMode
 import java.text.DecimalFormat
@@ -55,4 +59,13 @@ fun Double.roundOff(decimalPlaceCount: Int = 2): Double {
     return DecimalFormat("$DECIMAL_PLACEHOLDER.${DECIMAL_PLACEHOLDER.repeat(decimalPlaceCount)}").apply {
         roundingMode = RoundingMode.CEILING
     }.format(this).toDouble()
+}
+/* ----------- Fragment ----------- */
+
+fun Fragment.preloadProfileImage(storageUrl: String?) {
+    if (storageUrl == null) return
+
+    Glide.with(requireContext())
+        .load(Firebase.storage.getReferenceFromUrl(storageUrl))
+        .preload()
 }
