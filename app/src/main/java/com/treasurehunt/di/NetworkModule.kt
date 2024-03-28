@@ -6,6 +6,8 @@ import com.treasurehunt.data.remote.ImageService
 import com.treasurehunt.data.remote.LogService
 import com.treasurehunt.data.remote.PlaceService
 import com.treasurehunt.data.remote.UserService
+import com.treasurehunt.util.AuthStateRepository
+import com.treasurehunt.util.AuthStateRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -75,4 +77,8 @@ object NetworkModule {
         @Named(CLIENT_QUALIFIER_REMOTE_DATABASE) remoteBuilder: Retrofit
     ): ImageService =
         remoteBuilder.create(ImageService::class.java)
+
+    @Singleton
+    @Provides
+    fun provideAuthStateRepository(): AuthStateRepository = AuthStateRepositoryImpl()
 }

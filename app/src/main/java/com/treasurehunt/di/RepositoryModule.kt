@@ -4,12 +4,12 @@ import com.treasurehunt.data.ImageRepository
 import com.treasurehunt.data.ImageRepositoryImpl
 import com.treasurehunt.data.LogRepository
 import com.treasurehunt.data.LogRepositoryImpl
-import com.treasurehunt.data.UserPreferencesRepository
-import com.treasurehunt.data.UserPreferencesRepositoryImpl
 import com.treasurehunt.data.MapPlaceSearchRepository
 import com.treasurehunt.data.MapPlaceSearchRepositoryImpl
 import com.treasurehunt.data.PlaceRepository
 import com.treasurehunt.data.PlaceRepositoryImpl
+import com.treasurehunt.data.UserPreferencesRepository
+import com.treasurehunt.data.UserPreferencesRepositoryImpl
 import com.treasurehunt.data.UserRepository
 import com.treasurehunt.data.UserRepositoryImpl
 import dagger.Binds
