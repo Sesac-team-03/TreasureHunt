@@ -25,8 +25,6 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageReference
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraUpdate
@@ -47,6 +45,8 @@ import com.treasurehunt.ui.model.MapPlaceModel
 import com.treasurehunt.ui.model.MapSymbol
 import com.treasurehunt.util.MAP_PLACE_CATEGORY_SEPARATOR
 import com.treasurehunt.util.directToLoginScreenOnNullUid
+import com.treasurehunt.util.restrictOnLostConnectivity
+import com.treasurehunt.util.showDisconnectedWarningMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -82,6 +82,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         initSegmentedButton()
         loadMap()
         directToLoginScreenOnNullUid(viewModel.uiState)
+        showDisconnectedWarningMessage(viewModel.uiState, binding.root)
     }
 
     override fun onDestroyView() {
@@ -119,6 +120,10 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         setSearchBar()
         setSymbolClick()
         showMarkers()
+        restrictOnLostConnectivity(viewModel.uiState) {
+            disableSymbolClick()
+            disablePlanClick()
+        }
     }
 
     private fun initMap(naverMap: NaverMap) {
@@ -282,10 +287,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
     private fun setSymbolClick() {
         map.setOnSymbolClickListener { symbol ->
-            if (!viewModel.uiState.value.isOnline) {
-                return@setOnSymbolClickListener false
-            }
-
             removeSearchResultPinIfExists()
 
             showMapDialog(symbol)
@@ -360,10 +361,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         val remotePlaceId = tag.toString()
 
         setOnClickListener {
-            if (!viewModel.uiState.value.isOnline) {
-                return@setOnClickListener false
-            }
-
             viewLifecycleOwner.lifecycleScope.launch {
                 val plan = viewModel.getRemotePlaceById(remotePlaceId)
                 val mapSymbol = MapSymbol(
@@ -377,6 +374,16 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                 findNavController().navigate(action)
             }
             true
+        }
+    }
+
+    private fun disableSymbolClick() {
+        map.onSymbolClickListener = null
+    }
+
+    private fun disablePlanClick() {
+        viewModel.uiState.value.planMarkers.forEach {
+            it.onClickListener = null
         }
     }
 }

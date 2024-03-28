@@ -1,6 +1,8 @@
 package com.treasurehunt.util
 
+import android.view.Gravity
 import android.view.View
+import android.view.View.TEXT_ALIGNMENT_CENTER
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
@@ -17,6 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -118,12 +121,12 @@ fun <T : BaseUiState> ViewModel.updateNetworkConnectivity(
 fun <T : BaseUiState> StateFlow<T>.filterSuccessiveStateChange(): Flow<T> =
     debounce(1500)
 
-fun <T : BaseUiState> StateFlow<T>.filterUidUnrelatedStateChange(): Flow<T> =
+fun <T : BaseUiState> Flow<T>.filterUidUnrelatedStateChange(): Flow<T> =
     distinctUntilChangedBy {
         it.uid
     }
 
-fun <T : BaseUiState> StateFlow<T>.filterConnectivityUnrelatedStateChange(): Flow<T> =
+fun <T : BaseUiState> Flow<T>.filterConnectivityUnrelatedStateChange(): Flow<T> =
     distinctUntilChangedBy {
         it.isOnline
     }
@@ -140,10 +143,42 @@ fun Fragment.preloadProfileImage(storageUrl: String?) {
 
 fun <T : BaseUiState> Fragment.directToLoginScreenOnNullUid(uiState: StateFlow<T>) {
     viewLifecycleOwner.lifecycleScope.launch {
-        uiState.filterSuccessiveStateChange().collect { uiState ->
-            if (uiState.uid == null) {
-                findNavController().navigate(R.id.action_global_to_loginFragment)
+        uiState.filterSuccessiveStateChange()
+            .filterUidUnrelatedStateChange()
+            .collect { uiState ->
+                if (uiState.uid == null) {
+                    findNavController().navigate(R.id.action_global_to_loginFragment)
+                }
             }
-        }
-    }    
+    }
+}
+
+fun <T : BaseUiState> Fragment.showDisconnectedWarningMessage(
+    uiState: StateFlow<T>,
+    rootView: View
+) {
+    viewLifecycleOwner.lifecycleScope.launch {
+        uiState.filterSuccessiveStateChange()
+            .filterConnectivityUnrelatedStateChange()
+            .collect { uiState ->
+                if (!uiState.isOnline) {
+                    rootView.showSnackbar(R.string.disconnected_warning_message)
+                }
+            }
+    }
+}
+
+fun <T : BaseUiState> Fragment.restrictOnLostConnectivity(
+    uiState: StateFlow<T>,
+    block: () -> Unit
+) {
+    viewLifecycleOwner.lifecycleScope.launch {
+        uiState.filterSuccessiveStateChange()
+            .filterConnectivityUnrelatedStateChange()
+            .collect { uiState ->
+                if (!uiState.isOnline) {
+                    block()
+                }
+            }
+    }
 }
