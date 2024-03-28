@@ -2,7 +2,6 @@ package com.treasurehunt.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
@@ -10,15 +9,17 @@ import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
 import com.treasurehunt.R
-import com.treasurehunt.data.LogRepository
 import com.treasurehunt.data.PlaceRepository
 import com.treasurehunt.data.UserRepository
 import com.treasurehunt.data.local.model.PlaceEntity
 import com.treasurehunt.data.remote.model.PlaceDTO
 import com.treasurehunt.data.remote.model.UserDTO
-import com.treasurehunt.ui.model.HomeMapUiState
+import com.treasurehunt.ui.model.HomeUiState
+import com.treasurehunt.util.AuthStateRepository
 import com.treasurehunt.util.ConnectivityRepository
 import com.treasurehunt.util.STORAGE_LOCATION_PROFILE_IMAGE
+import com.treasurehunt.util.updateNetworkConnectivity
+import com.treasurehunt.util.updateUid
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -43,21 +44,21 @@ private const val PLAN_MARKER_HEIGHT = 80
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val logRepo: LogRepository,
     private val placeRepo: PlaceRepository,
     private val userRepo: UserRepository,
+    private val authStateRepo: AuthStateRepository,
     private val connectivityRepo: ConnectivityRepository
 ) :
     ViewModel() {
 
-    private val _uiState: MutableStateFlow<HomeMapUiState> = MutableStateFlow(HomeMapUiState())
-    val uiState: StateFlow<HomeMapUiState> = _uiState.asStateFlow()
+    private val _uiState: MutableStateFlow<HomeUiState> = MutableStateFlow(HomeUiState())
+    val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
     private var fetchJob: Job? = null
     private val _searchResultPins: MutableList<Marker> = mutableListOf()
     val searchResultPins: List<Marker> get() = _searchResultPins.toList()
 
     init {
-        initUser()
+        updateUid()
         updateNetworkConnectivity()
         getAllMarkers()
     }
@@ -67,32 +68,33 @@ class HomeViewModel @Inject constructor(
         super.onCleared()
     }
 
-    private fun initUser() {
-        val uid = Firebase.auth.currentUser?.uid
-
-        _uiState.update {
-            it.copy(uid = uid)
+    private fun updateUid() {
+        updateUid(authStateRepo, _uiState) { uid ->
+            copy(
+                uid = uid
+            )
         }
     }
 
     private fun updateNetworkConnectivity() {
-        viewModelScope.launch {
-            connectivityRepo.isConnected.collect { value ->
-                _uiState.update {
-                    it.copy(isOnline = value)
-                }
-            }
+        updateNetworkConnectivity(connectivityRepo, _uiState) { value ->
+            this.copy(
+                isOnline = value
+            )
         }
     }
 
     suspend fun getRemoteUser(uid: String): UserDTO = userRepo.getRemoteUserById(uid)
 
-    suspend fun getUserProfileImageStorageRef(uid: String): StorageReference? =
-        Firebase.storage.reference.child(uid).child(STORAGE_LOCATION_PROFILE_IMAGE)
+    suspend fun getUserProfileImageStorageRef(): StorageReference? {
+        val uid = uiState.value.uid ?: return null
+
+        return Firebase.storage.reference.child(uid).child(STORAGE_LOCATION_PROFILE_IMAGE)
             .list(1)
             .await()
             .items
             .singleOrNull()
+    }
 
     suspend fun updateUser(uid: String, user: UserDTO) {
         userRepo.update(uid, user)

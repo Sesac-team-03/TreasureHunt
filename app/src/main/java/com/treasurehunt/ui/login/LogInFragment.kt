@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -20,6 +21,7 @@ import com.treasurehunt.BuildConfig
 import com.treasurehunt.R
 import com.treasurehunt.databinding.FragmentLoginBinding
 import com.treasurehunt.ui.model.NaverUser
+import com.treasurehunt.util.preloadProfileImage
 import com.treasurehunt.util.showSnackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -29,11 +31,11 @@ private const val NAVER_LOGIN_CLIENT_SECRET = BuildConfig.NAVER_LOGIN_CLIENT_SEC
 private const val APP_NAME = BuildConfig.APP_NAME
 
 @AndroidEntryPoint
-class LogInFragment : PreloadFragment() {
+class LogInFragment : Fragment() {
 
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
-    override val viewModel: LoginViewModel by viewModels()
+    private val viewModel: LoginViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -116,7 +118,7 @@ class LogInFragment : PreloadFragment() {
                 if (task.isSuccessful) {
                     launchIfUserExistsElseShowErrorMessage(LoginError.NAVER_LOGIN_FAIL) { currentUser ->
                         viewModel.initLocalData(currentUser.uid)
-                        preloadProfileImage(currentUser)
+                        preloadProfileImage(viewModel.getProfileImageStorageUrl(currentUser.uid))
                         findNavController().navigate(R.id.action_logInFragment_to_homeFragment)
                     }
                 } else {
@@ -136,7 +138,7 @@ class LogInFragment : PreloadFragment() {
                 if (task.isSuccessful) {
                     launchIfUserExistsElseShowErrorMessage(LoginError.NAVER_LOGIN_FAIL) { currentUser ->
                         viewModel.insertNaverUser(naverUser, currentUser)
-                        preloadProfileImage(currentUser)
+                        preloadProfileImage(viewModel.getProfileImageStorageUrl(currentUser.uid))
                         findNavController().navigate(R.id.action_logInFragment_to_homeFragment)
                     }
                 } else {
